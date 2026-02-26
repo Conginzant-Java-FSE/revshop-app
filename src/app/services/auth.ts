@@ -18,4 +18,40 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register/seller`, sellerData);
   }
 
+  // ==== Authentication Helper Methods ====
+
+  /**
+   * Saves authentication data to localStorage
+   */
+  saveAuthData(token: string, role: string, userId: string, name: string): void {
+    localStorage.setItem('token', token);
+    localStorage.setItem('role', role);
+    localStorage.setItem('userId', userId);
+    localStorage.setItem('name', name);
+  }
+
+  /**
+   * Clears authentication data from localStorage
+   */
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('name');
+  }
+
+  /**
+   * Returns whether a user is currently logged in (token exists)
+   */
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  /**
+   * Returns the current user's role
+   */
+  getUserRole(): string | null {
+    return localStorage.getItem('role');
+  }
+
 }

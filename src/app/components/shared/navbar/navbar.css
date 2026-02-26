@@ -1,0 +1,59 @@
+.custom-navbar {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.branding-text {
+    letter-spacing: -0.5px;
+}
+
+.search-form {
+    max-width: 400px;
+    width: 100%;
+}
+
+.search-input {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    background-color: white;
+    color: #333;
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.25);
+    border-color: #ffc107;
+}
+
+.search-btn {
+    border: none;
+    background: transparent;
+}
+
+.search-input:focus+.search-btn i {
+    color: #ffc107 !important;
+}
+
+.nav-link {
+    transition: color 0.2s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #ffc107 !important;
+}
+
+.nav-link i {
+    transition: transform 0.2s ease;
+}
+
+.nav-link:hover i {
+    transform: scale(1.1);
+}
+
+.cart-badge {
+    font-size: 0.65rem;
+    padding: 0.25em 0.5em;
+}

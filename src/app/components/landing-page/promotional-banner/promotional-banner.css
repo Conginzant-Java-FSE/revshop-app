@@ -1,0 +1,58 @@
+.promotional-banner {
+    background: linear-gradient(135deg, #1a1c29 0%, #2a2d43 100%);
+    min-height: 80vh;
+    padding-top: 2rem;
+}
+
+.banner-overlay {
+    background: radial-gradient(circle at top right, rgba(255, 193, 7, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.ls-tight {
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+}
+
+.tracking-wide {
+    letter-spacing: 2px;
+}
+
+.btn-hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.z-index-1 {
+    z-index: 1;
+}
+
+@media (max-width: 991.98px) {
+    .promotional-banner {
+        min-height: 60vh;
+        text-align: center;
+    }
+
+    .promotional-banner .d-flex.flex-wrap {
+        justify-content: center;
+    }
+
+    .promotional-banner .mt-5.d-flex {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .promotional-banner p.lead {
+        padding-right: 0 !important;
+    }
+}

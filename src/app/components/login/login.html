@@ -1,0 +1,76 @@
+<div class="login-page min-vh-100 d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-header bg-primary text-white p-4 text-center border-0">
+                        <h3 class="mb-0 fw-bold">Welcome Back</h3>
+                        <p class="mb-0 text-white-50 small">Log in to RevShop</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <div *ngIf="errorMessage" class="alert alert-danger rounded-3" role="alert">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i> {{ errorMessage }}
+                        </div>
+
+                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                            <!-- Role Selection Toggle -->
+                            <div class="mb-4 text-center">
+                                <div class="btn-group w-100" role="group" aria-label="Account Type">
+                                    <input type="radio" class="btn-check" formControlName="role" id="roleBuyer"
+                                        value="BUYER" autocomplete="off">
+                                    <label class="btn btn-outline-primary fw-bold" for="roleBuyer">
+                                        <i class="fa-solid fa-cart-shopping mb-1 d-block"></i> Buyer
+                                    </label>
+
+                                    <input type="radio" class="btn-check" formControlName="role" id="roleSeller"
+                                        value="SELLER" autocomplete="off">
+                                    <label class="btn btn-outline-primary fw-bold" for="roleSeller">
+                                        <i class="fa-solid fa-store mb-1 d-block"></i> Seller
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Email Field -->
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" formControlName="email"
+                                            placeholder="name@example.com"
+                                            [ngClass]="{'is-invalid': submitted && loginForm.get('email')?.errors}">
+                                        <label for="email">Email address</label>
+                                        <div class="invalid-feedback">A valid email is required</div>
+                                    </div>
+                                </div>
+
+                                <!-- Password Field -->
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="password"
+                                            formControlName="password" placeholder="Password"
+                                            [ngClass]="{'is-invalid': submitted && loginForm.get('password')?.errors}">
+                                        <label for="password">Password</label>
+                                        <div class="invalid-feedback">Password is required</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
+                                        Login
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="card-footer bg-light p-4 text-center border-0">
+                        <p class="mb-0 text-muted">Don't have an account? <a href="/register"
+                                class="text-primary fw-bold text-decoration-none">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

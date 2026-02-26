@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top py-3 custom-navbar">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <i class="fa-solid fa-store fs-3 text-warning me-2"></i>
+            <span class="fw-bold fs-4 branding-text">Rev<span class="text-warning">Shop</span></span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCore"
+            aria-controls="navbarCore" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCore">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+            </ul>
+            <form class="d-flex mx-auto search-form position-relative" role="search">
+                <input class="form-control rounded-pill pe-5 search-input" type="search"
+                    placeholder="Search for products..." aria-label="Search">
+                <button class="btn search-btn position-absolute end-0 top-50 translate-middle-y rounded-circle"
+                    type="submit">
+                    <i class="fa-solid fa-search text-muted"></i>
+                </button>
+            </form>
+            <ul
+                class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
+                <li class="nav-item me-lg-3">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative" href="#">
+                        <i class="fa-solid fa-user fs-5 mb-1"></i>
+                        <span class="small d-none d-lg-block">Account</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning" href="#">
+                        <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
+                            3
+                        </span>
+                        <span class="small d-none d-lg-block text-white">Cart</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

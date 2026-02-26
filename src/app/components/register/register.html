@@ -1,0 +1,196 @@
+<div class="register-page min-vh-100 d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-header bg-primary text-white p-4 text-center border-0">
+                        <h3 class="mb-0 fw-bold">Join RevShop</h3>
+                        <p class="mb-0 text-white-50 small">Create your account today</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+
+                        <div *ngIf="errorMessage" class="alert alert-danger rounded-3" role="alert">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i> {{ errorMessage }}
+                        </div>
+
+                        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+                            <!-- Role Selection Toggle -->
+                            <div class="mb-4 text-center">
+                                <div class="btn-group w-100" role="group" aria-label="Account Type">
+                                    <input type="radio" class="btn-check" formControlName="role" id="roleBuyer"
+                                        value="BUYER" autocomplete="off">
+                                    <label class="btn btn-outline-primary fw-bold" for="roleBuyer">
+                                        <i class="fa-solid fa-cart-shopping mb-1 d-block"></i> Buyer
+                                    </label>
+
+                                    <input type="radio" class="btn-check" formControlName="role" id="roleSeller"
+                                        value="SELLER" autocomplete="off">
+                                    <label class="btn btn-outline-primary fw-bold" for="roleSeller">
+                                        <i class="fa-solid fa-store mb-1 d-block"></i> Seller
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Name Field -->
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="name" formControlName="name"
+                                            placeholder="John Doe"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('name')?.errors}">
+                                        <label for="name">Full Name</label>
+                                        <div class="invalid-feedback">Name is required</div>
+                                    </div>
+                                </div>
+
+                                <!-- Email Field -->
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" formControlName="email"
+                                            placeholder="name@example.com"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('email')?.errors}">
+                                        <label for="email">Email address</label>
+                                        <div class="invalid-feedback"
+                                            *ngIf="registerForm.get('email')?.hasError('required')">Email is required
+                                        </div>
+                                        <div class="invalid-feedback"
+                                            *ngIf="registerForm.get('email')?.hasError('email')">Invalid email format
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Password Field -->
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="password"
+                                            formControlName="password" placeholder="Password"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('password')?.errors}">
+                                        <label for="password">Password</label>
+                                        <div class="invalid-feedback"
+                                            *ngIf="registerForm.get('password')?.hasError('required')">Password is
+                                            required</div>
+                                        <div class="invalid-feedback"
+                                            *ngIf="registerForm.get('password')?.hasError('minlength')">Minimum 6
+                                            characters</div>
+                                    </div>
+                                </div>
+
+                                <!-- Phone Field -->
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-floating">
+                                        <input type="tel" class="form-control" id="phone" formControlName="phone"
+                                            placeholder="1234567890"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('phone')?.errors}">
+                                        <label for="phone">Phone Number</label>
+                                        <div class="invalid-feedback">Phone number is required</div>
+                                    </div>
+                                </div>
+
+                                <!-- Age Field -->
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="age" formControlName="age"
+                                            placeholder="25"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('age')?.errors}">
+                                        <label for="age">Age</label>
+                                        <div class="invalid-feedback"
+                                            *ngIf="registerForm.get('age')?.hasError('required')">Age is required</div>
+                                        <div class="invalid-feedback" *ngIf="registerForm.get('age')?.hasError('min')">
+                                            Must be at least 18</div>
+                                    </div>
+                                </div>
+
+                                <!-- Security Question -->
+                                <div class="col-12 mt-4">
+                                    <h6 class="text-muted mb-3"><i class="fa-solid fa-lock me-2"></i>Security Recovery
+                                    </h6>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="securityQuestion"
+                                            formControlName="securityQuestion"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('securityQuestion')?.errors}">
+                                            <option value="" disabled selected>Select a question</option>
+                                            <option value="What is your pet's name?">What is your pet's name?</option>
+                                            <option value="In what city were you born?">In what city were you born?
+                                            </option>
+                                            <option value="What is your mother's maiden name?">What is your mother's
+                                                maiden name?</option>
+                                            <option value="What high school did you attend?">What high school did you
+                                                attend?</option>
+                                        </select>
+                                        <label for="securityQuestion">Security Question</label>
+                                        <div class="invalid-feedback">Please select a security question</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="securityAnswer"
+                                            formControlName="securityAnswer" placeholder="Answer"
+                                            [ngClass]="{'is-invalid': submitted && registerForm.get('securityAnswer')?.errors}">
+                                        <label for="securityAnswer">Security Answer</label>
+                                        <div class="invalid-feedback">Security answer is required</div>
+                                    </div>
+                                </div>
+
+                                <!-- SELLER SPECIFIC FIELDS -->
+                                <ng-container *ngIf="isSeller">
+                                    <div class="col-12 mt-4">
+                                        <h6 class="text-muted mb-3"><i class="fa-solid fa-briefcase me-2"></i>Business
+                                            Details</h6>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="businessName"
+                                                formControlName="businessName" placeholder="Business Name"
+                                                [ngClass]="{'is-invalid': submitted && registerForm.get('businessName')?.errors}">
+                                            <label for="businessName">Business Name</label>
+                                            <div class="invalid-feedback">Business name is required</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="taxId" formControlName="taxId"
+                                                placeholder="Tax ID"
+                                                [ngClass]="{'is-invalid': submitted && registerForm.get('taxId')?.errors}">
+                                            <label for="taxId">Tax ID</label>
+                                            <div class="invalid-feedback">Tax ID is required</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" id="businessDescription"
+                                                formControlName="businessDescription" placeholder="Description"
+                                                style="height: 100px"
+                                                [ngClass]="{'is-invalid': submitted && registerForm.get('businessDescription')?.errors}"></textarea>
+                                            <label for="businessDescription">Business Description</label>
+                                            <div class="invalid-feedback">Business description is required</div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
+                                        Register as {{ isSeller ? 'Seller' : 'Buyer' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="card-footer bg-light p-4 text-center border-0">
+                        <p class="mb-0 text-muted">Already have an account? <a href="/login"
+                                class="text-primary fw-bold text-decoration-none">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

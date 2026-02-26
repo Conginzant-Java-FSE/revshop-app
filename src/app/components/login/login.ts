@@ -44,21 +44,23 @@ export class LoginComponent implements OnInit {
     if (role === 'SELLER') {
       this.authService.loginSeller(credentials).subscribe({
         next: (res) => {
-          this.authService.saveAuthData(res.token, res.role, res.userId, res.name);
+          const data = res.data || res;
+          this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          this.errorMessage = err.error || 'Login failed Check your credentials.';
+          this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';
         }
       });
     } else {
       this.authService.loginBuyer(credentials).subscribe({
         next: (res) => {
-          this.authService.saveAuthData(res.token, res.role, res.userId, res.name);
+          const data = res.data || res;
+          this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          this.errorMessage = err.error || 'Login failed. Check your credentials.';
+          this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';
         }
       });
     }

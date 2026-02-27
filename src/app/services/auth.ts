@@ -18,6 +18,14 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register/seller`, sellerData);
   }
 
+  loginBuyer(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login/buyer`, credentials);
+  }
+
+  loginSeller(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login/seller`, credentials);
+  }
+
   // ==== Authentication Helper Methods ====
 
   /**

@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SearchBarComponent } from '../../search-bar/search-bar';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SearchBarComponent],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  styleUrls: ['./navbar.css'],
 })
 export class Navbar {
 
+  
 }

@@ -20,9 +20,7 @@ export class CartService {
 
     // ==== Cart State Management ====
 
-    /**
-     * Add a product to the cart. If it already exists, increment the quantity.
-     */
+
     addToCart(product: { productId: number; productName: string; imageUrl: string; price: number }): void {
         const existingItem = this.cartItems.find(item => item.productId === product.productId);
 
@@ -44,18 +42,13 @@ export class CartService {
         this.updateCart();
     }
 
-    /**
-     * Remove an item from the cart entirely by productId.
-     */
+
     removeFromCart(productId: number): void {
         this.cartItems = this.cartItems.filter(item => item.productId !== productId);
         this.updateCart();
     }
 
-    /**
-     * Update the quantity of a specific cart item.
-     * If quantity drops to 0 or below, the item is removed.
-     */
+
     updateQuantity(productId: number, quantity: number): void {
         if (quantity <= 0) {
             this.removeFromCart(productId);
@@ -70,30 +63,21 @@ export class CartService {
         }
     }
 
-    /**
-     * Returns the current list of cart items.
-     */
+
     getCartItems(): CartItem[] {
         return this.cartItems;
     }
 
-    /**
-     * Returns the grand total of all items in the cart.
-     */
+
     getGrandTotal(): number {
         return this.cartItems.reduce((total, item) => total + item.subtotal, 0);
     }
 
-    /**
-     * Returns the total number of items in the cart.
-     */
     getTotalItems(): number {
         return this.cartItems.reduce((count, item) => count + item.quantity, 0);
     }
 
-    /**
-     * Clears the entire cart.
-     */
+
     clearCart(): void {
         this.cartItems = [];
         this.updateCart();
@@ -101,18 +85,12 @@ export class CartService {
 
     // ==== Backend Integration ====
 
-    /**
-     * Place an order by sending cart data to the backend.
-     */
     placeOrder(orderPayload: any): Observable<any> {
         return this.http.post(this.apiUrl, orderPayload);
     }
 
     // ==== Private Helpers ====
 
-    /**
-     * Emits the updated cart items and count to all subscribers.
-     */
     private updateCart(): void {
         this.cartItemsSubject.next([...this.cartItems]);
         this.cartCountSubject.next(this.getTotalItems());

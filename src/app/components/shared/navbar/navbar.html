@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top py-3 custom-navbar">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="/">
+        <a class="navbar-brand d-flex align-items-center" routerLink="/">
             <i class="fa-solid fa-store fs-3 text-warning me-2"></i>
             <span class="fw-bold fs-4 branding-text">Rev<span class="text-warning">Shop</span></span>
         </a>
@@ -10,28 +10,89 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCore">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                <li class="nav-item"><a class="nav-link active" routerLink="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/products">Products</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/about">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/contact">Contact</a></li>
             </ul>
             <app-search-bar class="mx-auto"></app-search-bar>
             <ul
                 class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
+
+                <!-- Notification Bell -->
+                <li class="nav-item dropdown me-lg-3">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative" href="#"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationDropdown">
+                        <i class="fa-solid fa-bell fs-5 mb-1"></i>
+                        <span *ngIf="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                            {{ unreadCount }}
+                        </span>
+                        <span class="small d-none d-lg-block">Alerts</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                        <li class="dropdown-header d-flex justify-content-between align-items-center px-3">
+                            <strong>Notifications</strong>
+                            <span *ngIf="notifications.length > 0" class="text-primary small mark-all-btn"
+                                (click)="markAllAsRead()">Mark all read</span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <ng-container *ngIf="notifications.length > 0; else noNotifications">
+                            <li *ngFor="let notification of notifications" class="notification-item"
+                                [class.unread]="!notification.read" (click)="markAsRead(notification.id)">
+                                <a class="dropdown-item py-2 px-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fa-solid fa-circle-info text-primary me-2 mt-1 notification-icon"></i>
+                                        <div>
+                                            <p class="mb-0 small">{{ notification.message }}</p>
+                                            <small class="text-muted">{{ notification.timestamp | date:'short' }}</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ng-container>
+                        <ng-template #noNotifications>
+                            <li class="text-center py-3 text-muted small">No notifications</li>
+                        </ng-template>
+                        <li *ngIf="notifications.length > 0"><hr class="dropdown-divider"></li>
+                        <li *ngIf="notifications.length > 0" class="text-center py-2">
+                            <span class="text-danger small clear-all-btn" (click)="clearNotifications()">Clear All</span>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Account / Login -->
                 <li class="nav-item me-lg-3">
                     <a class="nav-link d-flex flex-column align-items-center position-relative" href="#">
                         <i class="fa-solid fa-user fs-5 mb-1"></i>
-                        <span class="small d-none d-lg-block">Account</span>
+                        <span class="small d-none d-lg-block">{{ userName || 'Account' }}</span>
+                    </a>
+                    <a *ngIf="!isLoggedIn" class="nav-link d-flex flex-column align-items-center position-relative"
+                        routerLink="/login">
+                        <i class="fa-solid fa-right-to-bracket fs-5 mb-1"></i>
+                        <span class="small d-none d-lg-block">Login</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning" href="#">
+
+                <!-- Cart -->
+                <li class="nav-item me-lg-3">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
+                        routerLink="/cart">
                         <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
-                        <span
+                        <span *ngIf="cartCount > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
-                            3
+                            {{ cartCount }}
                         </span>
                         <span class="small d-none d-lg-block text-white">Cart</span>
+                    </a>
+                </li>
+
+                <!-- Logout (visible only when logged in) -->
+                <li *ngIf="isLoggedIn" class="nav-item">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative" href="#"
+                        (click)="onLogout(); $event.preventDefault()">
+                        <i class="fa-solid fa-right-from-bracket fs-5 mb-1"></i>
+                        <span class="small d-none d-lg-block">Logout</span>
                     </a>
                 </li>
             </ul>

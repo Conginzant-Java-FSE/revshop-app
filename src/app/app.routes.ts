@@ -5,6 +5,8 @@ import { LandingPageComponent } from './components/landing-page/landing-page';
 import { RegisterComponent } from './components/register/register';
 import { LoginComponent } from './components/login/login';
 import { DashboardComponent } from './components/dashboard/dashboard';
+import { CartComponent } from './components/cart/cart';
+import { CheckoutComponent } from './components/checkout/checkout';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -12,5 +14,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'cart', component: CartComponent, canActivate: [authGuard] },
+  { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
+

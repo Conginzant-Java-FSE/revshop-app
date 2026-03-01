@@ -9,7 +9,12 @@ import { SearchBarComponent } from '../../search-bar/search-bar';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],
 })
-export class Navbar {
+export class Navbar implements OnInit, OnDestroy {
+  cartCount: number = 0;
+  unreadCount: number = 0;
+  notifications: AppNotification[] = [];
+  isLoggedIn: boolean = false;
+  userName: string | null = '';
 
   
 }

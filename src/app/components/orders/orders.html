@@ -1,0 +1,155 @@
+<div class="container py-5">
+    <h1 class="text-white fw-bold mb-5">My Orders</h1>
+
+    <!-- Loading State -->
+    <div class="loading-container p-5 text-center" *ngIf="loading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state p-5 text-center bg-glass border-light border-opacity-10 rounded-4"
+        *ngIf="!loading && orders.length === 0">
+        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-4 mb-4">
+            <i class="fa-solid fa-box-open text-primary fs-1 mb-4"></i>
+        </div>
+        <h3 class="text-white fw-bold mb-2">No orders yet</h3>
+        <p class="text-white-50 mb-4">When you place orders, they'll appear here</p>
+        <a routerLink="/products" class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow-lg">Start Shopping</a>
+    </div>
+
+    <!-- Orders List -->
+    <div class="orders-list d-flex flex-column gap-4" *ngIf="!loading && orders.length > 0">
+        <div class="card bg-glass border-light border-opacity-10 overflow-hidden shadow-lg"
+            *ngFor="let order of orders">
+            <!-- Order Header -->
+            <div
+                class="card-header bg-transparent border-light border-opacity-10 p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-primary fw-bold me-3">Order #{{ order.orderNumber }}</span>
+                    <span class="text-white-50 small fw-medium">{{ order.orderDate | date:'mediumDate' }}</span>
+                </div>
+                <span class="badge rounded-pill bg-opacity-10 border px-3 py-2"
+                    style="font-size: 0.7rem; letter-spacing: 0.5px;" [ngClass]="{
+                        'bg-warning text-warning border-warning border-opacity-25': order.status === 'PENDING',
+                        'bg-info text-info border-info border-opacity-25': order.status === 'PROCESSING',
+                        'bg-secondary text-white-50 border-white border-opacity-25': order.status === 'SHIPPED',
+                        'bg-success text-success border-success border-opacity-25': order.status === 'DELIVERED',
+                        'bg-danger text-danger border-danger border-opacity-25': order.status === 'CANCELLED'
+                      }">
+                    {{ order.status }}
+                </span>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent border-light border-opacity-5 p-4"
+                        *ngFor="let item of order.items">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="avatar-sm rounded bg-primary bg-opacity-15 text-primary d-flex align-items-center justify-content-center fw-bold"
+                                style="width: 45px; height: 45px;">
+                                {{ item.productName.charAt(0) }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="text-white fw-bold">{{ item.productName }}</div>
+                                <div class="text-white-50 small">Qty: {{ item.quantity }} × ₹{{ item.price }}</div>
+                            </div>
+                            <div class="text-success fw-bold fs-5">₹{{ item.subtotal }}</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Order Footer -->
+            <div class="card-footer bg-glass border-light border-opacity-10 p-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+                    <div class="d-flex flex-column gap-1">
+                        <div class="text-white-50 small fw-medium">Order Total</div>
+                        <div class="text-white fs-3 fw-bold">₹{{ order.totalAmount }}</div>
+                        <div class="text-white-50 small" *ngIf="order.paymentMethod">
+                            Paid via <span class="text-white fw-medium">{{ order.paymentMethod | titlecase }}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary px-4 fw-bold shadow-sm rounded-pill"
+                            (click)="openTracking(order)">
+                            <i class="fa-solid fa-location-dot me-2"></i> Track Order
+                        </button>
+                        <button
+                            class="btn btn-outline-danger px-4 fw-bold hover-bg-danger hover-text-white transition-all shadow-sm rounded-pill"
+                            (click)="cancelOrder(order.orderId)"
+                            *ngIf="order.status !== 'CANCELLED' && order.status !== 'DELIVERED'">
+                            Cancel Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tracking Modal -->
+<div class="modal fade show d-block" *ngIf="showTrackingModal" tabindex="-1"
+    style="background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content bg-dark border-light border-opacity-10 shadow-2xl"
+            style="background-color: #0f0f20 !important; border-radius: 20px;">
+            <div class="modal-header border-light border-opacity-10 p-4">
+                <h5 class="modal-title text-white fw-bold">
+                    <i class="fa-solid fa-map-location-dot text-primary me-2"></i>
+                    Track Order #{{ selectedOrderNumber }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white shadow-none"
+                    (click)="showTrackingModal = false"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Loading State -->
+                <div class="text-center py-4" *ngIf="trackingLoading">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-white-50 mt-3">Fetching updates...</p>
+                </div>
+
+                <!-- Empty Tracking -->
+                <div class="text-center py-4" *ngIf="!trackingLoading && trackingDetails.length === 0">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="fa-solid fa-clock-rotate-left fs-4"></i>
+                    </div>
+                    <p class="text-white-50">No tracking updates available yet.</p>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline" *ngIf="!trackingLoading && trackingDetails.length > 0">
+                    <div class="timeline-item pb-4" *ngFor="let step of trackingDetails; let last = last"
+                        [class.border-start]="!last">
+                        <div class="timeline-dot bg-primary shadow-sm"></div>
+                        <div class="ps-4">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="text-white fw-bold mb-0 text-uppercase letter-spacing-1">{{ step.status }}
+                                </h6>
+                                <span class="text-white-50 x-small">{{ step.createdAt | date:'MMM d, HH:mm' }}</span>
+                            </div>
+                            <p class="text-white-50 small mb-0">{{ step.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-outline-light border-opacity-25 w-100 fw-bold rounded-pill"
+                    (click)="showTrackingModal = false">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+    <div class="toast align-items-center text-white bg-success border-0 shadow-lg" [class.show]="toastMsg" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-bold">
+                {{ toastMsg }}
+            </div>
+        </div>
+    </div>
+</div>

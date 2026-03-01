@@ -20,6 +20,7 @@ export class CartService {
 
     // ==== Cart State Management ====
 
+
     addToCart(product: { productId: number; productName: string; imageUrl: string; price: number }): void {
         const existingItem = this.cartItems.find(item => item.productId === product.productId);
 
@@ -41,10 +42,12 @@ export class CartService {
         this.updateCart();
     }
 
+
     removeFromCart(productId: number): void {
         this.cartItems = this.cartItems.filter(item => item.productId !== productId);
         this.updateCart();
     }
+
 
     updateQuantity(productId: number, quantity: number): void {
         if (quantity <= 0) {
@@ -60,9 +63,11 @@ export class CartService {
         }
     }
 
+
     getCartItems(): CartItem[] {
         return this.cartItems;
     }
+
 
     getGrandTotal(): number {
         return this.cartItems.reduce((total, item) => total + item.subtotal, 0);
@@ -71,6 +76,7 @@ export class CartService {
     getTotalItems(): number {
         return this.cartItems.reduce((count, item) => count + item.quantity, 0);
     }
+
 
     clearCart(): void {
         this.cartItems = [];

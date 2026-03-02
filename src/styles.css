@@ -7,7 +7,7 @@
   --surface: #1E293B;
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
-  --border-color: rgba(255,255,255,0.1);
+  --border-color: rgba(255, 255, 255, 0.1);
   --error: #EF4444;
   --success: #10B981;
 }
@@ -31,3 +31,47 @@ a {
   color: inherit;
 }
 
+
+/* Product card hover lift */
+.product-card {
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Discount badge */
+.discount-badge {
+  display: inline-block;
+  background-color: #16a34a;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* Sold-out overlay */
+.sold-out-overlay {
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 5;
+  border-radius: inherit;
+}
+
+.sold-out-badge {
+  background: #ef4444;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  padding: 6px 18px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}

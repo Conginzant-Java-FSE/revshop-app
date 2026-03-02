@@ -9,7 +9,7 @@ import { CartItem } from '../../../models/cart-item.model';
   standalone: true,
   imports: [RouterModule, CommonModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  styleUrls: ['./navbar.css'],
 })
 export class Navbar implements OnInit {
   totalCartItems: number = 0;

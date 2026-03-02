@@ -1,0 +1,44 @@
+<div class="modal-backdrop" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="header-title">
+                <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                <h2>Track Order #{{ orderNumber }}</h2>
+            </div>
+            <button class="close-btn-top" (click)="onClose()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div *ngIf="loading" class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading tracking details...</p>
+            </div>
+
+            <div *ngIf="!loading && trackingDetails.length === 0" class="empty-state">
+                <div class="icon-history">
+                    <i class="fa-solid fa-rotate-left fs-1 text-primary mb-3"></i>
+                </div>
+                <p>No tracking updates available yet.</p>
+            </div>
+
+            <div *ngIf="!loading && trackingDetails.length > 0" class="timeline">
+                <div *ngFor="let detail of trackingDetails; let i = index" class="timeline-item">
+                    <div class="timeline-dot" [class.active]="i === 0"></div>
+                    <div class="timeline-content">
+                        <h4 [class.active-text]="i === 0">{{ detail.status }}</h4>
+                        <p>{{ detail.description }}</p>
+                        <span class="timestamp">{{ detail.updatedAt | date:'medium' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="error" class="error-state">
+                <p>Failed to load tracking details. Please try again later.</p>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="close-btn-bottom" (click)="onClose()">Close</button>
+        </div>
+    </div>
+</div>

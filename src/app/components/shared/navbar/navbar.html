@@ -73,15 +73,13 @@
                         <span class="small d-none d-lg-block">Login</span>
                     </a>
                 </li>
-
-                <!-- Cart -->
-                <li class="nav-item me-lg-3">
+                <li class="nav-item">
                     <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
-                        routerLink="/cart">
+                        routerLink="/cart" style="cursor: pointer;">
                         <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
-                        <span *ngIf="cartCount > 0"
+                        <span *ngIf="totalCartItems > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
-                            {{ cartCount }}
+                            {{ totalCartItems }}
                         </span>
                         <span class="small d-none d-lg-block text-white">Cart</span>
                     </a>

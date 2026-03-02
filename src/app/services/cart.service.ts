@@ -1,98 +1,33 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { CartItem } from '../models/cart.model';
+import { Observable } from 'rxjs';
+import { CartItem } from '../models/cart-item.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class CartService {
-    private apiUrl = 'http://localhost:8080/api/orders';
-
-    private cartItems: CartItem[] = [];
-    private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
-    private cartCountSubject = new BehaviorSubject<number>(0);
-
-    cart$ = this.cartItemsSubject.asObservable();
-    cartCount$ = this.cartCountSubject.asObservable();
+    private apiUrl = 'http://localhost:8080/api/cart';
 
     constructor(private http: HttpClient) { }
 
-    // ==== Cart State Management ====
-
-
-    addToCart(product: { productId: number; productName: string; imageUrl: string; price: number }): void {
-        const existingItem = this.cartItems.find(item => item.productId === product.productId);
-
-        if (existingItem) {
-            existingItem.quantity += 1;
-            existingItem.subtotal = existingItem.price * existingItem.quantity;
-        } else {
-            const newItem: CartItem = {
-                productId: product.productId,
-                productName: product.productName,
-                imageUrl: product.imageUrl,
-                price: product.price,
-                quantity: 1,
-                subtotal: product.price
-            };
-            this.cartItems.push(newItem);
-        }
-
-        this.updateCart();
+    getCartItems(): Observable<CartItem[]> {
+        return this.http.get<CartItem[]>(this.apiUrl);
     }
 
-
-    removeFromCart(productId: number): void {
-        this.cartItems = this.cartItems.filter(item => item.productId !== productId);
-        this.updateCart();
+    addToCart(productId: number, quantity: number): Observable<CartItem> {
+        return this.http.post<CartItem>(`${this.apiUrl}/add`, { productId, quantity });
     }
 
-
-    updateQuantity(productId: number, quantity: number): void {
-        if (quantity <= 0) {
-            this.removeFromCart(productId);
-            return;
-        }
-
-        const item = this.cartItems.find(i => i.productId === productId);
-        if (item) {
-            item.quantity = quantity;
-            item.subtotal = item.price * quantity;
-            this.updateCart();
-        }
+    updateQuantity(id: number, quantity: number): Observable<CartItem> {
+        return this.http.put<CartItem>(`${this.apiUrl}/${id}`, { quantity });
     }
 
-
-    getCartItems(): CartItem[] {
-        return this.cartItems;
+    removeItem(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
-
-    getGrandTotal(): number {
-        return this.cartItems.reduce((total, item) => total + item.subtotal, 0);
-    }
-
-    getTotalItems(): number {
-        return this.cartItems.reduce((count, item) => count + item.quantity, 0);
-    }
-
-
-    clearCart(): void {
-        this.cartItems = [];
-        this.updateCart();
-    }
-
-    // ==== Backend Integration ====
-
-    placeOrder(orderPayload: any): Observable<any> {
-        return this.http.post(this.apiUrl, orderPayload);
-    }
-
-    // ==== Private Helpers ====
-
-    private updateCart(): void {
-        this.cartItemsSubject.next([...this.cartItems]);
-        this.cartCountSubject.next(this.getTotalItems());
+    clearCart(): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/clear`);
     }
 }

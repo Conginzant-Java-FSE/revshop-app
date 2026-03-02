@@ -1,113 +1,49 @@
-.cart-page {
-    min-height: 80vh;
+.cart-container {
+    min-height: 60vh;
 }
 
-.cart-card {
-    background-color: #1E293B;
-}
-
-.cart-table {
-    color: #F8FAFC;
-}
-
-.cart-table thead th {
-    background-color: #0F172A;
-    color: #94A3B8;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem 0.75rem;
-}
-
-.cart-table tbody tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    transition: background-color 0.2s ease;
-}
-
-.cart-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
-.cart-table tbody td {
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
-}
-
-.cart-product-img {
-    width: 60px;
-    height: 60px;
+.cart-item-img {
+    width: 100px;
+    height: 100px;
     object-fit: cover;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
 }
 
-.product-name {
-    color: #F8FAFC;
-    font-size: 0.95rem;
+.cart-item-img:hover {
+    transform: scale(1.05);
 }
 
-.qty-btn {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #F8FAFC;
-    transition: all 0.2s ease;
-}
-
-.qty-btn:hover:not(:disabled) {
-    background-color: #4F46E5;
-    border-color: #4F46E5;
-    color: white;
-}
-
-.qty-btn:disabled {
-    opacity: 0.3;
-}
-
-.qty-display {
-    min-width: 30px;
-    text-align: center;
-    font-size: 1.1rem;
-}
-
-.remove-btn {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.remove-btn:hover {
-    background-color: #EF4444;
-    border-color: #EF4444;
-    color: white;
-    transform: scale(1.1);
-}
-
-.summary-card {
-    background-color: #1E293B;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+.checkout-card {
+    top: 100px;
+    z-index: 10;
 }
 
 .checkout-btn {
     transition: all 0.3s ease;
-    font-size: 1.1rem;
+    letter-spacing: 1px;
 }
 
 .checkout-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4) !important;
 }
 
-.empty-cart-icon {
-    opacity: 0.4;
+.remove-btn {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.card:hover .remove-btn {
+    opacity: 1;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
 }

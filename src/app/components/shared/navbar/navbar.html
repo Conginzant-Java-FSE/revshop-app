@@ -32,11 +32,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning" href="#">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
+                        routerLink="/cart" style="cursor: pointer;">
                         <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
-                        <span
+                        <span *ngIf="totalCartItems > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
-                            3
+                            {{ totalCartItems }}
                         </span>
                         <span class="small d-none d-lg-block text-white">Cart</span>
                     </a>

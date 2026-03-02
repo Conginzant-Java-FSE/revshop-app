@@ -1,0 +1,63 @@
+.reviews-container {
+    min-height: 60vh;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+}
+
+.review-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+}
+
+.border-dashed {
+    border: 2px dashed #dee2e6;
+}
+
+.delete-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.review-card:hover .delete-btn {
+    opacity: 1;
+}
+
+.review-text {
+    font-style: italic;
+    border-left: 3px solid #0d6efd;
+}
+
+.add-review-card form input:focus,
+.add-review-card form select:focus,
+.add-review-card form textarea:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    outline: none;
+}
+
+.submit-btn {
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3) !important;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}

@@ -30,3 +30,4 @@ export const routes: Routes = [
   { path: 'favorites', component: FavoritesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
+

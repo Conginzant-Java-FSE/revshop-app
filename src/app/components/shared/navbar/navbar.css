@@ -61,3 +61,64 @@
     font-size: 0.65rem;
     padding: 0.25em 0.5em;
 }
+
+.notification-badge {
+    font-size: 0.6rem;
+    padding: 0.2em 0.45em;
+}
+
+.notification-dropdown {
+    min-width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #1E293B;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.notification-dropdown .dropdown-header {
+    color: #F8FAFC;
+    font-size: 0.9rem;
+}
+
+.notification-dropdown .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.notification-item a {
+    color: #94A3B8;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #F8FAFC;
+}
+
+.notification-item.unread a {
+    color: #F8FAFC;
+    background-color: rgba(79, 70, 229, 0.1);
+}
+
+.notification-item.unread .notification-icon {
+    color: #ffc107 !important;
+}
+
+.mark-all-btn {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.mark-all-btn:hover {
+    opacity: 0.8;
+}
+
+.clear-all-btn {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.clear-all-btn:hover {
+    opacity: 0.8;
+}

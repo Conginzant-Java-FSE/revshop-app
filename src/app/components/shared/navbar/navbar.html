@@ -16,14 +16,7 @@
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
             </ul>
-            <form class="d-flex mx-auto search-form position-relative" role="search">
-                <input class="form-control rounded-pill pe-5 search-input" type="search"
-                    placeholder="Search for products..." aria-label="Search">
-                <button class="btn search-btn position-absolute end-0 top-50 translate-middle-y rounded-circle"
-                    type="submit">
-                    <i class="fa-solid fa-search text-muted"></i>
-                </button>
-            </form>
+            <app-search-bar class="mx-auto"></app-search-bar>
             <ul
                 class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
                 <li class="nav-item me-lg-3" *ngIf="!authService.authState().token">
@@ -69,6 +62,15 @@
                         <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
                         <!-- Cart count badge can be added here with signals later -->
                         <span class="small d-none d-lg-block text-white">Cart</span>
+                    </a>
+                </li>
+
+                <!-- Logout (visible only when logged in) -->
+                <li *ngIf="isLoggedIn" class="nav-item">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative" href="#"
+                        (click)="onLogout(); $event.preventDefault()">
+                        <i class="fa-solid fa-right-from-bracket fs-5 mb-1"></i>
+                        <span class="small d-none d-lg-block">Logout</span>
                     </a>
                 </li>
             </ul>

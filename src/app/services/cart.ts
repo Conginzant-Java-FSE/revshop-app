@@ -6,17 +6,16 @@ import { ApiResponse } from '../models/api-response.model';
 export interface CartItemDTO {
     cartItemId?: number;
     productId: number;
-    productName: string;
-    productPrice: number;
+    productName?: string;
+    price?: number;
     quantity: number;
-    subtotal: number;
+    subtotal?: number;
 }
 
 export interface CartDTO {
     cartId: number;
-    userId: number;
-    cartItems: CartItemDTO[];
-    totalAmount: number;
+    items: CartItemDTO[];
+    totalPrice: number;
 }
 
 @Injectable({
@@ -31,23 +30,20 @@ export class CartService {
         return this.http.get<ApiResponse<CartDTO>>(`${this.apiUrl}/user/${userId}`);
     }
 
-    addItemToCart(userId: number, productId: number, quantity: number): Observable<ApiResponse<CartItemDTO>> {
-        return this.http.post<ApiResponse<CartItemDTO>>(`${this.apiUrl}/${userId}/items`, null, {
-            params: { productId: productId.toString(), quantity: quantity.toString() }
-        });
+    addItemToCart(userId: number, productId: number, quantity: number): Observable<ApiResponse<any>> {
+        const body = { productId, quantity };
+        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/user/${userId}/add`, body);
     }
 
-    updateItemQuantity(cartItemId: number, quantity: number): Observable<ApiResponse<CartItemDTO>> {
-        return this.http.put<ApiResponse<CartItemDTO>>(`${this.apiUrl}/items/${cartItemId}`, null, {
-            params: { quantity: quantity.toString() }
-        });
+    updateItemQuantity(cartItemId: number, quantity: number): Observable<ApiResponse<any>> {
+        return this.http.put<ApiResponse<any>>(`/api/cart-items/${cartItemId}`, { quantity });
     }
 
-    removeItemFromCart(userId: number, productId: number): Observable<ApiResponse<string>> {
-        return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${userId}/items/${productId}`);
+    removeItemFromCart(cartItemId: number): Observable<ApiResponse<any>> {
+        return this.http.delete<ApiResponse<any>>(`/api/cart-items/${cartItemId}`);
     }
 
-    clearCart(userId: number): Observable<ApiResponse<string>> {
-        return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${userId}/clear`);
+    clearCart(userId: number): Observable<ApiResponse<void>> {
+        return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/user/${userId}/clear`);
     }
 }

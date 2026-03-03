@@ -8,7 +8,7 @@
             </div>
         </div>
 
-        <div *ngIf="!loading() && (!cart() || cart()?.cartItems?.length === 0)"
+        <div *ngIf="!loading() && (!cart() || cart()?.items?.length === 0)"
             class="text-center py-5 bg-white rounded-4 shadow-sm">
             <div class="mb-4">
                 <i class="fa-solid fa-cart-arrow-down fs-1 text-muted"></i>
@@ -18,11 +18,10 @@
             <a routerLink="/products" class="btn btn-primary btn-lg rounded-pill px-5">Start Shopping</a>
         </div>
 
-        <div class="row g-4" *ngIf="!loading() && cart() && cart()!.cartItems.length > 0">
+        <div class="row g-4" *ngIf="!loading() && cart() && cart()!.items.length > 0">
             <!-- Items List -->
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4"
-                    *ngFor="let item of cart()?.cartItems">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" *ngFor="let item of cart()?.items">
                     <div class="card-body p-4">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center">
@@ -30,7 +29,7 @@
                             </div>
                             <div class="col-md-4">
                                 <h5 class="fw-bold mb-1">{{ item.productName }}</h5>
-                                <p class="text-muted small mb-0">Single Price: ₹{{ item.productPrice }}</p>
+                                <p class="text-muted small mb-0">Single Price: ₹{{ item.price }}</p>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group input-group-sm" style="width: 100px;">
@@ -46,7 +45,7 @@
                                 <h5 class="fw-bold text-primary mb-0">₹{{ item.subtotal }}</h5>
                             </div>
                             <div class="col-md-1 text-end">
-                                <button class="btn btn-link text-danger p-0" (click)="removeItem(item.productId)">
+                                <button class="btn btn-link text-danger p-0" (click)="removeItem(item.cartItemId!)">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
@@ -71,7 +70,7 @@
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Subtotal</span>
-                        <span class="fw-bold">₹{{ cart()?.totalAmount }}</span>
+                        <span class="fw-bold">₹{{ cart()?.totalPrice }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Shipping</span>
@@ -80,7 +79,7 @@
                     <hr class="my-3">
                     <div class="d-flex justify-content-between mb-4">
                         <h5 class="fw-bold">Total</h5>
-                        <h5 class="fw-bold text-primary">₹{{ cart()?.totalAmount }}</h5>
+                        <h5 class="fw-bold text-primary">₹{{ cart()?.totalPrice }}</h5>
                     </div>
 
                     <a routerLink="/checkout" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3 fw-bold">

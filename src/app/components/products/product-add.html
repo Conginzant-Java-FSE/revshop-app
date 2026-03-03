@@ -1,0 +1,117 @@
+<app-navbar></app-navbar>
+<app-header></app-header>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a routerLink="/seller-dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Add New Product</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4 border-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-white bg-opacity-25 p-3">
+                            <i class="fa-solid fa-plus fs-3"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0">Add New Product</h4>
+                            <p class="mb-0 opacity-75">List your product in the RevShop marketplace</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="row g-4">
+                        <!-- Product Name -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Product Name*</label>
+                            <input type="text" formControlName="name" class="form-control rounded-3"
+                                [ngClass]="{'is-invalid': submitted && productForm.get('name')?.errors}"
+                                placeholder="e.g. Wireless Noise Cancelling Headphones">
+                            <div class="invalid-feedback">Please enter a valid product name (min 3 characters).</div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Description*</label>
+                            <textarea formControlName="description" class="form-control rounded-3" rows="4"
+                                [ngClass]="{'is-invalid': submitted && productForm.get('description')?.errors}"
+                                placeholder="Describe your product features, specs, and benefits..."></textarea>
+                            <div class="invalid-feedback">Description is required.</div>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">MRP (Maximum Retail Price)*</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">₹</span>
+                                <input type="number" formControlName="mrp" class="form-control rounded-end-3"
+                                    [ngClass]="{'is-invalid': submitted && productForm.get('mrp')?.errors}">
+                                <div class="invalid-feedback">MRP must be greater than 0.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Selling Price*</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">₹</span>
+                                <input type="number" formControlName="sellingPrice" class="form-control rounded-end-3"
+                                    [ngClass]="{'is-invalid': submitted && productForm.get('sellingPrice')?.errors}">
+                                <div class="invalid-feedback">Selling Price must be greater than 0.</div>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Section -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Initial Stock*</label>
+                            <input type="number" formControlName="stockQuantity" class="form-control rounded-3"
+                                [ngClass]="{'is-invalid': submitted && productForm.get('stockQuantity')?.errors}">
+                            <div class="invalid-feedback">Stock cannot be negative.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Low Stock Threshold*</label>
+                            <input type="number" formControlName="thresholdQuantity" class="form-control rounded-3"
+                                [ngClass]="{'is-invalid': submitted && productForm.get('thresholdQuantity')?.errors}">
+                            <small class="text-muted">We'll alert you when stock falls below this.</small>
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Category*</label>
+                            <select formControlName="categoryId" class="form-select rounded-3"
+                                [ngClass]="{'is-invalid': submitted && productForm.get('categoryId')?.errors}">
+                                <option value="" disabled>Select a category</option>
+                                <option *ngFor="let cat of categories()" [value]="cat.categoryId">
+                                    {{ cat.name }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Please select a category.</div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12 mt-5">
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm"
+                                    [disabled]="loading()">
+                                    <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+                                    <i class="fa-solid fa-save me-2" *ngIf="!loading()"></i>
+                                    Publish Product
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary rounded-pill px-5 py-2"
+                                    routerLink="/seller-dashboard" [disabled]="loading()">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

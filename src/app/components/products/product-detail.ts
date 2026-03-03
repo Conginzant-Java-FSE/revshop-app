@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService, ProductDTO } from '../../services/product';
 import { CartService } from '../../services/cart';
+import { ReviewService } from '../../services/review';
+import { FavoriteService } from '../../services/favorite';
+import { Review } from '../../models/review.model';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
 
@@ -15,20 +18,32 @@ import { ToastService } from '../../services/toast';
 })
 export class ProductDetailComponent implements OnInit {
     product = signal<ProductDTO | null>(null);
+    reviews = signal<Review[]>([]);
+    isFavorite = signal<boolean>(false);
     quantity = signal<number>(1);
     loading = signal<boolean>(true);
+
+    newReview = {
+        rating: 5,
+        reviewText: ''
+    };
 
     constructor(
         private route: ActivatedRoute,
         private productService: ProductService,
         private cartService: CartService,
+        private reviewService: ReviewService,
+        private favoriteService: FavoriteService,
         private toastService: ToastService
     ) { }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
-            this.loadProduct(Number(id));
+            const productId = Number(id);
+            this.loadProduct(productId);
+            this.loadReviews(productId);
+            this.checkIfFavorite(productId);
         }
     }
 
@@ -42,11 +57,84 @@ export class ProductDetailComponent implements OnInit {
         });
     }
 
+    loadReviews(productId: number): void {
+        this.reviewService.getReviewsByProduct(productId).subscribe({
+            next: (res) => this.reviews.set(res.data)
+        });
+    }
+
+    checkIfFavorite(productId: number): void {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            this.favoriteService.getFavorites(Number(userId)).subscribe({
+                next: (res) => {
+                    const exists = res.data.some(f => f.productId === productId);
+                    this.isFavorite.set(exists);
+                }
+            });
+        }
+    }
+
+    toggleFavorite(): void {
+        const userId = localStorage.getItem('userId');
+        const prod = this.product();
+        if (!userId) {
+            this.toastService.error('Please login to favorite products');
+            return;
+        }
+        if (prod && prod.productId) {
+            if (this.isFavorite()) {
+                this.favoriteService.removeFromFavorite(Number(userId), prod.productId).subscribe({
+                    next: () => {
+                        this.isFavorite.set(false);
+                        this.toastService.success('Removed from favorites');
+                    }
+                });
+            } else {
+                this.favoriteService.addToFavorite(Number(userId), prod.productId).subscribe({
+                    next: () => {
+                        this.isFavorite.set(true);
+                        this.toastService.success('Added to favorites');
+                    }
+                });
+            }
+        }
+    }
+
+    submitReview(): void {
+        const userId = localStorage.getItem('userId');
+        const prod = this.product();
+        if (!userId) {
+            this.toastService.error('Please login to submit a review');
+            return;
+        }
+        if (!this.newReview.reviewText.trim()) {
+            this.toastService.error('Review text cannot be empty');
+            return;
+        }
+        if (prod && prod.productId) {
+            this.reviewService.addReview({
+                userId: Number(userId),
+                productId: prod.productId,
+                rating: this.newReview.rating,
+                reviewText: this.newReview.reviewText
+            }).subscribe({
+                next: () => {
+                    this.toastService.success('Review submitted successfully!');
+                    this.newReview.reviewText = '';
+                    if (prod && prod.productId) {
+                        this.loadReviews(prod.productId);
+                    }
+                }
+            });
+        }
+    }
+
     addToCart(): void {
         const userId = localStorage.getItem('userId');
         const prod = this.product();
         if (!userId) {
-            alert('Please login to add items to cart');
+            this.toastService.error('Please login to add items to cart');
             return;
         }
         if (prod && prod.productId) {

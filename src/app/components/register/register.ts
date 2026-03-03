@@ -77,31 +77,37 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    const formData = this.registerForm.value;
-
-    const payload = {
-      ...formData,
-      addresses: []
-    };
+    const { businessName, taxId, businessDescription, ...commonData } = this.registerForm.value;
 
     if (this.isSeller) {
+      const payload = {
+        ...commonData,
+        businessName,
+        taxId,
+        businessDescription,
+        addresses: []
+      };
       this.authService.registerSeller(payload).subscribe({
         next: (res) => {
           console.log('Seller registration successful', res);
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          this.errorMessage = err.error || 'Registration failed';
+          this.errorMessage = err.error?.message || err.error || 'Registration failed';
         }
       });
     } else {
+      const payload = {
+        ...commonData,
+        addresses: []
+      };
       this.authService.registerBuyer(payload).subscribe({
         next: (res) => {
           console.log('Buyer registration successful', res);
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          this.errorMessage = err.error || 'Registration failed';
+          this.errorMessage = err.error?.message || err.error || 'Registration failed';
         }
       });
     }

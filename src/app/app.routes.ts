@@ -13,6 +13,7 @@ import { ProfileComponent } from './components/profile/profile';
 import { FavoritesComponent } from './components/favorites/favorites';
 import { BuyerDashboardComponent } from './components/dashboard/buyer-dashboard';
 import { SellerDashboardComponent } from './components/dashboard/seller-dashboard';
+import { ProductAddComponent } from './components/products/product-add';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [
   { path: 'orders', component: OrderListComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'favorites', component: FavoritesComponent, canActivate: [authGuard] },
+  { path: 'products/new', component: ProductAddComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
 

@@ -43,13 +43,10 @@ export class CartComponent implements OnInit {
         });
     }
 
-    removeItem(productId: number): void {
-        const userId = localStorage.getItem('userId');
-        if (userId) {
-            this.cartService.removeItemFromCart(Number(userId), productId).subscribe({
-                next: () => this.loadCart()
-            });
-        }
+    removeItem(cartItemId: number): void {
+        this.cartService.removeItemFromCart(cartItemId).subscribe({
+            next: () => this.loadCart()
+        });
     }
 
     clearCart(): void {

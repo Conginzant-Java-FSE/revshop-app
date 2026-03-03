@@ -1,75 +1,63 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CartService } from '../../services/cart.service';
-import { CartItem } from '../../models/cart-item.model';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { CartService, CartDTO } from '../../services/cart';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-cart',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterLink, FormsModule],
     templateUrl: './cart.html',
     styleUrl: './cart.css'
 })
 export class CartComponent implements OnInit {
-    cartItems: CartItem[] = [];
-    errorMessage: string = '';
-    loading: boolean = false;
+    cart = signal<CartDTO | null>(null);
+    loading = signal<boolean>(true);
 
     constructor(private cartService: CartService) { }
 
     ngOnInit(): void {
-        this.loadCartItems();
+        this.loadCart();
     }
 
-    loadCartItems(): void {
-        this.loading = true;
-        this.errorMessage = '';
-        this.cartService.getCartItems().subscribe({
-            next: (items: CartItem[]) => {
-                this.cartItems = items;
-                this.loading = false;
-            },
-            error: (err: any) => {
-                console.error('Failed to load cart items', err);
-                this.errorMessage = 'Unable to load cart. Please try again later.';
-                this.loading = false;
-            }
+    loadCart(): void {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            this.cartService.getCartByUserId(Number(userId)).subscribe({
+                next: (res) => {
+                    this.cart.set(res.data);
+                    this.loading.set(false);
+                },
+                error: () => this.loading.set(false)
+            });
+        } else {
+            this.loading.set(false);
+        }
+    }
+
+    updateQuantity(cartItemId: number, quantity: number): void {
+        if (quantity < 1) return;
+        this.cartService.updateItemQuantity(cartItemId, quantity).subscribe({
+            next: () => this.loadCart()
         });
     }
 
-    increaseQuantity(item: CartItem): void {
-        this.cartService.updateQuantity(item.id, item.quantity + 1).subscribe({
-            next: () => this.loadCartItems(),
-            error: (err: any) => console.error('Failed to increase quantity', err)
-        });
-    }
-
-    decreaseQuantity(item: CartItem): void {
-        if (item.quantity > 1) {
-            this.cartService.updateQuantity(item.id, item.quantity - 1).subscribe({
-                next: () => this.loadCartItems(),
-                error: (err: any) => console.error('Failed to decrease quantity', err)
+    removeItem(productId: number): void {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            this.cartService.removeItemFromCart(Number(userId), productId).subscribe({
+                next: () => this.loadCart()
             });
         }
     }
 
-    removeItem(id: number): void {
-        this.cartService.removeItem(id).subscribe({
-            next: () => this.loadCartItems(),
-            error: (err: any) => console.error('Failed to remove item', err)
-        });
-    }
-
-    getTotalPrice(): number {
-        return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-    }
-
-    getTotalQuantity(): number {
-        return this.cartItems.reduce((total, item) => total + item.quantity, 0);
-    }
-
-    checkout(): void {
-        console.log('Proceeding to checkout');
+    clearCart(): void {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            this.cartService.clearCart(Number(userId)).subscribe({
+                next: () => this.cart.set(null)
+            });
+        }
     }
 }

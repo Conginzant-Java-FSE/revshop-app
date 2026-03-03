@@ -1,272 +1,97 @@
-<app-navbar></app-navbar>
-
 <div class="checkout-page py-5">
     <div class="container">
-        <div class="d-flex align-items-center mb-4">
-            <i class="fa-solid fa-credit-card fs-3 text-warning me-3"></i>
-            <h2 class="fw-bold mb-0">Checkout</h2>
-        </div>
+        <h2 class="fw-bold mb-4">Checkout</h2>
 
-        <!-- Stepper -->
-        <div class="stepper mb-5">
-            <div class="d-flex justify-content-center align-items-center">
-                <div class="step-item" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1"
-                    (click)="goToStep(1)">
-                    <div class="step-circle">
-                        <i *ngIf="currentStep > 1" class="fa-solid fa-check"></i>
-                        <span *ngIf="currentStep <= 1">1</span>
-                    </div>
-                    <span class="step-label">Shipping</span>
-                </div>
-                <div class="step-line" [class.active]="currentStep > 1"></div>
-                <div class="step-item" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2"
-                    (click)="goToStep(2)">
-                    <div class="step-circle">
-                        <i *ngIf="currentStep > 2" class="fa-solid fa-check"></i>
-                        <span *ngIf="currentStep <= 2">2</span>
-                    </div>
-                    <span class="step-label">Payment</span>
-                </div>
-                <div class="step-line" [class.active]="currentStep > 2"></div>
-                <div class="step-item" [class.active]="currentStep >= 3">
-                    <div class="step-circle">
-                        <span>3</span>
-                    </div>
-                    <span class="step-label">Review</span>
-                </div>
+        <div *ngIf="loading()" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row g-4" *ngIf="!loading()">
             <div class="col-lg-8">
+                <!-- Shipping Address -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-location-dot me-2 text-primary"></i> Shipping Address
+                    </h5>
 
-                <!-- Step 1: Shipping -->
-                <div *ngIf="currentStep === 1" class="card border-0 shadow-sm rounded-4 p-4 step-card">
-                    <h4 class="fw-bold mb-4"><i class="fa-solid fa-truck me-2 text-warning"></i>Shipping Address</h4>
+                    <div class="address-list" *ngIf="addresses().length > 0">
+                        <div class="form-check address-card p-3 border rounded-3 mb-2" *ngFor="let addr of addresses()"
+                            [class.border-primary]="selectedAddressId() === addr.addressId">
+                            <input class="form-check-input" type="radio" [id]="'addr' + addr.addressId"
+                                [value]="addr.addressId" [(ngModel)]="selectedAddressId" name="address">
+                            <label class="form-check-label w-100 ms-2" [for]="'addr' + addr.addressId">
+                                <span class="fw-bold d-block">{{ addr.addressLine }}</span>
+                                <span class="small text-muted">{{ addr.city }}, {{ addr.state }} - {{ addr.zipCode
+                                    }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div *ngIf="addresses().length === 0" class="text-center py-3">
+                        <p class="text-muted mb-3">No saved addresses found.</p>
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3">Add New Address</button>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-credit-card me-2 text-primary"></i> Payment Method
+                    </h5>
                     <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" [(ngModel)]="shippingInfo.fullName"
-                                placeholder="Enter full name">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Address Line 1</label>
-                            <input type="text" class="form-control" [(ngModel)]="shippingInfo.addressLine1"
-                                placeholder="Street address">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Address Line 2 (Optional)</label>
-                            <input type="text" class="form-control" [(ngModel)]="shippingInfo.addressLine2"
-                                placeholder="Apartment, suite, etc.">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-control" [(ngModel)]="shippingInfo.city" placeholder="City">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">State</label>
-                            <input type="text" class="form-control" [(ngModel)]="shippingInfo.state"
-                                placeholder="State">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Zip Code</label>
-                            <input type="text" class="form-control" [(ngModel)]="shippingInfo.zipCode"
-                                placeholder="Zip code">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" [(ngModel)]="shippingInfo.phone"
-                                placeholder="Phone number">
-                        </div>
-                        <div class="col-12 mt-4">
-                            <button class="btn btn-warning fw-bold py-2 px-4 rounded-3" [disabled]="!isShippingValid()"
-                                (click)="nextStep()">
-                                Continue to Payment <i class="fa-solid fa-arrow-right ms-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Payment -->
-                <div *ngIf="currentStep === 2" class="card border-0 shadow-sm rounded-4 p-4 step-card">
-                    <h4 class="fw-bold mb-4"><i class="fa-solid fa-wallet me-2 text-warning"></i>Payment Method</h4>
-
-                    <div class="list-group payment-options mb-4">
-                        <label class="list-group-item d-flex align-items-center payment-option"
-                            [class.active]="paymentMethod === 'COD'">
-                            <input type="radio" name="paymentMethod" value="COD" [(ngModel)]="paymentMethod"
-                                class="form-check-input me-3">
-                            <i class="fa-solid fa-money-bill-wave me-3 fs-5"></i>
-                            <div>
-                                <strong>Cash on Delivery</strong>
-                                <p class="mb-0 small text-muted">Pay when your order arrives</p>
-                            </div>
-                        </label>
-
-                        <label class="list-group-item d-flex align-items-center payment-option"
-                            [class.active]="paymentMethod === 'CARD'">
-                            <input type="radio" name="paymentMethod" value="CARD" [(ngModel)]="paymentMethod"
-                                class="form-check-input me-3">
-                            <i class="fa-solid fa-credit-card me-3 fs-5"></i>
-                            <div>
-                                <strong>Credit / Debit Card</strong>
-                                <p class="mb-0 small text-muted">Visa, Mastercard, RuPay</p>
-                            </div>
-                        </label>
-
-                        <label class="list-group-item d-flex align-items-center payment-option"
-                            [class.active]="paymentMethod === 'UPI'">
-                            <input type="radio" name="paymentMethod" value="UPI" [(ngModel)]="paymentMethod"
-                                class="form-check-input me-3">
-                            <i class="fa-solid fa-qrcode me-3 fs-5"></i>
-                            <div>
-                                <strong>UPI</strong>
-                                <p class="mb-0 small text-muted">Google Pay, PhonePe, Paytm</p>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Card Fields -->
-                    <div *ngIf="paymentMethod === 'CARD'" class="card-fields mb-4">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Card Number</label>
-                                <input type="text" class="form-control" [(ngModel)]="cardInfo.cardNumber"
-                                    placeholder="1234 5678 9012 3456" maxlength="19">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Expiry Date</label>
-                                <input type="text" class="form-control" [(ngModel)]="cardInfo.expiry"
-                                    placeholder="MM/YY" maxlength="5">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">CVV</label>
-                                <input type="password" class="form-control" [(ngModel)]="cardInfo.cvv" placeholder="•••"
-                                    maxlength="3">
+                        <div class="col-md-6">
+                            <div class="form-check payment-card p-3 border rounded-3 text-center"
+                                [class.border-primary]="paymentMethod() === 'CREDIT_CARD'">
+                                <input class="form-check-input d-none" type="radio" id="payCC" value="CREDIT_CARD"
+                                    [(ngModel)]="paymentMethod" name="payment">
+                                <label class="form-check-label w-100" for="payCC">
+                                    <i class="fa-solid fa-credit-card fs-3 mb-2 d-block"></i>
+                                    <span class="fw-bold">Credit/Debit Card</span>
+                                </label>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- UPI Field -->
-                    <div *ngIf="paymentMethod === 'UPI'" class="upi-field mb-4">
-                        <label class="form-label">UPI ID</label>
-                        <input type="text" class="form-control" [(ngModel)]="upiId" placeholder="yourname@upi">
-                    </div>
-
-                    <div class="d-flex justify-content-between mt-3">
-                        <button class="btn btn-outline-light py-2 px-4 rounded-3" (click)="prevStep()">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Back
-                        </button>
-                        <button class="btn btn-warning fw-bold py-2 px-4 rounded-3" [disabled]="!isPaymentValid()"
-                            (click)="nextStep()">
-                            Review Order <i class="fa-solid fa-arrow-right ms-2"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Step 3: Review -->
-                <div *ngIf="currentStep === 3" class="card border-0 shadow-sm rounded-4 p-4 step-card">
-                    <h4 class="fw-bold mb-4"><i class="fa-solid fa-clipboard-check me-2 text-warning"></i>Review Order
-                    </h4>
-
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-muted text-uppercase small mb-3">Shipping Address</h6>
-                        <div class="review-box p-3 rounded-3">
-                            <p class="mb-1 fw-semibold">{{ shippingInfo.fullName }}</p>
-                            <p class="mb-1 small">{{ shippingInfo.addressLine1 }}</p>
-                            <p *ngIf="shippingInfo.addressLine2" class="mb-1 small">{{ shippingInfo.addressLine2 }}</p>
-                            <p class="mb-1 small">{{ shippingInfo.city }}, {{ shippingInfo.state }} - {{
-                                shippingInfo.zipCode }}</p>
-                            <p class="mb-0 small">Phone: {{ shippingInfo.phone }}</p>
+                        <div class="col-md-6">
+                            <div class="form-check payment-card p-3 border rounded-3 text-center"
+                                [class.border-primary]="paymentMethod() === 'PAYPAL'">
+                                <input class="form-check-input d-none" type="radio" id="payPP" value="PAYPAL"
+                                    [(ngModel)]="paymentMethod" name="payment">
+                                <label class="form-check-label w-100" for="payPP">
+                                    <i class="fa-brands fa-paypal fs-3 mb-2 d-block"></i>
+                                    <span class="fw-bold">PayPal</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-muted text-uppercase small mb-3">Payment Method</h6>
-                        <div class="review-box p-3 rounded-3">
-                            <p class="mb-0 fw-semibold">{{ getPaymentLabel() }}</p>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-muted text-uppercase small mb-3">Order Items</h6>
-                        <div class="table-responsive">
-                            <table class="table align-middle review-table">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th class="text-center">Qty</th>
-                                        <th class="text-end">Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let item of cartItems">
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img [src]="item.imageUrl" [alt]="item.productName"
-                                                    class="rounded me-2 review-img">
-                                                <span class="small">{{ item.productName }}</span>
-                                            </div>
-                                        </td>
-                                        <td class="text-center">{{ item.quantity }}</td>
-                                        <td class="text-end fw-bold">₹{{ item.subtotal | number:'1.2-2' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                        <button class="btn btn-outline-light py-2 px-4 rounded-3" (click)="prevStep()">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Back
-                        </button>
-                        <button class="btn btn-success fw-bold py-3 px-5 rounded-3 place-order-btn"
-                            (click)="placeOrder()">
-                            <i class="fa-solid fa-lock me-2"></i>Place Order — ₹{{ grandTotal | number:'1.2-2' }}
-                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Order Summary Sidebar -->
-            <div class="col-lg-4 mt-4 mt-lg-0">
-                <div class="card border-0 shadow-sm rounded-4 p-4 step-card">
-                    <h5 class="fw-bold mb-3">Order Summary</h5>
-                    <div *ngFor="let item of cartItems" class="d-flex justify-content-between mb-2 small">
-                        <span class="text-muted">{{ item.productName }} × {{ item.quantity }}</span>
-                        <span>₹{{ item.subtotal | number:'1.2-2' }}</span>
-                    </div>
-                    <hr class="border-secondary">
-                    <div class="d-flex justify-content-between fw-bold fs-5">
-                        <span>Total</span>
-                        <span class="text-warning">₹{{ grandTotal | number:'1.2-2' }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            <!-- Order Summary Sticky -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+                    <h5 class="fw-bold mb-4">Order Summary</h5>
 
-<!-- Confirmation Modal -->
-<div *ngIf="showConfirmationModal" class="modal-backdrop-custom">
-    <div class="modal d-block" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4 shadow-lg confirmation-modal">
-                <div class="modal-body text-center p-5">
-                    <div class="success-icon mb-4">
-                        <i class="fa-solid fa-circle-check fa-5x text-success"></i>
+                    <div class="order-items mb-4">
+                        <div class="d-flex justify-content-between mb-2 small" *ngFor="let item of cart()?.cartItems">
+                            <span class="text-muted">{{ item.quantity }}x {{ item.productName }}</span>
+                            <span class="fw-bold">₹{{ item.subtotal }}</span>
+                        </div>
                     </div>
-                    <h3 class="fw-bold mb-2">🎉 Thank You!</h3>
-                    <p class="fs-5 mb-1">Your order has been placed successfully.</p>
-                    <p class="fw-bold fs-4 text-warning mb-4">Order {{ orderNumber }}</p>
-                    <p class="text-muted small mb-4">You will receive a confirmation notification shortly.</p>
-                    <button class="btn btn-warning fw-bold py-2 px-5 rounded-3" (click)="closeModal()">
-                        <i class="fa-solid fa-house me-2"></i>Continue Shopping
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-bold">₹{{ cart()?.totalAmount }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5 class="fw-bold">Total</h5>
+                        <h5 class="fw-bold text-primary">₹{{ cart()?.totalAmount }}</h5>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3 fw-bold"
+                        (click)='placeOrder()'>
+                        Place Order
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<app-footer></app-footer>

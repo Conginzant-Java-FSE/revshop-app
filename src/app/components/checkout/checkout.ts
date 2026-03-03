@@ -1,140 +1,90 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CartService } from '../../services/cart.service';
-import { NotificationService } from '../../services/notification.service';
-import { CartItem } from '../../models/cart.model';
-import { Navbar } from '../shared/navbar/navbar';
-import { Footer } from '../shared/footer/footer';
+import { CartService, CartDTO } from '../../services/cart';
+import { AddressService, AddressDTO } from '../../services/address';
+import { OrderService, OrderRequestDTO } from '../../services/order';
+import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../services/toast';
 
 @Component({
     selector: 'app-checkout',
     standalone: true,
-    imports: [CommonModule, FormsModule, Navbar, Footer],
+    imports: [CommonModule, FormsModule],
     templateUrl: './checkout.html',
     styleUrl: './checkout.css'
 })
 export class CheckoutComponent implements OnInit {
-    currentStep: number = 1;
-    cartItems: CartItem[] = [];
-    grandTotal: number = 0;
-    orderNumber: string = '';
-    showConfirmationModal: boolean = false;
-
-    shippingInfo = {
-        fullName: '',
-        addressLine1: '',
-        addressLine2: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        phone: ''
-    };
-
-    paymentMethod: string = 'COD';
-
-    cardInfo = {
-        cardNumber: '',
-        expiry: '',
-        cvv: ''
-    };
-
-    upiId: string = '';
+    cart = signal<CartDTO | null>(null);
+    addresses = signal<AddressDTO[]>([]);
+    selectedAddressId = signal<number | null>(null);
+    paymentMethod = signal<string>('CREDIT_CARD');
+    loading = signal<boolean>(true);
 
     constructor(
         private cartService: CartService,
-        private notificationService: NotificationService,
-        private router: Router
+        private addressService: AddressService,
+        private orderService: OrderService,
+        private router: Router,
+        private toastService: ToastService
     ) { }
 
     ngOnInit(): void {
-        this.cartItems = this.cartService.getCartItems();
-        this.grandTotal = this.cartService.getGrandTotal();
-
-        if (this.cartItems.length === 0) {
-            this.router.navigate(['/cart']);
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            this.loadCart(Number(userId));
+            this.loadAddresses(Number(userId));
         }
     }
 
-    nextStep(): void {
-        if (this.currentStep < 3) {
-            this.currentStep++;
-        }
-    }
-
-    prevStep(): void {
-        if (this.currentStep > 1) {
-            this.currentStep--;
-        }
-    }
-
-    goToStep(step: number): void {
-        if (step <= this.currentStep) {
-            this.currentStep = step;
-        }
-    }
-
-    isShippingValid(): boolean {
-        return !!(
-            this.shippingInfo.fullName &&
-            this.shippingInfo.addressLine1 &&
-            this.shippingInfo.city &&
-            this.shippingInfo.state &&
-            this.shippingInfo.zipCode &&
-            this.shippingInfo.phone
-        );
-    }
-
-    isPaymentValid(): boolean {
-        if (this.paymentMethod === 'COD') return true;
-        if (this.paymentMethod === 'CARD') {
-            return !!(this.cardInfo.cardNumber && this.cardInfo.expiry && this.cardInfo.cvv);
-        }
-        if (this.paymentMethod === 'UPI') {
-            return !!this.upiId;
-        }
-        return false;
-    }
-
-    getPaymentLabel(): string {
-        switch (this.paymentMethod) {
-            case 'COD': return 'Cash on Delivery';
-            case 'CARD': return 'Credit / Debit Card';
-            case 'UPI': return 'UPI';
-            default: return '';
-        }
-    }
-
-    placeOrder(): void {
-        this.orderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-
-        const orderPayload = {
-            userId: localStorage.getItem('userId'),
-            items: this.cartItems,
-            shippingAddress: this.shippingInfo,
-            paymentMethod: this.paymentMethod,
-            totalAmount: this.grandTotal
-        };
-
-        this.cartService.placeOrder(orderPayload).subscribe({
-            next: () => {
-                this.onOrderSuccess();
-            },
-            error: () => {
-                this.onOrderSuccess();
-            }
+    loadCart(userId: number): void {
+        this.cartService.getCartByUserId(userId).subscribe({
+            next: (res) => this.cart.set(res.data)
         });
     }
 
-    private onOrderSuccess(): void {
-        this.notificationService.addNotification('Order ' + this.orderNumber + ' Placed Successfully!');
-        this.cartService.clearCart();
-        this.showConfirmationModal = true;
+    loadAddresses(userId: number): void {
+        this.addressService.getAddressesByUserId(userId).subscribe({
+            next: (res) => {
+                this.addresses.set(res.data);
+                if (res.data.length > 0) {
+                    const defaultAddr = res.data.find(a => a.isDefault);
+                    this.selectedAddressId.set(defaultAddr ? defaultAddr.addressId! : res.data[0].addressId!);
+                }
+                this.loading.set(false);
+            },
+            error: () => this.loading.set(false)
+        });
     }
 
-    closeModal(): void {
-        this.showConfirmationModal = false;
-        this.router.navigate(['/']);
+    placeOrder(): void {
+        const userId = localStorage.getItem('userId');
+        const currentCart = this.cart();
+        const addressId = this.selectedAddressId();
+
+        if (!userId || !currentCart || !addressId) {
+            alert('Please fill all details');
+            return;
+        }
+
+        const orderRequest: OrderRequestDTO = {
+            userId: Number(userId),
+            shippingAddressId: addressId,
+            billingAddressId: addressId,
+            paymentMethod: this.paymentMethod(),
+            items: currentCart.cartItems.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity
+            }))
+        };
+
+        this.orderService.placeOrder(Number(userId), orderRequest).subscribe({
+            next: (res) => {
+                this.toastService.success('Order placed successfully! Order ID: ' + res.data.orderNumber);
+                this.cartService.clearCart(Number(userId)).subscribe();
+                this.router.navigate(['/dashboard']);
+            },
+            error: (err) => console.error(err)
+        });
     }
 }

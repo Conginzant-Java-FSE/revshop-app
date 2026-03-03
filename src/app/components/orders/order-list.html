@@ -1,0 +1,52 @@
+<div class="orders-page py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Order History</h2>
+            <a routerLink="/products" class="btn btn-outline-primary rounded-pill px-4">Continue Shopping</a>
+        </div>
+
+        <div *ngIf="loading()" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div *ngIf="!loading() && orders().length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm">
+            <div class="mb-4">
+                <i class="fa-solid fa-receipt fs-1 text-muted"></i>
+            </div>
+            <h4 class="text-muted">No orders found</h4>
+            <p class="text-muted">You haven't placed any orders yet.</p>
+        </div>
+
+        <div class="table-responsive bg-white rounded-4 shadow-sm p-4" *ngIf="!loading() && orders().length > 0">
+            <table class="table table-hover align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-0 px-4">Order #</th>
+                        <th class="border-0">Date</th>
+                        <th class="border-0">Amount</th>
+                        <th class="border-0">Status</th>
+                        <th class="border-0 text-end px-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let order of orders()">
+                        <td class="px-4 fw-bold text-primary">{{ order.orderNumber }}</td>
+                        <td class="text-muted">{{ order.orderDate | date:'mediumDate' }}</td>
+                        <td class="fw-bold">₹{{ order.totalAmount }}</td>
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2" [ngClass]="getStatusClass(order.status)">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td class="text-end px-4">
+                            <button class="btn btn-light btn-sm rounded-pill px-3 me-2">Track</button>
+                            <button class="btn btn-primary btn-sm rounded-pill px-3">Details</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

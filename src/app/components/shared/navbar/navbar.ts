@@ -1,36 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, signal } from '@angular/core';
+import { RouterLink, Router, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../services/auth';
 import { CommonModule } from '@angular/common';
-import { CartService } from '../../../services/cart.service';
-import { CartItem } from '../../../models/cart-item.model';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css'],
 })
 export class Navbar implements OnInit {
-  totalCartItems: number = 0;
-
-  constructor(private cartService: CartService) { }
+  constructor(public authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    this.loadCartCount();
   }
 
-  loadCartCount(): void {
-    this.cartService.getCartItems().subscribe({
-      next: (items: CartItem[]) => {
-        this.totalCartItems = 0;
-        items.forEach((item: CartItem) => {
-          this.totalCartItems += item.quantity;
-        });
-      },
-      error: () => {
-        this.totalCartItems = 0;
-      }
-    });
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

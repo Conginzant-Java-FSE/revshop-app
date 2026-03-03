@@ -69,4 +69,19 @@ export class AuthService {
     this.authState.set({ token: null, role: null, userId: null, name: null });
   }
 
+  /**
+ * Fetches the security question for a given email
+ */
+getSecurityQuestion(email: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/security-question`, { params: { email } });
+}
+
+/**
+ * Resets the password using security answer
+ */
+resetPassword(data: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/reset-password`, data);
+}
+
+
 }

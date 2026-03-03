@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, OrderResponseDTO } from '../../services/order';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TrackingModalComponent } from './tracking-modal/tracking-modal';
 
 @Component({
@@ -15,9 +15,12 @@ export class OrderListComponent implements OnInit {
     orders = signal<OrderResponseDTO[]>([]);
     loading = signal<boolean>(true);
     showTrackingModal = signal<boolean>(false);
+    showDetailsModal = signal<boolean>(false);
+    detailsLoading = signal<boolean>(false);
     selectedOrder = signal<{ id: number, number: string } | null>(null);
+    selectedOrderDetails = signal<OrderResponseDTO | null>(null);
 
-    constructor(private orderService: OrderService) { }
+    constructor(private orderService: OrderService, private router: Router) { }
 
     ngOnInit(): void {
         this.loadOrders();
@@ -55,6 +58,26 @@ export class OrderListComponent implements OnInit {
 
     closeTracking(): void {
         this.showTrackingModal.set(false);
+        this.selectedOrder.set(null);
+    }
+
+    viewDetails(order: OrderResponseDTO): void {
+        this.selectedOrder.set({ id: order.orderId, number: order.orderNumber });
+        this.showDetailsModal.set(true);
+        this.detailsLoading.set(true);
+
+        this.orderService.getOrderById(order.orderId).subscribe({
+            next: (res) => {
+                this.selectedOrderDetails.set(res.data);
+                this.detailsLoading.set(false);
+            },
+            error: () => this.detailsLoading.set(false)
+        });
+    }
+
+    closeDetails(): void {
+        this.showDetailsModal.set(false);
+        this.selectedOrderDetails.set(null);
         this.selectedOrder.set(null);
     }
 }

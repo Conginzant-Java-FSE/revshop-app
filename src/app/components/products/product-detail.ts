@@ -8,6 +8,7 @@ import { FavoriteService } from '../../services/favorite';
 import { Review } from '../../models/review.model';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
+import { Location } from '@angular/common'; // Added this
 
 @Component({
     selector: 'app-product-detail',
@@ -34,8 +35,13 @@ export class ProductDetailComponent implements OnInit {
         private cartService: CartService,
         private reviewService: ReviewService,
         private favoriteService: FavoriteService,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private location: Location // Added this
     ) { }
+
+    goBack(): void {
+        this.location.back();
+    }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');

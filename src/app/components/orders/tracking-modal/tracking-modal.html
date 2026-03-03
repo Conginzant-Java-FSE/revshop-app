@@ -1,44 +1,49 @@
-<div class="modal-backdrop" (click)="onClose()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-            <div class="header-title">
-                <i class="fa-solid fa-location-dot text-primary me-2"></i>
-                <h2>Track Order #{{ orderNumber }}</h2>
-            </div>
-            <button class="close-btn-top" (click)="onClose()">&times;</button>
-        </div>
-
-        <div class="modal-body">
-            <div *ngIf="loading" class="loading-state">
-                <div class="spinner"></div>
-                <p>Loading tracking details...</p>
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                    Track Order #{{ orderNumber }}
+                </h5>
+                <button type="button" class="btn-close shadow-none" (click)="onClose()"></button>
             </div>
 
-            <div *ngIf="!loading && trackingDetails.length === 0" class="empty-state">
-                <div class="icon-history">
-                    <i class="fa-solid fa-rotate-left fs-1 text-primary mb-3"></i>
+            <div class="modal-body p-4">
+                <div *ngIf="loading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted mt-2">Loading tracking details...</p>
                 </div>
-                <p>No tracking updates available yet.</p>
-            </div>
 
-            <div *ngIf="!loading && trackingDetails.length > 0" class="timeline">
-                <div *ngFor="let detail of trackingDetails; let i = index" class="timeline-item">
-                    <div class="timeline-dot" [class.active]="i === 0"></div>
-                    <div class="timeline-content">
-                        <h4 [class.active-text]="i === 0">{{ detail.status }}</h4>
-                        <p>{{ detail.description }}</p>
-                        <span class="timestamp">{{ detail.updatedAt | date:'medium' }}</span>
+                <div *ngIf="!loading && trackingDetails.length === 0" class="text-center py-4">
+                    <div class="bg-light rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="fa-solid fa-rotate-left fs-3 text-primary"></i>
+                    </div>
+                    <p class="text-muted">No tracking updates available yet.</p>
+                </div>
+
+                <div *ngIf="!loading && trackingDetails.length > 0" class="timeline">
+                    <div *ngFor="let detail of trackingDetails; let i = index"
+                        class="timeline-item border-start ps-4 pb-4 position-relative">
+                        <div class="timeline-dot bg-primary rounded-circle position-absolute start-0 translate-middle-x"
+                            style="width: 12px; height: 12px; margin-left: -1px; top: 8px;"
+                            [class.bg-success]="i === 0"></div>
+                        <div class="timeline-content">
+                            <h6 class="fw-bold mb-1" [class.text-success]="i === 0">{{ detail.status }}</h6>
+                            <p class="text-muted small mb-1">{{ detail.description }}</p>
+                            <span class="text-muted x-small d-block">{{ detail.updatedAt | date:'medium' }}</span>
+                        </div>
                     </div>
                 </div>
+
+                <div *ngIf="error" class="alert alert-danger rounded-3" role="alert">
+                    Failed to load tracking details. Please try again later.
+                </div>
             </div>
 
-            <div *ngIf="error" class="error-state">
-                <p>Failed to load tracking details. Please try again later.</p>
+            <div class="modal-footer border-0">
+                <button class="btn btn-light rounded-pill px-4" (click)="onClose()">Close</button>
             </div>
-        </div>
-
-        <div class="modal-footer">
-            <button class="close-btn-bottom" (click)="onClose()">Close</button>
         </div>
     </div>
 </div>

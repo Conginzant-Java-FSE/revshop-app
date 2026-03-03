@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { Location, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
@@ -21,8 +21,13 @@ export class RegisterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) { }
+
+  goBack(): void {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     this.registerForm = this.formBuilder.group({

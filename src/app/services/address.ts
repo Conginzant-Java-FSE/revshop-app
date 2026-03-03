@@ -6,12 +6,14 @@ import { ApiResponse } from '../models/api-response.model';
 export interface AddressDTO {
     addressId?: number;
     addressLine: string;
+    street?: string;
     city: string;
     state: string;
     zipCode: string;
     country: string;
     isDefault: boolean;
     userId?: number;
+    addressType?: string;
 }
 
 @Injectable({
@@ -27,9 +29,7 @@ export class AddressService {
     }
 
     addAddress(address: AddressDTO, userId: number): Observable<ApiResponse<AddressDTO>> {
-        return this.http.post<ApiResponse<AddressDTO>>(this.apiUrl, address, {
-            params: { userId: userId.toString() }
-        });
+        return this.http.post<ApiResponse<AddressDTO>>(`${this.apiUrl}/${userId}`, address);
     }
 
     updateAddress(id: number, address: AddressDTO): Observable<ApiResponse<AddressDTO>> {

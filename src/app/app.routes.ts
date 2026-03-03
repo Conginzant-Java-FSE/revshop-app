@@ -14,11 +14,13 @@ import { FavoritesComponent } from './components/favorites/favorites';
 import { BuyerDashboardComponent } from './components/dashboard/buyer-dashboard';
 import { SellerDashboardComponent } from './components/dashboard/seller-dashboard';
 import { ProductAddComponent } from './components/products/product-add';
+import { ForgotPasswordComponent } from './components/login/forgot-password';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'buyer-dashboard', component: BuyerDashboardComponent, canActivate: [authGuard] },
   { path: 'seller-dashboard', component: SellerDashboardComponent, canActivate: [authGuard] },

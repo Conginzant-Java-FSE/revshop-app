@@ -1,0 +1,16 @@
+.cart-page .card {
+    transition: transform 0.2s ease;
+}
+
+.cart-page .card:hover {
+    transform: translateX(5px);
+}
+
+.dropdown-menu-item:hover {
+    background-color: var(--bs-primary-bg-subtle) !important;
+}
+
+.cart-badge {
+    font-size: 0.65rem;
+    padding: 0.25em 0.5em;
+}

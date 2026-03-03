@@ -4,7 +4,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white overflow-hidden position-relative">
                 <div class="position-absolute end-0 bottom-0 p-4 opacity-10">
-                    <i class="fa-solid fa-graduation-cap" style="font-size: 15rem; transform: rotate(-15deg);"></i>
+                    <i class="fa-solid fa-cart-shopping" style="font-size: 15rem; transform: rotate(-15deg);"></i>
                 </div>
                 <div class="row align-items-center">
                     <div class="col-auto">
@@ -13,9 +13,9 @@
                         </div>
                     </div>
                     <div class="col">
-                        <h2 class="fw-bold mb-1">Welcome back, {{ userName() }}!</h2>
-                        <p class="mb-0 opacity-75">You're logged in as a <span
-                                class="badge bg-white text-primary rounded-pill">{{ userRole() }}</span></p>
+                        <h2 class="fw-bold mb-1">Buyer Dashboard</h2>
+                        <h4 class="mb-1">Welcome, {{ authService.authState().name }}!</h4>
+                        <p class="mb-0 opacity-75">Track your orders and manage your profile</p>
                     </div>
                     <div class="col-auto text-end">
                         <button class="btn btn-light rounded-pill px-4 shadow-sm" (click)="onLogout()">
@@ -27,8 +27,8 @@
         </div>
     </div>
 
-    <!-- Buyer Dashboard -->
-    <div class="row g-4" *ngIf="userRole() === 'BUYER'">
+    <!-- Buyer Dashboard Content -->
+    <div class="row g-4">
         <!-- Left Stats -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
@@ -46,7 +46,7 @@
                         class="list-group-item list-group-item-action border-0 py-3 rounded-3 mb-2 d-flex align-items-center gap-3">
                         <i class="fa-solid fa-receipt text-info fs-5"></i> Order History
                     </a>
-                    <a href="#"
+                    <a routerLink="/favorites"
                         class="list-group-item list-group-item-action border-0 py-3 rounded-3 d-flex align-items-center gap-3">
                         <i class="fa-solid fa-heart text-danger fs-5"></i> Favorites
                     </a>
@@ -90,69 +90,6 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Seller Dashboard -->
-    <div class="row g-4" *ngIf="userRole() === 'SELLER'">
-        <!-- Inventory Management -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold mb-0">Your Products ({{ myProducts().length }})</h5>
-                    <button class="btn btn-primary rounded-pill px-4" routerLink="/products/new">
-                        <i class="fa-solid fa-plus me-2"></i> Add New Product
-                    </button>
-                </div>
-
-                <div *ngIf="loading()" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status"></div>
-                </div>
-
-                <div class="table-responsive" *ngIf="!loading()">
-                    <table class="table table-hover align-middle" *ngIf="myProducts().length > 0">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>SRP</th>
-                                <th>Stock</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let product of myProducts()">
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-light rounded-3 p-2" style="width: 40px; height: 40px;">
-                                            <i class="fa-solid fa-box text-muted"></i>
-                                        </div>
-                                        <span class="fw-bold">{{ product.name }}</span>
-                                    </div>
-                                </td>
-                                <td class="fw-bold text-primary">₹{{ product.sellingPrice }}</td>
-                                <td>
-                                    <span
-                                        [ngClass]="product.stockQuantity < product.thresholdQuantity ? 'text-danger fw-bold' : 'text-muted'">
-                                        {{ product.stockQuantity }}
-                                    </span>
-                                </td>
-                                <td><span class="badge bg-success-subtle text-success rounded-pill px-2">Active</span>
-                                </td>
-                                <td class="text-end">
-                                    <button class="btn btn-light btn-sm rounded-circle me-2"><i
-                                            class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-light btn-sm rounded-circle text-danger"><i
-                                            class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div *ngIf="myProducts().length === 0 && !loading()" class="text-center py-5">
-                        <p class="text-muted">You haven't listed any products yet.</p>
-                    </div>
                 </div>
             </div>
         </div>

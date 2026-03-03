@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top py-3 custom-navbar">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="/">
+        <a class="navbar-brand d-flex align-items-center" routerLink="/">
             <i class="fa-solid fa-store fs-3 text-warning me-2"></i>
             <span class="fw-bold fs-4 branding-text">Rev<span class="text-warning">Shop</span></span>
         </a>
@@ -10,10 +10,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCore">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
+                </li>
                 <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
             </ul>
             <form class="d-flex mx-auto search-form position-relative" role="search">
                 <input class="form-control rounded-pill pe-5 search-input" type="search"
@@ -25,19 +26,48 @@
             </form>
             <ul
                 class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
-                <li class="nav-item me-lg-3">
+                <li class="nav-item me-lg-3" *ngIf="!authService.authState().token">
                     <a class="nav-link d-flex flex-column align-items-center position-relative" routerLink="/login">
                         <i class="fa-solid fa-user fs-5 mb-1"></i>
-                        <span class="small d-none d-lg-block">Account</span>
+                        <span class="small d-none d-lg-block">Login</span>
                     </a>
                 </li>
+                <li class="nav-item dropdown me-lg-3" *ngIf="authService.authState().token">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarDropdown"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-circle-user fs-4"></i>
+                        <span class="small fw-bold">{{ authService.authState().name }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2"
+                        aria-labelledby="navbarDropdown">
+                        <li *ngIf="authService.authState().role === 'BUYER'">
+                            <a class="dropdown-menu-item dropdown-item py-2" routerLink="/buyer-dashboard">
+                                <i class="fa-solid fa-gauge me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li *ngIf="authService.authState().role === 'SELLER'">
+                            <a class="dropdown-menu-item dropdown-item py-2" routerLink="/seller-dashboard">
+                                <i class="fa-solid fa-gauge me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li><a class="dropdown-menu-item dropdown-item py-2" routerLink="/profile"><i
+                                    class="fa-solid fa-user-pen me-2"></i> Profile</a></li>
+                        <li *ngIf="authService.authState().role === 'BUYER'"><a
+                                class="dropdown-menu-item dropdown-item py-2" routerLink="/favorites"><i
+                                    class="fa-solid fa-heart me-2"></i> Favorites</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-menu-item dropdown-item py-2 text-danger" (click)="onLogout()"
+                                style="cursor: pointer;"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning" href="#">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
+                        routerLink="/cart">
                         <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
-                        <span
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
-                            3
-                        </span>
+                        <!-- Cart count badge can be added here with signals later -->
                         <span class="small d-none d-lg-block text-white">Cart</span>
                     </a>
                 </li>

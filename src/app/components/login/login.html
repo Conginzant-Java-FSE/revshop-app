@@ -47,17 +47,11 @@
 
                                 <!-- Password Field -->
                                 <div class="col-12">
-                                    <div class="form-floating position-relative">
-                                        <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                            id="password" formControlName="password" placeholder="Password"
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="password"
+                                            formControlName="password" placeholder="Password"
                                             [ngClass]="{'is-invalid': submitted && loginForm.get('password')?.errors}">
                                         <label for="password">Password</label>
-                                        <button type="button"
-                                            class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted pe-3"
-                                            (click)="showPassword = !showPassword" style="z-index: 5;">
-                                            <i class="fa-solid"
-                                                [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                                        </button>
                                         <div class="invalid-feedback">Password is required</div>
                                     </div>
                                 </div>

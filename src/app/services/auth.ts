@@ -1,32 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { signal, computed } from '@angular/core';
-
-export interface UserAuth {
-  token: string | null;
-  role: string | null;
-  userId: string | null;
-  name: string | null;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = '/api/auth';
-
-  // Reactive authentication state
-  authState = signal<UserAuth>({
-    token: localStorage.getItem('token'),
-    role: localStorage.getItem('role'),
-    userId: localStorage.getItem('userId'),
-    name: localStorage.getItem('name')
-  });
-
-  // Derived reactive states
-  isLoggedIn = computed(() => !!this.authState().token);
-  userRole = computed(() => this.authState().role);
 
   constructor(private http: HttpClient) { }
 
@@ -56,17 +36,30 @@ export class AuthService {
     localStorage.setItem('role', role);
     localStorage.setItem('userId', userId);
     localStorage.setItem('name', name);
-
-    // Update signal
-    this.authState.set({ token, role, userId, name });
   }
 
   /**
-   * Clears authentication data and resets state
+   * Clears authentication data from localStorage
    */
   logout(): void {
-    localStorage.clear();
-    this.authState.set({ token: null, role: null, userId: null, name: null });
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('name');
+  }
+
+  /**
+   * Returns whether a user is currently logged in (token exists)
+   */
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  /**
+   * Returns the current user's role
+   */
+  getUserRole(): string | null {
+    return localStorage.getItem('role');
   }
 
 }

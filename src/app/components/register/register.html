@@ -63,25 +63,17 @@
 
 
                                 <div class="col-12 col-sm-6">
-                                    <div class="form-floating position-relative">
-                                        <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                            id="password" formControlName="password" placeholder="Password"
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="password"
+                                            formControlName="password" placeholder="Password"
                                             [ngClass]="{'is-invalid': submitted && registerForm.get('password')?.errors}">
                                         <label for="password">Password</label>
-                                        <button type="button"
-                                            class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-decoration-none text-muted pe-3"
-                                            (click)="showPassword = !showPassword" style="z-index: 5;">
-                                            <i class="fa-solid"
-                                                [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                                        </button>
                                         <div class="invalid-feedback"
                                             *ngIf="registerForm.get('password')?.hasError('required')">Password is
                                             required</div>
                                         <div class="invalid-feedback"
-                                            *ngIf="registerForm.get('password')?.hasError('minlength') || registerForm.get('password')?.hasError('pattern')">
-                                            Password must be at least 8 characters and include: 1 uppercase, 1
-                                            lowercase, 1 digit, and 1 special character.
-                                        </div>
+                                            *ngIf="registerForm.get('password')?.hasError('minlength')">Minimum 6
+                                            characters</div>
                                     </div>
                                 </div>
 

@@ -15,7 +15,6 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   submitted: boolean = false;
   errorMessage: string = '';
-  showPassword: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -47,7 +46,7 @@ export class LoginComponent implements OnInit {
         next: (res) => {
           const data = res.data || res;
           this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
-          this.router.navigate(['/']);
+          this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';

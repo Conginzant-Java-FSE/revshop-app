@@ -16,6 +16,7 @@ export class RegisterComponent implements OnInit {
   isSeller: boolean = false;
   submitted: boolean = false;
   errorMessage: string = '';
+  showPassword: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -28,7 +29,11 @@ export class RegisterComponent implements OnInit {
       role: ['BUYER', Validators.required],
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/)
+      ]],
       phone: ['', Validators.required],
       age: ['', [Validators.required, Validators.min(18)]],
       securityQuestion: ['', Validators.required],

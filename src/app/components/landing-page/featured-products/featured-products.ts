@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { CartService } from '../../../services/cart.service';
+import { CartService } from '../../../services/cart';
+import { AuthService } from '../../../services/auth';
+import { ToastService } from '../../../services/toast';
 
 @Component({
   selector: 'app-featured-products',
@@ -13,18 +15,26 @@ import { CartService } from '../../../services/cart.service';
 export class FeaturedProducts {
   successMessage: string = '';
 
-  constructor(private cartService: CartService, private router: Router) { }
+  constructor(
+    private cartService: CartService,
+    private authService: AuthService,
+    private toastService: ToastService,
+    private router: Router
+  ) { }
 
   addToCart(productId: number): void {
-    this.cartService.addToCart(productId, 1).subscribe({
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.toastService.success('Please login to add items to cart');
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.cartService.addItemToCart(Number(userId), productId, 1).subscribe({
       next: () => {
-        this.successMessage = 'Item added to cart!';
-        setTimeout(() => this.successMessage = '', 3000);
+        this.toastService.success('Item added to cart!');
       },
       error: (err: any) => {
         console.error('Failed to add to cart', err);
-        this.successMessage = 'Failed to add item to cart.';
-        setTimeout(() => this.successMessage = '', 3000);
       }
     });
   }

@@ -1,11 +1,14 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { TrackingService } from '../../../services/tracking.service';
 import { TrackingDetail } from '../../../models/tracking.model';
 
 @Component({
   selector: 'app-tracking-modal',
-  templateUrl: './tracking-modal.component.html',
-  styleUrls: ['./tracking-modal.component.css']
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './tracking-modal.html',
+  styleUrl: './tracking-modal.css'
 })
 export class TrackingModalComponent implements OnInit {
   @Input() orderId!: number;

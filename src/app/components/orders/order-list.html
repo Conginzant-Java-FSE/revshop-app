@@ -41,12 +41,18 @@
                             </span>
                         </td>
                         <td class="text-end px-4">
-                            <button class="btn btn-light btn-sm rounded-pill px-3 me-2">Track</button>
+                            <button class="btn btn-light btn-sm rounded-pill px-3 me-2"
+                                (click)="openTracking(order)">Track</button>
                             <button class="btn btn-primary btn-sm rounded-pill px-3">Details</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- Tracking Modal -->
+        <app-tracking-modal *ngIf="showTrackingModal()" [orderId]="selectedOrder()?.id || 0"
+            [orderNumber]="selectedOrder()?.number || ''" (close)="closeTracking()">
+        </app-tracking-modal>
     </div>
 </div>

@@ -3,11 +3,13 @@ import { AuthService } from '../../services/auth';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductService, ProductDTO } from '../../services/product';
+import { Navbar } from '../shared/navbar/navbar';
+import { Header } from '../shared/header/header';
 
 @Component({
     selector: 'app-seller-dashboard',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, Navbar, Header],
     templateUrl: './seller-dashboard.html',
     styleUrl: './dashboard.css'
 })
@@ -39,6 +41,6 @@ export class SellerDashboardComponent implements OnInit {
 
     onLogout(): void {
         this.authService.logout();
-        this.router.navigate(['/login']);
+        this.router.navigate(['/']);
     }
 }

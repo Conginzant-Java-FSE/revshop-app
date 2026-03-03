@@ -17,10 +17,7 @@ export interface ProductDTO {
     sellerId: number;
 }
 
-export interface ApiResponse<T> {
-    message: string;
-    data: T;
-}
+import { ApiResponse } from '../models/api-response.model';
 
 export interface Page<T> {
     content: T[];

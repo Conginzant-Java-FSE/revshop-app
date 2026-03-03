@@ -2,17 +2,20 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService, OrderResponseDTO } from '../../services/order';
 import { RouterLink } from '@angular/router';
+import { TrackingModalComponent } from './tracking-modal/tracking-modal';
 
 @Component({
     selector: 'app-order-list',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, TrackingModalComponent],
     templateUrl: './order-list.html',
     styleUrl: './order-list.css'
 })
 export class OrderListComponent implements OnInit {
     orders = signal<OrderResponseDTO[]>([]);
     loading = signal<boolean>(true);
+    showTrackingModal = signal<boolean>(false);
+    selectedOrder = signal<{ id: number, number: string } | null>(null);
 
     constructor(private orderService: OrderService) { }
 
@@ -43,5 +46,15 @@ export class OrderListComponent implements OnInit {
             case 'CANCELLED': return 'bg-danger-subtle text-danger-emphasis';
             default: return 'bg-secondary-subtle text-secondary-emphasis';
         }
+    }
+
+    openTracking(order: OrderResponseDTO): void {
+        this.selectedOrder.set({ id: order.orderId, number: order.orderNumber });
+        this.showTrackingModal.set(true);
+    }
+
+    closeTracking(): void {
+        this.showTrackingModal.set(false);
+        this.selectedOrder.set(null);
     }
 }

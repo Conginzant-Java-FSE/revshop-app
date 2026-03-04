@@ -8,6 +8,7 @@ import { ProductDetailComponent } from './components/products/product-detail';
 import { CartComponent } from './components/cart/cart';
 import { CheckoutComponent } from './components/checkout/checkout';
 import { OrderListComponent } from './components/orders/order-list';
+import { OrderDetailComponent } from './components/orders/order-detail/order-detail';
 import { authGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/profile/profile';
 import { FavoritesComponent } from './components/favorites/favorites';
@@ -30,6 +31,7 @@ export const routes: Routes = [
   { path: 'cart', component: CartComponent, canActivate: [authGuard] },
   { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard] },
   { path: 'orders', component: OrderListComponent, canActivate: [authGuard] },
+  { path: 'orders/:id', component: OrderDetailComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'favorites', component: FavoritesComponent, canActivate: [authGuard] },
   { path: 'products/new', component: ProductAddComponent, canActivate: [authGuard] },

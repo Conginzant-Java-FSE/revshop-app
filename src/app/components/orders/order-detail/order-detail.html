@@ -1,0 +1,165 @@
+<div class="od-page">
+
+    <!-- Toast -->
+    <div class="od-toast" [class.show]="showToast()" [class.toast-error]="toastType() === 'error'">
+        <span class="toast-icon">{{ toastType() === 'success' ? '✓' : '✕' }}</span>
+        {{ toastMessage() }}
+    </div>
+
+    <!-- Return Reason Modal -->
+    <div class="modal-overlay" *ngIf="showReturnModal()" (click)="closeReturnModal()">
+        <div class="return-modal" (click)="$event.stopPropagation()">
+            <h3 class="modal-title">Request Return</h3>
+            <p class="modal-sub">Please select a reason for your return:</p>
+            <select class="reason-select" [(ngModel)]="returnReason">
+                <option *ngFor="let r of returnReasons" [value]="r">{{ r }}</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" (click)="closeReturnModal()">Cancel</button>
+                <button class="btn-submit-return" (click)="submitReturn()" [disabled]="actionLoading()">
+                    <span *ngIf="actionLoading()">Submitting…</span>
+                    <span *ngIf="!actionLoading()">Submit Return</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="od-loading">
+        <div class="spinner"></div>
+        <p>Loading order details…</p>
+    </div>
+
+    <div *ngIf="!loading() && order()" class="od-content">
+
+        <!-- Back button -->
+        <button class="back-btn" (click)="goBack()">← Back to Orders</button>
+
+        <!-- ===== a) PAGE HEADER ===== -->
+        <div class="od-header-card">
+            <div class="od-header-left">
+                <h1 class="od-order-number">Order #{{ order().orderNumber }}</h1>
+                <p class="od-date">Placed on {{ order().orderDate | date:'MMMM d, yyyy, h:mm a' }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(order().status)">
+                {{ order().status | titlecase }}
+            </span>
+        </div>
+
+        <!-- ===== b) TRACKING STEPPER ===== -->
+        <div class="od-card">
+            <h2 class="od-section-title">Shipment Progress</h2>
+            <div class="stepper">
+                <ng-container
+                    *ngFor="let step of ['Ordered','Processing','Shipped','Out for Delivery','Delivered']; let i = index">
+                    <div class="step-item" [class.step-done]="!isCancelled() && getStatusIndex(order().status) > i"
+                        [class.step-active]="!isCancelled() && getStatusIndex(order().status) === i"
+                        [class.step-cancelled]="isCancelled()">
+                        <div class="step-circle">
+                            <span *ngIf="!isCancelled() && getStatusIndex(order().status) > i">✓</span>
+                            <span *ngIf="isCancelled()">✕</span>
+                            <span *ngIf="!isCancelled() && getStatusIndex(order().status) <= i">{{ i + 1 }}</span>
+                        </div>
+                        <p class="step-label">{{ step }}</p>
+                    </div>
+                    <div class="step-line" *ngIf="i < 4"
+                        [class.line-done]="!isCancelled() && getStatusIndex(order().status) > i">
+                    </div>
+                </ng-container>
+            </div>
+            <div *ngIf="isCancelled()" class="cancelled-note">
+                This order was cancelled.
+            </div>
+        </div>
+
+        <!-- ===== c) TRACKING HISTORY LOG ===== -->
+        <div class="od-card" *ngIf="trackingHistory().length > 0">
+            <h2 class="od-section-title">Tracking History</h2>
+            <div class="timeline">
+                <div class="timeline-item" *ngFor="let event of trackingHistory(); let last = last">
+                    <div class="timeline-dot" [ngClass]="getTrackingBadgeClass(event.status)"></div>
+                    <div class="timeline-line" *ngIf="!last"></div>
+                    <div class="timeline-content">
+                        <span class="track-status-badge" [ngClass]="getTrackingBadgeClass(event.status)">
+                            {{ event.status }}
+                        </span>
+                        <p class="track-desc">{{ event.description }}</p>
+                        <p class="track-time">{{ event.createdAt | date:'MMM d, y, h:mm a' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== d) ORDER ITEMS TABLE ===== -->
+        <div class="od-card">
+            <h2 class="od-section-title">Order Items</h2>
+            <div class="items-table-wrap">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-right">Unit Price</th>
+                            <th class="text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of order().items">
+                            <td class="item-name">{{ item.productName }}</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-right">₹{{ item.priceAtPurchase | number:'1.2-2' }}</td>
+                            <td class="text-right fw-bold">₹{{ item.subtotal | number:'1.2-2' }}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="total-label">Total</td>
+                            <td class="total-value">₹{{ order().totalAmount | number:'1.2-2' }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== e) PAYMENT INFO CARD ===== -->
+        <div class="od-card payment-card">
+            <h2 class="od-section-title">Payment Info</h2>
+            <div class="payment-grid">
+                <div class="payment-item">
+                    <span class="pay-label">Payment Method</span>
+                    <span class="pay-value">{{ order().paymentMethod || 'N/A' }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="pay-label">Order Date</span>
+                    <span class="pay-value">{{ order().orderDate | date:'mediumDate' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== f) ACTION BUTTONS ===== -->
+        <div class="od-actions">
+            <button class="btn-action btn-cancel-order" *ngIf="canCancel()" (click)="cancelOrder()"
+                [disabled]="actionLoading()">
+                <span *ngIf="actionLoading()">Processing…</span>
+                <span *ngIf="!actionLoading()">✕ Cancel Order</span>
+            </button>
+
+            <button class="btn-action btn-return" *ngIf="canReturn()" (click)="openReturnModal()"
+                [disabled]="actionLoading()">
+                ↩ Return Item
+            </button>
+
+            <span class="return-requested-label" *ngIf="isReturnRequested()">
+                ↩ Return Requested
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Not found -->
+    <div *ngIf="!loading() && !order()" class="od-notfound">
+        <p>Order not found.</p>
+        <button class="back-btn" (click)="goBack()">← Go Back</button>
+    </div>
+
+</div>

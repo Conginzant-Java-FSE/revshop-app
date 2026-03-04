@@ -54,4 +54,12 @@ export class OrderService {
             params: { status, sellerId: sellerId.toString() }
         });
     }
+
+    getSellerOrders(sellerId: number): Observable<ApiResponse<OrderResponseDTO[]>> {
+        return this.http.get<ApiResponse<OrderResponseDTO[]>>(`${this.apiUrl}/seller/${sellerId}`);
+    }
+
+    getSellerStats(sellerId: number): Observable<ApiResponse<any>> {
+        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/seller/${sellerId}/stats`);
+    }
 }

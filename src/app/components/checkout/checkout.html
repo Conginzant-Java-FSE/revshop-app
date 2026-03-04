@@ -12,8 +12,14 @@
             <div class="col-lg-8">
                 <!-- Shipping Address -->
                 <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-location-dot me-2 text-primary"></i> Shipping Address
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot me-2 text-primary"></i> Shipping
+                            Address</h5>
+                        <button class="btn btn-link btn-sm text-decoration-none fw-bold" (click)="openAddressModal()"
+                            *ngIf="addresses().length > 0">
+                            + Add New
+                        </button>
+                    </div>
 
                     <div class="address-list" *ngIf="addresses().length > 0">
                         <div class="form-check address-card p-3 border rounded-3 mb-2" *ngFor="let addr of addresses()"
@@ -30,7 +36,9 @@
 
                     <div *ngIf="addresses().length === 0" class="text-center py-3">
                         <p class="text-muted mb-3">No saved addresses found.</p>
-                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3">Add New Address</button>
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                            (click)="openAddressModal()">Add
+                            New Address</button>
                     </div>
                 </div>
 
@@ -40,8 +48,9 @@
                     </h5>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="form-check payment-card p-3 border rounded-3 text-center"
-                                [class.border-primary]="paymentMethod() === 'CREDIT_CARD'">
+                            <div class="form-check payment-card p-3 border rounded-3 text-center h-100 d-flex flex-column align-items-center justify-content-center"
+                                [class.border-primary]="paymentMethod() === 'CREDIT_CARD'"
+                                (click)="paymentMethod.set('CREDIT_CARD')">
                                 <input class="form-check-input d-none" type="radio" id="payCC" value="CREDIT_CARD"
                                     [(ngModel)]="paymentMethod" name="payment">
                                 <label class="form-check-label w-100" for="payCC">
@@ -51,8 +60,9 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-check payment-card p-3 border rounded-3 text-center"
-                                [class.border-primary]="paymentMethod() === 'PAYPAL'">
+                            <div class="form-check payment-card p-3 border rounded-3 text-center h-100 d-flex flex-column align-items-center justify-content-center"
+                                [class.border-primary]="paymentMethod() === 'PAYPAL'"
+                                (click)="paymentMethod.set('PAYPAL')">
                                 <input class="form-check-input d-none" type="radio" id="payPP" value="PAYPAL"
                                     [(ngModel)]="paymentMethod" name="payment">
                                 <label class="form-check-label w-100" for="payPP">
@@ -61,6 +71,35 @@
                                 </label>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Card Details Form -->
+                    <div class="mt-4 p-4 border rounded-4 bg-light" *ngIf="paymentMethod() === 'CREDIT_CARD'">
+                        <h6 class="fw-bold mb-3">Card Details</h6>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Card Number</label>
+                            <input type="text" class="form-control rounded-pill px-3" placeholder="0000 0000 0000 0000"
+                                [(ngModel)]="cardNumber" name="cardNo">
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Expiry Date</label>
+                                <input type="text" class="form-control rounded-pill px-3" placeholder="MM/YY"
+                                    [(ngModel)]="expiryDate" name="expiry">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">CVV</label>
+                                <input type="password" class="form-control rounded-pill px-3" placeholder="***"
+                                    [(ngModel)]="cvv" name="cvv">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PayPal Info -->
+                    <div class="mt-4 p-4 border rounded-4 bg-light text-center" *ngIf="paymentMethod() === 'PAYPAL'">
+                        <i class="fa-brands fa-paypal text-primary fs-1 mb-2"></i>
+                        <p class="mb-0 text-muted">You will be redirected to PayPal to complete your purchase securely.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -94,4 +133,60 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Address Modal -->
+    <div class="modal fade" [class.show]="showAddressModal()" [style.display]="showAddressModal() ? 'block' : 'none'"
+        tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-light border-0 py-3">
+                    <h5 class="modal-title fw-bold">Add New Shipping Address</h5>
+                    <button type="button" class="btn-close" (click)="closeAddressModal()"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form (ngSubmit)="onAddressSubmit()">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Address Line</label>
+                            <input type="text" class="form-control rounded-3" [(ngModel)]="addressForm.addressLine"
+                                name="line" placeholder="House No, Street, Area">
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">City</label>
+                                <input type="text" class="form-control rounded-3" [(ngModel)]="addressForm.city"
+                                    name="city" placeholder="City">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">State</label>
+                                <input type="text" class="form-control rounded-3" [(ngModel)]="addressForm.state"
+                                    name="state" placeholder="State">
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Zip Code</label>
+                                <input type="text" class="form-control rounded-3" [(ngModel)]="addressForm.zipCode"
+                                    name="zip" placeholder="Zip Code">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Country</label>
+                                <input type="text" class="form-control rounded-3" [(ngModel)]="addressForm.country"
+                                    name="country" readonly>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4 flex-grow-1"
+                                (click)="closeAddressModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 flex-grow-1"
+                                [disabled]="submittingAddress()">
+                                <span *ngIf="submittingAddress()" class="spinner-border spinner-border-sm me-2"></span>
+                                Save Address
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="showAddressModal()" class="modal-backdrop fade show"></div>
 </div>

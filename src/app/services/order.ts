@@ -17,7 +17,10 @@ export interface OrderResponseDTO {
     totalAmount: number;
     status: string;
     orderDate: string;
-    userId: number;
+    paymentMethod?: string;
+    buyerName?: string;
+    buyerEmail?: string;
+    items?: any[];
 }
 
 @Injectable({
@@ -29,7 +32,7 @@ export class OrderService {
     constructor(private http: HttpClient) { }
 
     placeOrder(userId: number, request: OrderRequestDTO): Observable<ApiResponse<OrderResponseDTO>> {
-        return this.http.post<ApiResponse<OrderResponseDTO>>(`${this.apiUrl}/place/${userId}`, request);
+        return this.http.post<ApiResponse<OrderResponseDTO>>(`${this.apiUrl}/place`, request);
     }
 
     getOrderById(orderId: number): Observable<ApiResponse<OrderResponseDTO>> {

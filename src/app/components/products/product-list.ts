@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ProductService, ProductDTO } from '../../services/product';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Location } from '@angular/common'; // Added this
 import { CartService } from '../../services/cart';
 import { ToastService } from '../../services/toast';
 
@@ -23,8 +24,13 @@ export class ProductListComponent implements OnInit {
     constructor(
         private productService: ProductService,
         private cartService: CartService,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private location: Location // Added this
     ) { }
+
+    goBack(): void {
+        this.location.back();
+    }
 
     ngOnInit(): void {
         this.loadProducts();

@@ -8,7 +8,8 @@ import { FavoriteService } from '../../services/favorite';
 import { Review } from '../../models/review.model';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
-import { Location } from '@angular/common'; // Added this
+import { Location } from '@angular/common';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-product-detail',
@@ -23,6 +24,10 @@ export class ProductDetailComponent implements OnInit {
     isFavorite = signal<boolean>(false);
     quantity = signal<number>(1);
     loading = signal<boolean>(true);
+    averageRating = signal<number>(0);
+    reviewCount = signal<number>(0);
+    hasUserReviewed = signal<boolean>(false);
+    stars = [1, 2, 3, 4, 5];
 
     newReview = {
         rating: 5,
@@ -36,7 +41,7 @@ export class ProductDetailComponent implements OnInit {
         private reviewService: ReviewService,
         private favoriteService: FavoriteService,
         private toastService: ToastService,
-        private location: Location // Added this
+        private location: Location
     ) { }
 
     goBack(): void {
@@ -47,9 +52,14 @@ export class ProductDetailComponent implements OnInit {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             const productId = Number(id);
+            const userId = localStorage.getItem('userId');
             this.loadProduct(productId);
             this.loadReviews(productId);
-            this.checkIfFavorite(productId);
+            this.loadAverageRating(productId);
+            if (userId) {
+                this.checkIfFavorite(productId);
+                this.checkHasUserReviewed(productId, Number(userId));
+            }
         }
     }
 
@@ -67,6 +77,27 @@ export class ProductDetailComponent implements OnInit {
         this.reviewService.getReviewsByProduct(productId).subscribe({
             next: (res) => this.reviews.set(res.data)
         });
+    }
+
+    loadAverageRating(productId: number): void {
+        this.reviewService.getAverageRating(productId).subscribe({
+            next: (res) => {
+                this.averageRating.set(res.data.averageRating);
+                this.reviewCount.set(res.data.reviewCount);
+            },
+            error: () => { /* ignore */ }
+        });
+    }
+
+    checkHasUserReviewed(productId: number, userId: number): void {
+        this.reviewService.hasUserReviewed(userId, productId).subscribe({
+            next: (res) => this.hasUserReviewed.set(res.data),
+            error: () => { /* ignore */ }
+        });
+    }
+
+    setRating(star: number): void {
+        this.newReview.rating = star;
     }
 
     checkIfFavorite(productId: number): void {
@@ -128,8 +159,11 @@ export class ProductDetailComponent implements OnInit {
                 next: () => {
                     this.toastService.success('Review submitted successfully!');
                     this.newReview.reviewText = '';
+                    this.newReview.rating = 5;
+                    this.hasUserReviewed.set(true);
                     if (prod && prod.productId) {
                         this.loadReviews(prod.productId);
+                        this.loadAverageRating(prod.productId);
                     }
                 }
             });
@@ -162,5 +196,9 @@ export class ProductDetailComponent implements OnInit {
         if (this.quantity() > 1) {
             this.quantity.set(this.quantity() - 1);
         }
+    }
+
+    getStarArray(): number[] {
+        return [1, 2, 3, 4, 5];
     }
 }

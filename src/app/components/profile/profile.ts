@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { UserService, UserDTO, PasswordUpdateRequest } from '../../services/user';
 import { AddressService, AddressDTO } from '../../services/address';
 import { AuthService } from '../../services/auth';
-import { Navbar } from '../shared/navbar/navbar';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
@@ -11,9 +10,8 @@ import { ToastService } from '../../services/toast';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, Navbar, Header, FormsModule],
+  imports: [CommonModule, Header, FormsModule],
   template: `
-    <app-navbar></app-navbar>
     <app-header></app-header>
     
     <div class="container py-5">
@@ -49,7 +47,7 @@ import { ToastService } from '../../services/toast';
                   <div class="col-md-6">
                     <label class="form-label text-muted small text-uppercase fw-bold">Full Name</label>
                     <div *ngIf="!isEditMode()" class="detail-value fs-5 fw-semibold border-bottom pb-2">{{ user()?.name }}</div>
-                    <input *ngIf="isEditMode()" type="text" class="form-control rounded-pill" [(ngModel)]="editForm().name">
+                    <input *ngIf="isEditMode()" type="text" class="form-control rounded-pill" [(ngModel)]="editForm.name" autocomplete="off">
                   </div>
                   <div class="col-md-6">
                     <label class="form-label text-muted small text-uppercase fw-bold">Email Address</label>
@@ -59,12 +57,12 @@ import { ToastService } from '../../services/toast';
                   <div class="col-md-6">
                     <label class="form-label text-muted small text-uppercase fw-bold">Phone Number</label>
                     <div *ngIf="!isEditMode()" class="detail-value fs-5 fw-semibold border-bottom pb-2">{{ user()?.phone || 'Not provided' }}</div>
-                    <input *ngIf="isEditMode()" type="text" class="form-control rounded-pill" [(ngModel)]="editForm().phone">
+                    <input *ngIf="isEditMode()" type="text" class="form-control rounded-pill" [(ngModel)]="editForm.phone" autocomplete="off">
                   </div>
                   <div class="col-md-6">
                     <label class="form-label text-muted small text-uppercase fw-bold">Age</label>
                     <div *ngIf="!isEditMode()" class="detail-value fs-5 fw-semibold border-bottom pb-2">{{ user()?.age }} years</div>
-                    <input *ngIf="isEditMode()" type="number" class="form-control rounded-pill" [(ngModel)]="editForm().age">
+                    <input *ngIf="isEditMode()" type="number" class="form-control rounded-pill" [(ngModel)]="editForm.age" autocomplete="off">
                   </div>
                 </div>
 
@@ -157,13 +155,15 @@ import { ToastService } from '../../services/toast';
             <button type="button" class="btn-close" (click)="closePasswordModal()"></button>
           </div>
           <div class="modal-body p-4">
+            <!-- Hidden username field to prevent Chrome from autofilling the navbar search bar -->
+            <input type="email" name="username" autocomplete="username" [value]="user()?.email" style="opacity:0; position:absolute; z-index:-1; width:1px; height:1px;" tabindex="-1">
             <div class="mb-3">
               <label class="form-label small fw-bold text-muted">CURRENT PASSWORD</label>
-              <input type="password" class="form-control rounded-pill px-3" [(ngModel)]="passwordForm.oldPassword" placeholder="Current password">
+              <input type="password" autocomplete="current-password" class="form-control rounded-pill px-3" [(ngModel)]="passwordForm.oldPassword" placeholder="Current password">
             </div>
             <div class="mb-3">
               <label class="form-label small fw-bold text-muted">NEW PASSWORD</label>
-              <input type="password" class="form-control rounded-pill px-3" [(ngModel)]="passwordForm.newPassword" placeholder="New password">
+              <input type="password" autocomplete="new-password" class="form-control rounded-pill px-3" [(ngModel)]="passwordForm.newPassword" placeholder="New password">
             </div>
           </div>
           <div class="modal-footer border-0 p-4 pt-0">
@@ -188,6 +188,10 @@ import { ToastService } from '../../services/toast';
             <div class="mb-3">
               <label class="form-label small fw-bold text-muted">ADDRESS LINE</label>
               <input type="text" class="form-control rounded-pill" [(ngModel)]="addressForm().addressLine" placeholder="e.g. 123 Main St">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted">STREET / AREA</label>
+              <input type="text" class="form-control rounded-pill" [(ngModel)]="addressForm().street" placeholder="e.g. Sector 5, MG Road">
             </div>
             <div class="row g-3 mb-3">
               <div class="col-6">
@@ -243,7 +247,7 @@ export class ProfileComponent implements OnInit {
   // Profile Edit
   isEditMode = signal<boolean>(false);
   submittingEdit = signal<boolean>(false);
-  editForm = signal<any>({ name: '', phone: '', age: 0 });
+  editForm: any = { name: '', phone: '', age: 0 };
 
   // Password Update
   showPasswordModal = signal<boolean>(false);
@@ -293,8 +297,10 @@ export class ProfileComponent implements OnInit {
   loadAddresses(userId: number): void {
     this.loadingAddresses.set(true);
     this.addressService.getAddressesByUserId(userId).subscribe({
-      next: (res) => {
-        this.addresses.set(res.data);
+      next: (res: any) => {
+        // Backend may return bare array or ApiResponse-wrapped
+        const list: AddressDTO[] = Array.isArray(res) ? res : (res.data ?? []);
+        this.addresses.set(list);
         this.loadingAddresses.set(false);
       },
       error: () => this.loadingAddresses.set(false)
@@ -304,11 +310,11 @@ export class ProfileComponent implements OnInit {
   // Edit Profile Methods
   toggleEditMode(): void {
     if (this.user()) {
-      this.editForm.set({
-        name: this.user()?.name,
-        phone: this.user()?.phone,
-        age: this.user()?.age
-      });
+      this.editForm = {
+        name: this.user()?.name ?? '',
+        phone: this.user()?.phone ?? '',
+        age: this.user()?.age ?? 0
+      };
       this.isEditMode.set(true);
     }
   }
@@ -322,7 +328,7 @@ export class ProfileComponent implements OnInit {
     if (!userId) return;
 
     this.submittingEdit.set(true);
-    const updatedData = { ...this.user()!, ...this.editForm() };
+    const updatedData = { ...this.user()!, ...this.editForm };
 
     this.userService.updateProfile(Number(userId), updatedData).subscribe({
       next: (res) => {
@@ -332,7 +338,7 @@ export class ProfileComponent implements OnInit {
         this.isEditMode.set(false);
       },
       error: (err) => {
-        this.toastService.success(err.error?.message || 'Failed to update profile');
+        this.toastService.error(err.error?.message || 'Failed to update profile');
         this.submittingEdit.set(false);
       }
     });
@@ -417,14 +423,15 @@ export class ProfileComponent implements OnInit {
       });
     } else {
       this.addressService.addAddress(data, Number(userId)).subscribe({
-        next: () => {
+        next: (res) => {
+          // Backend returns bare AddressDTO (not wrapped in ApiResponse)
           this.toastService.success('Address added successfully');
           this.addressSubmitting.set(false);
           this.closeAddressModal();
           this.loadAddresses(Number(userId));
         },
-        error: () => {
-          this.toastService.success('Failed to add address');
+        error: (err) => {
+          this.toastService.error('Failed to add address: ' + (err?.error?.message ?? 'Please try again'));
           this.addressSubmitting.set(false);
         }
       });
@@ -440,7 +447,7 @@ export class ProfileComponent implements OnInit {
         const userId = localStorage.getItem('userId');
         if (userId) this.loadAddresses(Number(userId));
       },
-      error: () => this.toastService.success('Failed to delete address')
+      error: (err: any) => this.toastService.error(err?.error?.message ?? 'Failed to delete address')
     });
   }
 }

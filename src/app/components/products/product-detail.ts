@@ -75,7 +75,8 @@ export class ProductDetailComponent implements OnInit {
 
     loadReviews(productId: number): void {
         this.reviewService.getReviewsByProduct(productId).subscribe({
-            next: (res) => this.reviews.set(res.data)
+            next: (res) => this.reviews.set(res.data ?? []),
+            error: () => this.reviews.set([])
         });
     }
 
@@ -153,7 +154,7 @@ export class ProductDetailComponent implements OnInit {
             this.reviewService.addReview({
                 userId: Number(userId),
                 productId: prod.productId,
-                rating: this.newReview.rating,
+                rating: Number(this.newReview.rating),
                 reviewText: this.newReview.reviewText
             }).subscribe({
                 next: () => {

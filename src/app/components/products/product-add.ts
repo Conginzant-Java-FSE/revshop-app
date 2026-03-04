@@ -4,14 +4,13 @@ import { ProductService } from '../../services/product';
 import { CategoryService, CategoryDTO } from '../../services/category';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Navbar } from '../shared/navbar/navbar';
 import { Header } from '../shared/header/header';
 import { ToastService } from '../../services/toast';
 
 @Component({
     selector: 'app-product-add',
     standalone: true,
-    imports: [ReactiveFormsModule, CommonModule, RouterLink, Navbar, Header],
+    imports: [ReactiveFormsModule, CommonModule, RouterLink, Header],
     templateUrl: './product-add.html',
     styleUrl: './product-add.css'
 })

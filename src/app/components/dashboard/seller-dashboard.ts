@@ -6,14 +6,13 @@ import { ProductService, ProductDTO } from '../../services/product';
 import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
 import { ShipperService, ShipperDTO } from '../../services/shipper.service';
-import { Navbar } from '../shared/navbar/navbar';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-seller-dashboard',
     standalone: true,
-    imports: [CommonModule, RouterLink, Navbar, Header, FormsModule],
+    imports: [CommonModule, RouterLink, Header, FormsModule],
     templateUrl: './seller-dashboard.html',
     styleUrl: './dashboard.css'
 })

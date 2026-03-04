@@ -20,8 +20,16 @@
             <!-- Product Info -->
             <div class="col-lg-6">
                 <div class="ps-lg-4">
-                    <h1 class="fw-bold mb-3">{{ product()?.name }}</h1>
-
+                    <h1 class="fw-bold mb-2">{{ product()?.name }}</h1>
+                    <!-- Average Rating Badge -->
+                    <div class="d-flex align-items-center gap-2 mb-3" *ngIf="reviewCount() > 0">
+                        <span class="text-warning">
+                            <i class="fa-solid fa-star" *ngFor="let s of getStarArray()"
+                                [class.text-muted]="s > averageRating()"></i>
+                        </span>
+                        <span class="fw-bold">{{ averageRating() | number:'1.1-1' }}</span>
+                        <span class="text-muted small">({{ reviewCount() }} reviews)</span>
+                    </div>
                     <div class="d-flex align-items-center gap-3 mb-4">
                         <h2 class="text-primary fw-bold mb-0">₹{{ product()?.sellingPrice }}</h2>
                         <span class="text-muted text-decoration-line-through fs-4">₹{{ product()?.mrp }}</span>
@@ -127,27 +135,34 @@
 
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
-                        <h5 class="fw-bold mb-4">Write a Review</h5>
-                        <form (ngSubmit)="submitReview()">
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Rating</label>
-                                <select class="form-select rounded-3" [(ngModel)]="newReview.rating" name="rating">
-                                    <option [value]="5">5 - Excellent</option>
-                                    <option [value]="4">4 - Good</option>
-                                    <option [value]="3">3 - Average</option>
-                                    <option [value]="2">2 - Poor</option>
-                                    <option [value]="1">1 - Terrible</option>
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label small fw-bold">Your Review</label>
-                                <textarea class="form-control rounded-3" rows="4" placeholder="Share your experience..."
-                                    [(ngModel)]="newReview.reviewText" name="reviewText"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">
-                                Post Review
-                            </button>
-                        </form>
+                        <!-- Already reviewed -->
+                        <div *ngIf="hasUserReviewed()" class="text-center py-3">
+                            <i class="fa-solid fa-circle-check text-success fs-2 mb-2"></i>
+                            <p class="text-muted mb-0">You have already reviewed this product.</p>
+                        </div>
+                        <!-- Review form -->
+                        <div *ngIf="!hasUserReviewed()">
+                            <h5 class="fw-bold mb-4">Write a Review</h5>
+                            <form (ngSubmit)="submitReview()">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Rating</label>
+                                    <div class="d-flex gap-1 fs-4">
+                                        <i *ngFor="let s of getStarArray()"
+                                            [class]="s <= newReview.rating ? 'fa-solid fa-star text-warning' : 'fa-regular fa-star text-muted'"
+                                            style="cursor:pointer" (click)="setRating(s)"></i>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label small fw-bold">Your Review</label>
+                                    <textarea class="form-control rounded-3" rows="4"
+                                        placeholder="Share your experience..." [(ngModel)]="newReview.reviewText"
+                                        name="reviewText"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">
+                                    Post Review
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

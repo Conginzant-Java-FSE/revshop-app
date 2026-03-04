@@ -46,60 +46,12 @@
                 <div class="card border-0 shadow-sm rounded-4 p-4">
                     <h5 class="fw-bold mb-3"><i class="fa-solid fa-credit-card me-2 text-primary"></i> Payment Method
                     </h5>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="form-check payment-card p-3 border rounded-3 text-center h-100 d-flex flex-column align-items-center justify-content-center"
-                                [class.border-primary]="paymentMethod() === 'CREDIT_CARD'"
-                                (click)="paymentMethod.set('CREDIT_CARD')">
-                                <input class="form-check-input d-none" type="radio" id="payCC" value="CREDIT_CARD"
-                                    [(ngModel)]="paymentMethod" name="payment">
-                                <label class="form-check-label w-100" for="payCC">
-                                    <i class="fa-solid fa-credit-card fs-3 mb-2 d-block"></i>
-                                    <span class="fw-bold">Credit/Debit Card</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-check payment-card p-3 border rounded-3 text-center h-100 d-flex flex-column align-items-center justify-content-center"
-                                [class.border-primary]="paymentMethod() === 'PAYPAL'"
-                                (click)="paymentMethod.set('PAYPAL')">
-                                <input class="form-check-input d-none" type="radio" id="payPP" value="PAYPAL"
-                                    [(ngModel)]="paymentMethod" name="payment">
-                                <label class="form-check-label w-100" for="payPP">
-                                    <i class="fa-brands fa-paypal fs-3 mb-2 d-block"></i>
-                                    <span class="fw-bold">PayPal</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card Details Form -->
-                    <div class="mt-4 p-4 border rounded-4 bg-light" *ngIf="paymentMethod() === 'CREDIT_CARD'">
-                        <h6 class="fw-bold mb-3">Card Details</h6>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Card Number</label>
-                            <input type="text" class="form-control rounded-pill px-3" placeholder="0000 0000 0000 0000"
-                                [(ngModel)]="cardNumber" name="cardNo">
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="form-label small fw-bold">Expiry Date</label>
-                                <input type="text" class="form-control rounded-pill px-3" placeholder="MM/YY"
-                                    [(ngModel)]="expiryDate" name="expiry">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label small fw-bold">CVV</label>
-                                <input type="password" class="form-control rounded-pill px-3" placeholder="***"
-                                    [(ngModel)]="cvv" name="cvv">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PayPal Info -->
-                    <div class="mt-4 p-4 border rounded-4 bg-light text-center" *ngIf="paymentMethod() === 'PAYPAL'">
-                        <i class="fa-brands fa-paypal text-primary fs-1 mb-2"></i>
-                        <p class="mb-0 text-muted">You will be redirected to PayPal to complete your purchase securely.
-                        </p>
+                    <!-- Razorpay option -->
+                    <div class="p-4 border border-primary rounded-4 bg-primary bg-opacity-10 text-center">
+                        <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" style="width:40px"
+                            class="mb-2">
+                        <div class="fw-bold text-primary">Razorpay Secure Payment</div>
+                        <div class="small text-muted mt-1">UPI · Cards · NetBanking · Wallets</div>
                     </div>
                 </div>
             </div>
@@ -118,17 +70,49 @@
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Subtotal</span>
-                        <span class="fw-bold">₹{{ cart()?.totalPrice }}</span>
+                        <span class="fw-bold">₹{{ subtotal | number:'1.0-0' }}</span>
                     </div>
+
+                    <!-- Coupon Section -->
+                    <div class="mb-3">
+                        <div class="input-group" *ngIf="!appliedCouponCode">
+                            <input type="text" class="form-control rounded-start-3" placeholder="Coupon code"
+                                [(ngModel)]="couponCode" name="coupon">
+                            <button class="btn btn-outline-primary" (click)="applyCoupon()" [disabled]="applyingCoupon">
+                                <span *ngIf="applyingCoupon" class="spinner-border spinner-border-sm"></span>
+                                <span *ngIf="!applyingCoupon">Apply</span>
+                            </button>
+                        </div>
+                        <div *ngIf="appliedCouponCode" class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                                <i class="fa-solid fa-tag me-1"></i>{{ appliedCouponCode }}
+                            </span>
+                            <button class="btn btn-link btn-sm text-danger p-0" (click)="removeCoupon()">Remove</button>
+                        </div>
+                        <div *ngIf="couponMessage" class="small mt-2" [class.text-success]="couponSuccess"
+                            [class.text-danger]="!couponSuccess">
+                            {{ couponMessage }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2 text-success" *ngIf="discountAmount > 0">
+                        <span>Discount</span>
+                        <span class="fw-bold">- ₹{{ discountAmount | number:'1.0-0' }}</span>
+                    </div>
+
+                    <hr>
                     <div class="d-flex justify-content-between mb-4">
                         <h5 class="fw-bold">Total</h5>
-                        <h5 class="fw-bold text-primary">₹{{ cart()?.totalPrice }}</h5>
+                        <h5 class="fw-bold text-primary">₹{{ finalTotal | number:'1.0-0' }}</h5>
                     </div>
 
                     <button class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3 fw-bold"
-                        (click)='placeOrder()'>
-                        Place Order
+                        (click)="placeOrder()">
+                        <i class="fa-solid fa-lock me-2"></i>Pay ₹{{ finalTotal | number:'1.0-0' }} with Razorpay
                     </button>
+                    <p class="text-center text-muted small mt-2 mb-0">
+                        <i class="fa-solid fa-shield-halved me-1"></i>100% Secure &amp; Encrypted
+                    </p>
                 </div>
             </div>
         </div>

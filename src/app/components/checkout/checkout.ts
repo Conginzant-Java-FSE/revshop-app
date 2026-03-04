@@ -5,7 +5,9 @@ import { Router } from '@angular/router';
 import { AddressService, AddressDTO } from '../../services/address';
 import { CartService, CartDTO } from '../../services/cart';
 import { OrderService } from '../../services/order';
-import { ToastService } from '../../services/toast'; // Added this
+import { ToastService } from '../../services/toast';
+import { CouponService } from '../../services/coupon.service';
+import { PaymentService } from '../../services/payment.service';
 
 @Component({
     selector: 'app-checkout',
@@ -19,9 +21,17 @@ export class CheckoutComponent implements OnInit {
     addresses = signal<AddressDTO[]>([]);
     cart = signal<CartDTO | null>(null);
     selectedAddressId = signal<number | null>(null);
-    paymentMethod = signal<string>('CREDIT_CARD');
+    paymentMethod = signal<string>('RAZORPAY');
 
-    // Card Details Signals
+    // Coupon state
+    couponCode = '';
+    appliedCouponCode = '';
+    couponMessage = '';
+    couponSuccess = false;
+    discountAmount = 0;
+    applyingCoupon = false;
+
+    // Card Details Signals (kept for backward compat)
     cardNumber = signal<string>('');
     expiryDate = signal<string>('');
     cvv = signal<string>('');
@@ -42,7 +52,9 @@ export class CheckoutComponent implements OnInit {
         private addressService: AddressService,
         private cartService: CartService,
         private orderService: OrderService,
-        private toastService: ToastService, // Added this
+        private toastService: ToastService,
+        private couponService: CouponService,
+        private paymentService: PaymentService,
         private router: Router
     ) { }
 
@@ -67,36 +79,126 @@ export class CheckoutComponent implements OnInit {
         });
     }
 
+    get subtotal(): number {
+        const cart = this.cart();
+        if (!cart || !cart.items) return 0;
+        return cart.items.reduce((sum: number, item: any) => sum + (item.sellingPrice * item.quantity), 0);
+    }
+
+    get finalTotal(): number {
+        return Math.max(0, this.subtotal - this.discountAmount);
+    }
+
+    applyCoupon(): void {
+        if (!this.couponCode.trim()) return;
+        this.applyingCoupon = true;
+        this.couponMessage = '';
+        this.couponService.validateCoupon(this.couponCode.trim(), this.subtotal).subscribe({
+            next: (res) => {
+                const result = res.data;
+                this.applyingCoupon = false;
+                if (result.valid) {
+                    this.discountAmount = result.discountAmount;
+                    this.appliedCouponCode = this.couponCode;
+                    this.couponSuccess = true;
+                    this.couponMessage = result.message;
+                } else {
+                    this.discountAmount = 0;
+                    this.appliedCouponCode = '';
+                    this.couponSuccess = false;
+                    this.couponMessage = result.message;
+                }
+            },
+            error: () => {
+                this.applyingCoupon = false;
+                this.couponSuccess = false;
+                this.couponMessage = 'Could not validate coupon. Please try again.';
+            }
+        });
+    }
+
+    removeCoupon(): void {
+        this.couponCode = '';
+        this.appliedCouponCode = '';
+        this.discountAmount = 0;
+        this.couponMessage = '';
+        this.couponSuccess = false;
+    }
+
+    /** Main pay flow — places order then triggers Razorpay popup */
     placeOrder(): void {
         const userId = Number(localStorage.getItem('userId'));
         const addrId = this.selectedAddressId();
         const cart = this.cart();
 
-        if (!addrId) { alert('Please select a shipping address.'); return; }
-        if (!cart || !cart.items || cart.items.length === 0) { alert('Your cart is empty.'); return; }
-
-        // Payment Validation
-        if (this.paymentMethod() === 'CREDIT_CARD') {
-            if (!this.cardNumber() || !this.expiryDate() || !this.cvv()) {
-                alert('Please fill in all card details.');
-                return;
-            }
-        }
+        if (!addrId) { this.toastService.error('Please select a shipping address.'); return; }
+        if (!cart || !cart.items || cart.items.length === 0) { this.toastService.error('Your cart is empty.'); return; }
 
         const request = {
             userId,
             shippingAddressId: addrId,
             billingAddressId: addrId,
-            paymentMethod: this.paymentMethod(),
+            paymentMethod: 'RAZORPAY',
             items: cart.items.map((i: any) => ({ productId: i.productId, quantity: i.quantity }))
         };
 
         this.orderService.placeOrder(userId, request).subscribe({
+            next: (res: any) => {
+                const orderId = res.data?.orderId ?? res.data?.order?.orderId;
+                if (!orderId) {
+                    this.toastService.error('Order placed but payment initialization failed.');
+                    return;
+                }
+                this.initiateRazorpayPayment(orderId, this.finalTotal, userId);
+            },
+            error: (err: any) => this.toastService.error('Order failed: ' + (err?.error?.message ?? 'Unknown error'))
+        });
+    }
+
+    private initiateRazorpayPayment(orderId: number, amount: number, userId: number): void {
+        this.paymentService.createRazorpayOrder(amount, orderId).subscribe({
+            next: (res) => {
+                const rzpData = res.data;
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.onload = () => {
+                    const options = {
+                        key: rzpData.keyId,
+                        amount: rzpData.amount,
+                        currency: rzpData.currency,
+                        name: 'RevShop',
+                        description: 'Order Payment',
+                        order_id: rzpData.razorpayOrderId,
+                        handler: (response: any) => {
+                            this.verifyAndConfirm(response, orderId);
+                        },
+                        prefill: {
+                            name: localStorage.getItem('userName') ?? '',
+                            email: localStorage.getItem('userEmail') ?? ''
+                        },
+                        theme: { color: '#0d6efd' }
+                    };
+                    const rzp = new (window as any).Razorpay(options);
+                    rzp.open();
+                };
+                document.body.appendChild(script);
+            },
+            error: () => this.toastService.error('Payment initialization failed. Please try again.')
+        });
+    }
+
+    private verifyAndConfirm(paymentResponse: any, orderId: number): void {
+        this.paymentService.verifyPayment({
+            razorpayOrderId: paymentResponse.razorpay_order_id,
+            razorpayPaymentId: paymentResponse.razorpay_payment_id,
+            razorpaySignature: paymentResponse.razorpay_signature,
+            internalOrderId: orderId
+        }).subscribe({
             next: () => {
-                this.toastService.success('Order placed successfully!');
+                this.toastService.success('Payment Successful! 🎉');
                 setTimeout(() => this.router.navigate(['/orders']), 1500);
             },
-            error: (err) => alert('Order failed: ' + (err?.error?.message ?? 'Unknown error'))
+            error: () => this.toastService.error('Payment verification failed. Contact support with your payment ID.')
         });
     }
 
@@ -117,7 +219,7 @@ export class CheckoutComponent implements OnInit {
         if (!userId) return;
 
         if (!this.addressForm.addressLine || !this.addressForm.city || !this.addressForm.state || !this.addressForm.zipCode) {
-            this.toastService.success('Please fill all required fields');
+            this.toastService.error('Please fill all required fields');
             return;
         }
 
@@ -131,8 +233,8 @@ export class CheckoutComponent implements OnInit {
                 this.submittingAddress.set(false);
                 this.closeAddressModal();
             },
-            error: (err) => {
-                this.toastService.success('Failed to add address');
+            error: () => {
+                this.toastService.error('Failed to add address');
                 this.submittingAddress.set(false);
             }
         });

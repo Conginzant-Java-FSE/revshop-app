@@ -15,10 +15,7 @@ export class OrderListComponent implements OnInit {
     orders = signal<OrderResponseDTO[]>([]);
     loading = signal<boolean>(true);
     showTrackingModal = signal<boolean>(false);
-    showDetailsModal = signal<boolean>(false);
-    detailsLoading = signal<boolean>(false);
     selectedOrder = signal<{ id: number, number: string } | null>(null);
-    selectedOrderDetails = signal<OrderResponseDTO | null>(null);
 
     constructor(private orderService: OrderService, private router: Router) { }
 
@@ -61,23 +58,7 @@ export class OrderListComponent implements OnInit {
         this.selectedOrder.set(null);
     }
 
-    viewDetails(order: OrderResponseDTO): void {
-        this.selectedOrder.set({ id: order.orderId, number: order.orderNumber });
-        this.showDetailsModal.set(true);
-        this.detailsLoading.set(true);
-
-        this.orderService.getOrderById(order.orderId).subscribe({
-            next: (res) => {
-                this.selectedOrderDetails.set(res.data);
-                this.detailsLoading.set(false);
-            },
-            error: () => this.detailsLoading.set(false)
-        });
-    }
-
-    closeDetails(): void {
-        this.showDetailsModal.set(false);
-        this.selectedOrderDetails.set(null);
-        this.selectedOrder.set(null);
+    viewOrderDetail(orderId: number): void {
+        this.router.navigate(['/orders', orderId]);
     }
 }

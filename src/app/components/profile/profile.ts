@@ -112,8 +112,11 @@ import { ToastService } from '../../services/toast';
                   <div class="address-card p-3 border rounded-3 position-relative transition-all h-100">
                     <div class="d-flex justify-content-between mb-2">
                       <span *ngIf="addr.isDefault" class="badge bg-success-subtle text-success rounded-pill x-small">Default</span>
-                      <div class="dropdown ms-auto">
-                        <button class="btn btn-link text-muted p-0" (click)="deleteAddress(addr.addressId!)">
+                      <div class="d-flex gap-2 ms-auto">
+                        <button class="btn btn-link text-primary p-0" (click)="editAddress(addr)" title="Edit">
+                          <i class="fa-solid fa-pen-to-square small"></i>
+                        </button>
+                        <button class="btn btn-link text-muted p-0" (click)="deleteAddress(addr.addressId!)" title="Delete">
                           <i class="fa-solid fa-trash-can small"></i>
                         </button>
                       </div>
@@ -178,7 +181,7 @@ import { ToastService } from '../../services/toast';
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
           <div class="modal-header border-0 pb-0">
-            <h5 class="modal-title fw-bold">Add New Address</h5>
+            <h5 class="modal-title fw-bold">{{ editingAddressId() ? 'Edit Address' : 'Add New Address' }}</h5>
             <button type="button" class="btn-close" (click)="closeAddressModal()"></button>
           </div>
           <div class="modal-body p-4">
@@ -252,6 +255,7 @@ export class ProfileComponent implements OnInit {
   loadingAddresses = signal<boolean>(true);
   showAddressModal = signal<boolean>(false);
   addressSubmitting = signal<boolean>(false);
+  editingAddressId = signal<number | null>(null);
   addressForm = signal<AddressDTO>({
     addressLine: '', city: '', state: '', zipCode: '', country: '', isDefault: false
   });
@@ -367,14 +371,22 @@ export class ProfileComponent implements OnInit {
 
   // Address Modal Methods
   openAddressModal(): void {
+    this.editingAddressId.set(null);
     this.addressForm.set({
       addressLine: '', city: '', state: '', zipCode: '', country: '', isDefault: false
     });
     this.showAddressModal.set(true);
   }
 
+  editAddress(addr: AddressDTO): void {
+    this.editingAddressId.set(addr.addressId ?? null);
+    this.addressForm.set({ ...addr });
+    this.showAddressModal.set(true);
+  }
+
   closeAddressModal(): void {
     this.showAddressModal.set(false);
+    this.editingAddressId.set(null);
   }
 
   saveAddress(): void {
@@ -388,18 +400,35 @@ export class ProfileComponent implements OnInit {
     }
 
     this.addressSubmitting.set(true);
-    this.addressService.addAddress(data, Number(userId)).subscribe({
-      next: () => {
-        this.toastService.success('Address added successfully');
-        this.addressSubmitting.set(false);
-        this.closeAddressModal();
-        this.loadAddresses(Number(userId));
-      },
-      error: () => {
-        this.toastService.success('Failed to add address');
-        this.addressSubmitting.set(false);
-      }
-    });
+    const editId = this.editingAddressId();
+
+    if (editId) {
+      this.addressService.updateAddress(editId, data).subscribe({
+        next: () => {
+          this.toastService.success('Address updated successfully');
+          this.addressSubmitting.set(false);
+          this.closeAddressModal();
+          this.loadAddresses(Number(userId));
+        },
+        error: () => {
+          this.toastService.success('Failed to update address');
+          this.addressSubmitting.set(false);
+        }
+      });
+    } else {
+      this.addressService.addAddress(data, Number(userId)).subscribe({
+        next: () => {
+          this.toastService.success('Address added successfully');
+          this.addressSubmitting.set(false);
+          this.closeAddressModal();
+          this.loadAddresses(Number(userId));
+        },
+        error: () => {
+          this.toastService.success('Failed to add address');
+          this.addressSubmitting.set(false);
+        }
+      });
+    }
   }
 
   deleteAddress(id: number): void {

@@ -21,6 +21,17 @@
                         </button>
                     </div>
 
+                    <!-- Quick Select Dropdown -->
+                    <div class="mb-3" *ngIf="addresses().length > 0">
+                        <label class="form-label small fw-semibold text-muted">Quick Select</label>
+                        <select class="form-select rounded-3" (change)="onSavedAddressSelect($event)">
+                            <option value="">-- Choose a saved address --</option>
+                            <option *ngFor="let addr of addresses()" [value]="addr.addressId">
+                                {{ addr.addressLine }}, {{ addr.city }}
+                            </option>
+                        </select>
+                    </div>
+
                     <div class="address-list" *ngIf="addresses().length > 0">
                         <div class="form-check address-card p-3 border rounded-3 mb-2" *ngFor="let addr of addresses()"
                             [class.border-primary]="selectedAddressId() === addr.addressId">

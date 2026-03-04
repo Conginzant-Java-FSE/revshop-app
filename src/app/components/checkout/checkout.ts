@@ -239,4 +239,14 @@ export class CheckoutComponent implements OnInit {
             }
         });
     }
+
+    onSavedAddressSelect(event: Event): void {
+        const select = event.target as HTMLSelectElement;
+        const addrId = Number(select.value);
+        if (addrId) {
+            this.selectedAddressId.set(addrId);
+        } else {
+            this.selectedAddressId.set(null);
+        }
+    }
 }

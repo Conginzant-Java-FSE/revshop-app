@@ -252,4 +252,109 @@
         </div>
     </div>
 
+    <!-- ===== ORDERS SECTION ===== -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h5 class="fw-bold mb-4">
+                    <i class="fa-solid fa-clipboard-list me-2 text-primary"></i>
+                    Orders ({{ sellerOrders().length }})
+                </h5>
+
+                <div *ngIf="loadingOrders()" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+
+                <div class="table-responsive" *ngIf="!loadingOrders()">
+                    <table class="table table-hover align-middle" *ngIf="sellerOrders().length > 0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Order #</th>
+                                <th>Buyer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Shipper</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let order of sellerOrders()">
+                                <td class="fw-semibold">{{ order.orderNumber }}</td>
+                                <td>{{ order.buyerName }}</td>
+                                <td class="fw-bold text-primary">₹{{ order.totalAmount | number:'1.0-0' }}</td>
+                                <td>
+                                    <span class="badge rounded-pill px-3" [ngClass]="{
+                                            'bg-warning-subtle text-warning': order.status === 'PENDING',
+                                            'bg-info-subtle text-info': order.status === 'PROCESSING',
+                                            'bg-primary-subtle text-primary': order.status === 'SHIPPED',
+                                            'bg-success-subtle text-success': order.status === 'DELIVERED',
+                                            'bg-danger-subtle text-danger': order.status === 'CANCELLED'
+                                        }">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span *ngIf="order.shipperName" class="badge bg-light text-dark rounded-pill px-2">
+                                        <i class="fa-solid fa-truck-fast me-1 text-primary"></i>{{ order.shipperName }}
+                                    </span>
+                                    <span *ngIf="!order.shipperName" class="text-muted small">—</span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                        *ngIf="order.status === 'PENDING'" (click)="openShipperModal(order.orderId)">
+                                        <i class="fa-solid fa-truck me-1"></i>Assign Shipper
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="sellerOrders().length === 0" class="text-center py-4">
+                        <i class="fa-solid fa-clipboard text-muted" style="font-size: 2rem;"></i>
+                        <p class="text-muted small mt-2 mb-0">No orders yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<!-- Assign Shipper Modal -->
+<div class="modal fade" [class.show]="showShipperModal()" [style.display]="showShipperModal() ? 'block' : 'none'"
+    tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-primary text-white border-0 rounded-top-4">
+                <h6 class="modal-title fw-bold mb-0">
+                    <i class="fa-solid fa-truck me-2"></i>Assign Shipper
+                </h6>
+                <button type="button" class="btn-close btn-close-white" (click)="closeShipperModal()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div *ngIf="availableShippers().length === 0" class="text-center py-3">
+                    <i class="fa-solid fa-user-slash text-muted fs-3 mb-2 d-block"></i>
+                    <p class="text-muted small mb-0">No available shippers at the moment.</p>
+                </div>
+                <div *ngIf="availableShippers().length > 0">
+                    <label class="form-label small fw-bold text-muted">SELECT SHIPPER</label>
+                    <select class="form-select rounded-3" [(ngModel)]="selectedShipperId">
+                        <option [ngValue]="null" disabled>-- Choose a shipper --</option>
+                        <option *ngFor="let shipper of availableShippers()" [ngValue]="shipper.shipperId">
+                            {{ shipper.name }} ({{ shipper.vehicleNumber }})
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4"
+                    (click)="closeShipperModal()">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4"
+                    [disabled]="!selectedShipperId() || assigningShipper()" (click)="confirmAssignShipper()">
+                    <span *ngIf="assigningShipper()" class="spinner-border spinner-border-sm me-2"></span>
+                    Assign
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="showShipperModal()" class="modal-backdrop fade show"></div>

@@ -5,13 +5,15 @@ import { CommonModule } from '@angular/common';
 import { ProductService, ProductDTO } from '../../services/product';
 import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
+import { ShipperService, ShipperDTO } from '../../services/shipper.service';
 import { Navbar } from '../shared/navbar/navbar';
 import { Header } from '../shared/header/header';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-seller-dashboard',
     standalone: true,
-    imports: [CommonModule, RouterLink, Navbar, Header],
+    imports: [CommonModule, RouterLink, Navbar, Header, FormsModule],
     templateUrl: './seller-dashboard.html',
     styleUrl: './dashboard.css'
 })
@@ -22,6 +24,17 @@ export class SellerDashboardComponent implements OnInit {
     stats = signal<any>(null);
     loadingStats = signal<boolean>(true);
 
+    // Orders
+    sellerOrders = signal<any[]>([]);
+    loadingOrders = signal<boolean>(true);
+
+    // Shipper Assignment
+    availableShippers = signal<ShipperDTO[]>([]);
+    showShipperModal = signal<boolean>(false);
+    selectedShipperId = signal<number | null>(null);
+    assigningOrderId = signal<number | null>(null);
+    assigningShipper = signal<boolean>(false);
+
     sellerId!: number;
 
     constructor(
@@ -29,13 +42,15 @@ export class SellerDashboardComponent implements OnInit {
         private router: Router,
         private productService: ProductService,
         private orderService: OrderService,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private shipperService: ShipperService
     ) { }
 
     ngOnInit(): void {
         this.sellerId = Number(localStorage.getItem('userId'));
         this.loadProducts();
         this.loadStats();
+        this.loadSellerOrders();
     }
 
     loadProducts(): void {
@@ -61,6 +76,20 @@ export class SellerDashboardComponent implements OnInit {
             },
             error: () => {
                 this.loadingStats.set(false);
+            }
+        });
+    }
+
+    loadSellerOrders(): void {
+        this.loadingOrders.set(true);
+        this.orderService.getSellerOrders(this.sellerId).subscribe({
+            next: (res) => {
+                this.sellerOrders.set(res.data ?? []);
+                this.loadingOrders.set(false);
+            },
+            error: () => {
+                this.loadingOrders.set(false);
+                this.toastService.error('Failed to load orders');
             }
         });
     }
@@ -95,6 +124,47 @@ export class SellerDashboardComponent implements OnInit {
         const s = this.stats();
         if (!s?.ordersByStatus) return [];
         return Object.entries(s.ordersByStatus).map(([key, value]) => ({ key, value: value as number }));
+    }
+
+    // Shipper Assignment
+    openShipperModal(orderId: number): void {
+        this.assigningOrderId.set(orderId);
+        this.selectedShipperId.set(null);
+        this.showShipperModal.set(true);
+        this.shipperService.getAvailableShippers().subscribe({
+            next: (res) => this.availableShippers.set(res.data ?? []),
+            error: () => this.toastService.error('Failed to load shippers')
+        });
+    }
+
+    closeShipperModal(): void {
+        this.showShipperModal.set(false);
+        this.assigningOrderId.set(null);
+        this.selectedShipperId.set(null);
+    }
+
+    confirmAssignShipper(): void {
+        const shipperId = this.selectedShipperId();
+        const orderId = this.assigningOrderId();
+        if (!shipperId || !orderId) {
+            this.toastService.error('Please select a shipper');
+            return;
+        }
+
+        this.assigningShipper.set(true);
+        this.shipperService.assignShipper(shipperId, orderId).subscribe({
+            next: () => {
+                this.toastService.success('Shipper assigned successfully!');
+                this.assigningShipper.set(false);
+                this.closeShipperModal();
+                this.loadSellerOrders();
+                this.loadStats();
+            },
+            error: () => {
+                this.toastService.error('Failed to assign shipper');
+                this.assigningShipper.set(false);
+            }
+        });
     }
 
     onLogout(): void {

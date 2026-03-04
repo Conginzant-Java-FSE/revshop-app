@@ -15,6 +15,8 @@ export interface ProductDTO {
     isActive: boolean;
     categoryId: number;
     sellerId: number;
+    categoryName?: string;
+    sellerName?: string;
 }
 
 import { ApiResponse } from '../models/api-response.model';
@@ -80,5 +82,17 @@ export class ProductService {
 
     deleteProduct(id: number): Observable<ApiResponse<string>> {
         return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${id}`);
+    }
+
+    getProductsBySeller(sellerId: number, page: number = 0, size: number = 20): Observable<ApiResponse<Page<ProductDTO>>> {
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString());
+
+        return this.http.get<ApiResponse<Page<ProductDTO>>>(`${this.apiUrl}/seller/${sellerId}`, { params });
+    }
+
+    toggleActive(productId: number): Observable<ApiResponse<ProductDTO>> {
+        return this.http.patch<ApiResponse<ProductDTO>>(`${this.apiUrl}/${productId}/toggle-active`, {});
     }
 }

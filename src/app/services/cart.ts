@@ -10,6 +10,7 @@ export interface CartItemDTO {
     price?: number;
     quantity: number;
     subtotal?: number;
+    imageUrl?: string;
 }
 
 export interface CartDTO {

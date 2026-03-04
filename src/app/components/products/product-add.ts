@@ -45,7 +45,8 @@ export class ProductAddComponent implements OnInit {
             thresholdQuantity: [5, [Validators.required, Validators.min(1)]],
             categoryId: ['', [Validators.required]],
             sellerId: [Number(sellerId), [Validators.required]],
-            isActive: [true]
+            isActive: [true],
+            imageUrl: ['']
         });
     }
 

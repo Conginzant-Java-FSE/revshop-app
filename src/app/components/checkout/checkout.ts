@@ -8,6 +8,7 @@ import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
 import { CouponService } from '../../services/coupon.service';
 import { PaymentService } from '../../services/payment.service';
+import { NotificationService } from '../../services/notification.service';
 import { ApiResponse } from '../../models/api-response.model';
 
 
@@ -58,6 +59,7 @@ export class CheckoutComponent implements OnInit {
         private toastService: ToastService,
         private couponService: CouponService,
         private paymentService: PaymentService,
+        private notificationService: NotificationService,
         private router: Router
     ) { }
 
@@ -167,6 +169,7 @@ export class CheckoutComponent implements OnInit {
                 if (this.paymentMethod() === 'COD') {
                     this.toastService.success('Order placed successfully (Cash on Delivery)');
                     this.submitting = false;
+                    this.notificationService.triggerRefresh();
                     // Clear cart properly after COD
                     this.cartService.clearCart(userId).subscribe({
                         next: () => this.router.navigate(['/profile']),
@@ -246,6 +249,7 @@ export class CheckoutComponent implements OnInit {
         }).subscribe({
             next: () => {
                 this.toastService.success('Payment Successful! 🎉');
+                this.notificationService.triggerRefresh();
                 setTimeout(() => this.router.navigate(['/orders']), 1500);
             },
             error: () => this.toastService.error('Payment verification failed. Contact support with your payment ID.')

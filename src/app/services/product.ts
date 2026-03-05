@@ -51,19 +51,23 @@ export class ProductService {
         return this.http.get<ApiResponse<ProductDTO>>(`${this.apiUrl}/${id}`);
     }
 
-    searchProducts(keyword: string, page: number = 0, size: number = 10): Observable<ApiResponse<Page<ProductDTO>>> {
+    searchProducts(keyword: string, page: number = 0, size: number = 10, sortBy: string = 'productId', direction: string = 'asc'): Observable<ApiResponse<Page<ProductDTO>>> {
         let params = new HttpParams()
             .set('keyword', keyword)
             .set('page', page.toString())
-            .set('size', size.toString());
+            .set('size', size.toString())
+            .set('sortBy', sortBy)
+            .set('direction', direction);
 
         return this.http.get<ApiResponse<Page<ProductDTO>>>(`${this.apiUrl}/search`, { params });
     }
 
-    filterProducts(filters: { minPrice?: number, maxPrice?: number, categoryId?: number }, page: number = 0, size: number = 10): Observable<ApiResponse<Page<ProductDTO>>> {
+    filterProducts(filters: { minPrice?: number, maxPrice?: number, categoryId?: number }, page: number = 0, size: number = 10, sortBy: string = 'productId', direction: string = 'asc'): Observable<ApiResponse<Page<ProductDTO>>> {
         let params = new HttpParams()
             .set('page', page.toString())
-            .set('size', size.toString());
+            .set('size', size.toString())
+            .set('sortBy', sortBy)
+            .set('direction', direction);
 
         if (filters.minPrice !== undefined) params = params.set('minPrice', filters.minPrice.toString());
         if (filters.maxPrice !== undefined) params = params.set('maxPrice', filters.maxPrice.toString());

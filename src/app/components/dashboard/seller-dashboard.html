@@ -304,7 +304,7 @@
                                 <td class="text-end">
                                     <div class="d-flex gap-2 justify-content-end">
                                         <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
-                                            *ngIf="order.status === 'PENDING'"
+                                            *ngIf="order.status === 'PENDING' || order.status === 'PROCESSING'"
                                             (click)="openShipperModal(order.orderId)">
                                             <i class="fa-solid fa-truck me-1"></i>Assign Shipper
                                         </button>
@@ -320,8 +320,15 @@
                                             (click)="rejectReturn(order.orderId)">
                                             <i class="fa-solid fa-xmark me-1"></i>Reject Return
                                         </button>
+
+                                        <!-- No action indicator for terminal/in-transit states -->
+                                        <span class="text-muted small"
+                                            *ngIf="order.status !== 'PENDING' && order.status !== 'PROCESSING' && order.status !== 'RETURN_REQUESTED'">
+                                            —
+                                        </span>
                                     </div>
                                 </td>
+
 
                             </tr>
                         </tbody>

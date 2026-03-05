@@ -3,13 +3,12 @@ import { RegisterComponent } from './register';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
-import { RegisterComponent } from './register';
+
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location, CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('RegisterComponent', () => {
@@ -21,16 +20,16 @@ describe('RegisterComponent', () => {
 
   beforeEach(async () => {
     authServiceSpy = {
-      registerBuyer: vi.fn(),
-      registerSeller: vi.fn()
+      registerBuyer: jasmine.createSpy('registerBuyer'),
+      registerSeller: jasmine.createSpy('registerSeller')
     };
     routerSpy = {
-      navigate: vi.fn(),
-      createUrlTree: vi.fn().mockReturnValue({}),
-      serializeUrl: vi.fn().mockReturnValue(''),
+      navigate: jasmine.createSpy('navigate'),
+      createUrlTree: jasmine.createSpy('createUrlTree').and.returnValue({}),
+      serializeUrl: jasmine.createSpy('serializeUrl').and.returnValue(''),
       events: of()
     };
-    locationSpy = { back: vi.fn() };
+    locationSpy = { back: jasmine.createSpy('back') };
 
     await TestBed.configureTestingModule({
       imports: [RegisterComponent, ReactiveFormsModule, CommonModule],
@@ -82,7 +81,7 @@ describe('RegisterComponent', () => {
 
   it('should call registerBuyer and navigate on successful submission', async () => {
     fixture.detectChanges();
-    authServiceSpy.registerBuyer.mockReturnValue(of({}));
+    authServiceSpy.registerBuyer.and.returnValue(of({}));
 
     component.registerForm.patchValue({
       role: 'BUYER',
@@ -104,7 +103,7 @@ describe('RegisterComponent', () => {
   it('should display error message on buyer registration failure', async () => {
     fixture.detectChanges();
     const errorResponse = { error: { message: 'Email already exists' } };
-    authServiceSpy.registerBuyer.mockReturnValue(throwError(() => errorResponse));
+    authServiceSpy.registerBuyer.and.returnValue(throwError(() => errorResponse));
 
     component.registerForm.patchValue({
       role: 'BUYER',
@@ -124,7 +123,7 @@ describe('RegisterComponent', () => {
 
   it('should call registerSeller and navigate on successful submission', async () => {
     fixture.detectChanges();
-    authServiceSpy.registerSeller.mockReturnValue(of({}));
+    authServiceSpy.registerSeller.and.returnValue(of({}));
 
     component.registerForm.patchValue({
       role: 'SELLER',

@@ -3,13 +3,12 @@ import { LoginComponent } from './login';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
-import { LoginComponent } from './login';
+
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location, CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('LoginComponent', () => {
@@ -21,17 +20,17 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     authServiceSpy = {
-      loginBuyer: vi.fn(),
-      loginSeller: vi.fn(),
-      saveAuthData: vi.fn()
+      loginBuyer: jasmine.createSpy('loginBuyer'),
+      loginSeller: jasmine.createSpy('loginSeller'),
+      saveAuthData: jasmine.createSpy('saveAuthData')
     };
     routerSpy = {
-      navigate: vi.fn(),
-      createUrlTree: vi.fn().mockReturnValue({}),
-      serializeUrl: vi.fn().mockReturnValue(''),
+      navigate: jasmine.createSpy('navigate'),
+      createUrlTree: jasmine.createSpy('createUrlTree').and.returnValue({}),
+      serializeUrl: jasmine.createSpy('serializeUrl').and.returnValue(''),
       events: of()
     };
-    locationSpy = { back: vi.fn() };
+    locationSpy = { back: jasmine.createSpy('back') };
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule, CommonModule],
@@ -83,7 +82,7 @@ describe('LoginComponent', () => {
   it('should call loginBuyer and navigate on successful buyer login', async () => {
     fixture.detectChanges();
     const mockResponse = { data: { token: 'token123', role: 'BUYER', userId: 1, name: 'John Doe' } };
-    authServiceSpy.loginBuyer.mockReturnValue(of(mockResponse));
+    authServiceSpy.loginBuyer.and.returnValue(of(mockResponse));
 
     component.loginForm.patchValue({
       role: 'BUYER',
@@ -101,7 +100,7 @@ describe('LoginComponent', () => {
   it('should set error message on buyer login failure', async () => {
     fixture.detectChanges();
     const errorResponse = { error: { message: 'Invalid credentials' } };
-    authServiceSpy.loginBuyer.mockReturnValue(throwError(() => errorResponse));
+    authServiceSpy.loginBuyer.and.returnValue(throwError(() => errorResponse));
 
     component.loginForm.patchValue({
       role: 'BUYER',
@@ -117,7 +116,7 @@ describe('LoginComponent', () => {
   it('should call loginSeller and navigate on successful seller login', async () => {
     fixture.detectChanges();
     const mockResponse = { data: { token: 'token456', role: 'SELLER', userId: 2, name: 'Seller Store' } };
-    authServiceSpy.loginSeller.mockReturnValue(of(mockResponse));
+    authServiceSpy.loginSeller.and.returnValue(of(mockResponse));
 
     component.loginForm.patchValue({
       role: 'SELLER',
@@ -135,7 +134,7 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
     // Return an error object that matches the component's expectation for .error.message
     const errorResponse = { error: { message: 'Login Failed API Error' } };
-    authServiceSpy.loginSeller.mockReturnValue(throwError(() => errorResponse));
+    authServiceSpy.loginSeller.and.returnValue(throwError(() => errorResponse));
 
     component.loginForm.patchValue({
       role: 'SELLER',

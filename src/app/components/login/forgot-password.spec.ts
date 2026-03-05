@@ -6,7 +6,6 @@ import { ToastService } from '../../services/toast';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ForgotPasswordComponent', () => {
@@ -18,12 +17,12 @@ describe('ForgotPasswordComponent', () => {
 
     beforeEach(async () => {
         authServiceSpy = {
-            getSecurityQuestion: vi.fn(),
-            resetPassword: vi.fn()
+            getSecurityQuestion: jasmine.createSpy('getSecurityQuestion'),
+            resetPassword: jasmine.createSpy('resetPassword')
         };
         toastServiceSpy = {
-            success: vi.fn(),
-            error: vi.fn()
+            success: jasmine.createSpy('success'),
+            error: jasmine.createSpy('error')
         };
 
         await TestBed.configureTestingModule({
@@ -40,7 +39,7 @@ describe('ForgotPasswordComponent', () => {
         fixture = TestBed.createComponent(ForgotPasswordComponent);
         component = fixture.componentInstance;
         router = TestBed.inject(Router);
-        vi.spyOn(router, 'navigate');
+        spyOn(router, 'navigate');
     });
 
     it('should create', () => {
@@ -79,7 +78,7 @@ describe('ForgotPasswordComponent', () => {
 
     it('fetchQuestion should fetch security question and proceed to step 2 on success', async () => {
         const question = 'What is your pet name?';
-        authServiceSpy.getSecurityQuestion.mockReturnValue(of({ data: question }));
+        authServiceSpy.getSecurityQuestion.and.returnValue(of({ data: question }));
 
         component.emailForm.patchValue({ email: 'test@example.com' });
         component.fetchQuestion();
@@ -92,7 +91,7 @@ describe('ForgotPasswordComponent', () => {
     });
 
     it('fetchQuestion should show error toast on failure', async () => {
-        authServiceSpy.getSecurityQuestion.mockReturnValue(throwError(() => ({ error: { message: 'User not found' } })));
+        authServiceSpy.getSecurityQuestion.and.returnValue(throwError(() => ({ error: { message: 'User not found' } })));
 
         component.emailForm.patchValue({ email: 'unknown@example.com' });
         component.fetchQuestion();
@@ -108,7 +107,7 @@ describe('ForgotPasswordComponent', () => {
     });
 
     it('resetPassword should call reset API and navigate to login on success', async () => {
-        authServiceSpy.resetPassword.mockReturnValue(of({}));
+        authServiceSpy.resetPassword.and.returnValue(of({}));
 
         component.emailForm.patchValue({ email: 'test@example.com' });
         component.resetForm.patchValue({
@@ -130,7 +129,7 @@ describe('ForgotPasswordComponent', () => {
     });
 
     it('resetPassword should show error toast on failure', async () => {
-        authServiceSpy.resetPassword.mockReturnValue(throwError(() => ({ error: { message: 'Incorrect security answer' } })));
+        authServiceSpy.resetPassword.and.returnValue(throwError(() => ({ error: { message: 'Incorrect security answer' } })));
 
         component.emailForm.patchValue({ email: 'test@example.com' });
         component.resetForm.patchValue({

@@ -8,6 +8,8 @@ import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
 import { CouponService } from '../../services/coupon.service';
 import { PaymentService } from '../../services/payment.service';
+import { ApiResponse } from '../../models/api-response.model';
+
 
 @Component({
     selector: 'app-checkout',
@@ -79,7 +81,7 @@ export class CheckoutComponent implements OnInit {
         });
 
         this.cartService.getCartByUserId(userId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<CartDTO>) => {
                 this.cart.set(res.data);
                 this.loading.set(false);
             },
@@ -109,7 +111,7 @@ export class CheckoutComponent implements OnInit {
         this.applyingCoupon = true;
         this.couponMessage = '';
         this.couponService.validateCoupon(code, this.subtotal).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 const result = res.data;
                 this.applyingCoupon = false;
                 if (result.valid) {
@@ -186,7 +188,7 @@ export class CheckoutComponent implements OnInit {
 
     private initiateRazorpayPayment(orderId: number, amount: number, userId: number): void {
         this.paymentService.createRazorpayOrder(amount, orderId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 const rzpData = res.data;
                 const script = document.createElement('script');
                 script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -273,7 +275,7 @@ export class CheckoutComponent implements OnInit {
 
         this.submittingAddress.set(true);
         this.addressService.addAddress(this.addressForm, userId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<AddressDTO>) => {
                 // Backend returns bare AddressDTO (not wrapped in ApiResponse)
                 const newAddress: AddressDTO = res.data ?? res;
                 this.addresses.update(prev => [...prev, newAddress]);

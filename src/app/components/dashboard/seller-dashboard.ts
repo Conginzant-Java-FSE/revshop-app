@@ -8,6 +8,8 @@ import { ToastService } from '../../services/toast';
 import { ShipperService, ShipperDTO } from '../../services/shipper.service';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../models/api-response.model';
+
 
 @Component({
     selector: 'app-seller-dashboard',
@@ -55,7 +57,7 @@ export class SellerDashboardComponent implements OnInit {
     loadProducts(): void {
         this.loadingProducts.set(true);
         this.productService.getProductsBySeller(this.sellerId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 this.myProducts.set(res.data?.content ?? []);
                 this.loadingProducts.set(false);
             },
@@ -69,7 +71,7 @@ export class SellerDashboardComponent implements OnInit {
     loadStats(): void {
         this.loadingStats.set(true);
         this.orderService.getSellerStats(this.sellerId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 this.stats.set(res.data);
                 this.loadingStats.set(false);
             },
@@ -82,7 +84,7 @@ export class SellerDashboardComponent implements OnInit {
     loadSellerOrders(): void {
         this.loadingOrders.set(true);
         this.orderService.getSellerOrders(this.sellerId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any[]>) => {
                 this.sellerOrders.set(res.data ?? []);
                 this.loadingOrders.set(false);
             },

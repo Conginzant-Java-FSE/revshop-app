@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService, ShipperOrder } from '../../services/shipper.service';
 import { ToastService } from '../../services/toast';
+import { ApiResponse } from '../../models/api-response.model';
+
 
 @Component({
     selector: 'app-shipper-dashboard',
@@ -60,7 +62,7 @@ export class ShipperDashboardComponent implements OnInit {
     loadOrders(): void {
         this.loading.set(true);
         this.shipperService.getOrdersByShipper(this.shipperId()).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<ShipperOrder[]>) => {
                 this.allOrders.set(res.data ?? []);
                 this.loading.set(false);
             },

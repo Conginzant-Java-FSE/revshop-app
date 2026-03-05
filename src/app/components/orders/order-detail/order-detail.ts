@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { OrderService } from '../../../services/order';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../../models/api-response.model';
+
 
 @Component({
     selector: 'app-order-detail',
@@ -45,11 +47,11 @@ export class OrderDetailComponent implements OnInit {
 
     loadData(): void {
         this.loading.set(true);
-        forkJoin([
-            this.orderService.getOrderById(this.orderId),
-            this.orderService.getOrderTracking(this.orderId)
-        ]).subscribe({
-            next: ([orderRes, trackingRes]) => {
+        forkJoin({
+            orderRes: this.orderService.getOrderById(this.orderId),
+            trackingRes: this.orderService.getOrderTracking(this.orderId)
+        }).subscribe({
+            next: ({ orderRes, trackingRes }: { orderRes: ApiResponse<any>, trackingRes: ApiResponse<any[]> }) => {
                 this.order.set(orderRes.data);
                 const sorted = (trackingRes.data || []).slice().sort(
                     (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -146,7 +148,7 @@ export class OrderDetailComponent implements OnInit {
         const userId = Number(localStorage.getItem('userId'));
         this.actionLoading.set(true);
         this.orderService.requestReturn(this.orderId, userId, this.returnReason).subscribe({
-            next: () => {
+            next: (res: ApiResponse<void>) => {
                 this.showReturnModal.set(false);
                 this.showToastMsg('Return request submitted successfully', 'success');
                 this.actionLoading.set(false);

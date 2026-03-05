@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService } from '../../services/shipper.service';
+import { ApiResponse } from '../../models/api-response.model';
+
 
 @Component({
     selector: 'app-shipper-login',
@@ -43,7 +45,7 @@ export class ShipperLoginComponent {
         const { email, password } = this.loginForm.value;
 
         this.shipperService.loginShipper(email, password).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 const data = res.data;
                 localStorage.setItem('shipperToken', data.token || '');
                 localStorage.setItem('shipperId', data.shipperId?.toString() || '');

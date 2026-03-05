@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService } from '../../services/shipper.service';
+import { ApiResponse } from '../../models/api-response.model';
+
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
@@ -57,7 +59,7 @@ export class ShipperRegisterComponent {
         const { name, email, phone, vehicleNumber, password } = this.form.value;
 
         this.shipperService.registerShipper({ name, email, phone, vehicleNumber, password }).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 const data = res.data;
                 localStorage.setItem('shipperId', data.shipperId?.toString() || '');
                 localStorage.setItem('shipperName', data.name || '');

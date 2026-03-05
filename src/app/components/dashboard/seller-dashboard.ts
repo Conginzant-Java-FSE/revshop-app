@@ -166,6 +166,28 @@ export class SellerDashboardComponent implements OnInit {
         });
     }
 
+    acceptReturn(orderId: number): void {
+        this.orderService.updateOrderStatus(orderId, 'RETURN_APPROVED', this.sellerId).subscribe({
+            next: () => {
+                this.toastService.success('Return accepted');
+                this.loadSellerOrders();
+                this.loadStats();
+            },
+            error: () => this.toastService.error('Failed to accept return')
+        });
+    }
+
+    rejectReturn(orderId: number): void {
+        this.orderService.updateOrderStatus(orderId, 'RETURN_REJECTED', this.sellerId).subscribe({
+            next: () => {
+                this.toastService.success('Return rejected');
+                this.loadSellerOrders();
+                this.loadStats();
+            },
+            error: () => this.toastService.error('Failed to reject return')
+        });
+    }
+
     onLogout(): void {
         this.authService.logout();
         this.router.navigate(['/']);

@@ -1,0 +1,224 @@
+<div class="shipper-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <span class="logo-icon">🚚</span>
+                <span>RevShop</span>
+            </div>
+        </div>
+
+        <div class="shipper-profile">
+            <div class="avatar">{{ shipperName().charAt(0) | uppercase }}</div>
+            <div class="profile-info">
+                <h3>{{ shipperName() }}</h3>
+                <p>{{ shipperVehicle() }}</p>
+            </div>
+        </div>
+
+        <div class="availability-toggle">
+            <span class="avail-label">Status</span>
+            <button class="toggle-btn" [class.active]="isAvailable()" (click)="toggleAvailability()">
+                <span class="toggle-dot"></span>
+                {{ isAvailable() ? 'Available' : 'Unavailable' }}
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item" [class.active]="activeTab() === 'all'" (click)="setTab('all')">
+                <span>📋</span> All Orders
+                <span class="nav-badge">{{ allOrders().length }}</span>
+            </button>
+            <button class="nav-item" [class.active]="activeTab() === 'pending'" (click)="setTab('pending')">
+                <span>📦</span> In Transit
+                <span class="nav-badge orange">{{ pendingOrders().length }}</span>
+            </button>
+            <button class="nav-item" [class.active]="activeTab() === 'delivered'" (click)="setTab('delivered')">
+                <span>✅</span> Delivered
+                <span class="nav-badge green">{{ deliveredOrders().length }}</span>
+            </button>
+        </nav>
+
+        <button class="logout-btn" (click)="logout()">
+            <span>🚪</span> Logout
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Delivery Dashboard</h1>
+                <p>Welcome back, {{ shipperName() }} 👋</p>
+            </div>
+            <div class="header-right">
+                <button class="refresh-btn" (click)="loadOrders()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card blue">
+                <div class="stat-icon">📋</div>
+                <div class="stat-info">
+                    <h2>{{ allOrders().length }}</h2>
+                    <p>Total Assigned</p>
+                </div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-icon">🚚</div>
+                <div class="stat-info">
+                    <h2>{{ pendingOrders().length }}</h2>
+                    <p>In Transit</p>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <h2>{{ deliveredOrders().length }}</h2>
+                    <p>Delivered</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <section class="orders-section">
+            <div class="section-header">
+                <h2>
+                    @switch (activeTab()) {
+                    @case ('pending') { In Transit Orders }
+                    @case ('delivered') { Delivered Orders }
+                    @default { All Assigned Orders }
+                    }
+                </h2>
+            </div>
+
+            @if (loading()) {
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading your orders...</p>
+            </div>
+            } @else if (filteredOrders().length === 0) {
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No Orders Found</h3>
+                <p>You don't have any orders in this category yet.</p>
+            </div>
+            } @else {
+            <div class="orders-grid">
+                @for (order of filteredOrders(); track order.orderId) {
+                <div class="order-card" [class]="'order-' + order.status.toLowerCase()">
+                    <!-- Card Header -->
+                    <div class="card-header">
+                        <div class="order-id">
+                            <span class="order-icon">{{ getStatusIcon(order.status) }}</span>
+                            <div>
+                                <h3>#{{ order.orderNumber || order.orderId }}</h3>
+                                <p class="order-date">{{ formatDate(order.orderDate) }}</p>
+                            </div>
+                        </div>
+                        <span class="status-badge" [class]="getStatusColor(order.status)">
+                            {{ order.status }}
+                        </span>
+                    </div>
+
+                    <!-- Tracking Timeline -->
+                    <div class="tracking-timeline">
+                        <div class="timeline-track">
+                            <div class="step" [class.active]="getTrackingStep(order.status) >= 0"
+                                [class.complete]="getTrackingStep(order.status) > 0">
+                                <div class="step-dot"></div>
+                                <span>Ordered</span>
+                            </div>
+                            <div class="step-line" [class.active]="getTrackingStep(order.status) >= 1"></div>
+                            <div class="step" [class.active]="getTrackingStep(order.status) >= 1"
+                                [class.complete]="getTrackingStep(order.status) > 1">
+                                <div class="step-dot"></div>
+                                <span>Packed</span>
+                            </div>
+                            <div class="step-line" [class.active]="getTrackingStep(order.status) >= 2"></div>
+                            <div class="step" [class.active]="getTrackingStep(order.status) >= 2"
+                                [class.complete]="getTrackingStep(order.status) > 2">
+                                <div class="step-dot"></div>
+                                <span>In Transit</span>
+                            </div>
+                            <div class="step-line" [class.active]="getTrackingStep(order.status) >= 3"></div>
+                            <div class="step" [class.active]="getTrackingStep(order.status) >= 3"
+                                [class.complete]="getTrackingStep(order.status) > 3">
+                                <div class="step-dot"></div>
+                                <span>Out for Delivery</span>
+                            </div>
+                            <div class="step-line" [class.active]="getTrackingStep(order.status) >= 4"></div>
+                            <div class="step" [class.active]="getTrackingStep(order.status) >= 4">
+                                <div class="step-dot"></div>
+                                <span>Delivered</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Info -->
+                    <div class="customer-section">
+                        <div class="customer-avatar">{{ order.customerName.charAt(0) | uppercase }}</div>
+                        <div class="customer-details">
+                            <h4>{{ order.customerName }}</h4>
+                            @if (order.customerPhone) {
+                            <a [href]="'tel:' + order.customerPhone" class="customer-phone">📞 {{ order.customerPhone
+                                }}</a>
+                            }
+                        </div>
+                        <div class="order-amount">{{ formatCurrency(order.totalAmount) }}</div>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="delivery-address">
+                        <div class="address-icon">📍</div>
+                        <div class="address-text">
+                            <strong>Deliver to:</strong>
+                            <p>
+                                {{ order.shippingAddress?.addressLine }}
+                                @if (order.shippingAddress?.street) { , {{ order.shippingAddress?.street }} }
+                                , {{ order.shippingAddress?.city }}, {{ order.shippingAddress?.state }} - {{
+                                order.shippingAddress?.zipCode }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="order-items">
+                        <h5>Items ({{ order.orderItems?.length || 0 }})</h5>
+                        <div class="items-list">
+                            @for (item of order.orderItems?.slice(0, 2); track item.productName) {
+                            <div class="item-row">
+                                <span class="item-name">{{ item.productName }}</span>
+                                <span class="item-qty">×{{ item.quantity }}</span>
+                            </div>
+                            }
+                            @if ((order.orderItems?.length || 0) > 2) {
+                            <p class="more-items">+{{ (order.orderItems?.length || 0) - 2 }} more items</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    @if (getNextStatus(order.status); as next) {
+                    <button class="action-btn" [class.btn-blue]="next.color === 'blue'"
+                        [class.btn-green]="next.color === 'green'" [disabled]="updatingOrderId() === order.orderId"
+                        (click)="updateStatus(order, next.value)">
+                        @if (updatingOrderId() === order.orderId) {
+                        <span class="btn-spinner"></span>
+                        Updating...
+                        } @else {
+                        {{ next.label }}
+                        }
+                    </button>
+                    }
+                </div>
+                }
+            </div>
+            }
+        </section>
+    </main>
+</div>

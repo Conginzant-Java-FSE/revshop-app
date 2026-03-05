@@ -69,6 +69,7 @@ export class OrderDetailComponent implements OnInit {
             case 'PENDING': return 0;
             case 'PROCESSING': return 1;
             case 'SHIPPED': return 2;
+            case 'OUT_FOR_DELIVERY': return 3;
             case 'DELIVERED': return 4;
             default: return -1; // CANCELLED, RETURN_REQUESTED etc.
         }
@@ -83,6 +84,7 @@ export class OrderDetailComponent implements OnInit {
             case 'PENDING': return 'badge-pending';
             case 'PROCESSING': return 'badge-processing';
             case 'SHIPPED': return 'badge-shipped';
+            case 'OUT_FOR_DELIVERY': return 'badge-shipped'; // Reuse shipped color
             case 'DELIVERED': return 'badge-delivered';
             case 'CANCELLED': return 'badge-cancelled';
             case 'RETURN_REQUESTED': return 'badge-return';
@@ -94,7 +96,7 @@ export class OrderDetailComponent implements OnInit {
     getTrackingBadgeClass(status: string): string {
         const s = status?.toUpperCase();
         if (s === 'DELIVERED' || s === 'RETURN_APPROVED') return 'track-badge-green';
-        if (s === 'SHIPPED') return 'track-badge-orange';
+        if (s === 'SHIPPED' || s === 'OUT_FOR_DELIVERY') return 'track-badge-orange';
         if (s === 'PROCESSING') return 'track-badge-blue';
         if (s === 'CANCELLED') return 'track-badge-red';
         if (s === 'RETURN_REQUESTED') return 'track-badge-purple';

@@ -1,0 +1,156 @@
+<div class="register-page">
+    <div class="register-container">
+        <!-- Brand Panel -->
+        <div class="brand-panel">
+            <div class="brand-content">
+                <div class="brand-icon">🚚</div>
+                <h1>Join Our Delivery Network</h1>
+                <p>Register as a delivery partner and start earning. Manage your deliveries with our smart dashboard.
+                </p>
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📦</span>
+                        <div>
+                            <strong>Real-time order management</strong>
+                            <p>Track and manage all your assigned deliveries instantly</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📍</span>
+                        <div>
+                            <strong>Clear delivery addresses</strong>
+                            <p>Full customer and delivery details on every order</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>One-tap status updates</strong>
+                            <p>Update delivery status instantly with a single click</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Create Shipper Account</h2>
+                    <p>Fill in your details to get started</p>
+                </div>
+
+                @if (errorMessage) {
+                <div class="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {{ errorMessage }}
+                </div>
+                }
+
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div class="form-row">
+                        <!-- Full Name -->
+                        <div class="form-group full-width" [class.error]="submitted && f['name'].invalid">
+                            <label>Full Name</label>
+                            <div class="input-wrap">
+                                <span class="input-prefix">👤</span>
+                                <input type="text" formControlName="name" placeholder="Rajesh Kumar">
+                            </div>
+                            @if (submitted && f['name'].invalid) {
+                            <span class="err">Name must be at least 3 characters</span>
+                            }
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group" [class.error]="submitted && f['email'].invalid">
+                            <label>Email Address</label>
+                            <div class="input-wrap">
+                                <span class="input-prefix">📧</span>
+                                <input type="email" formControlName="email" placeholder="rajesh@example.com"
+                                    autocomplete="email">
+                            </div>
+                            @if (submitted && f['email'].invalid) {
+                            <span class="err">Enter a valid email address</span>
+                            }
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="form-group" [class.error]="submitted && f['phone'].invalid">
+                            <label>Phone Number</label>
+                            <div class="input-wrap">
+                                <span class="input-prefix">📞</span>
+                                <input type="tel" formControlName="phone" placeholder="9876543210" maxlength="10">
+                            </div>
+                            @if (submitted && f['phone'].invalid) {
+                            <span class="err">Enter a valid 10-digit phone number</span>
+                            }
+                        </div>
+
+                        <!-- Vehicle Number -->
+                        <div class="form-group" [class.error]="submitted && f['vehicleNumber'].invalid">
+                            <label>Vehicle Number</label>
+                            <div class="input-wrap">
+                                <span class="input-prefix">🚗</span>
+                                <input type="text" formControlName="vehicleNumber" placeholder="TN05AB1234">
+                            </div>
+                            @if (submitted && f['vehicleNumber'].invalid) {
+                            <span class="err">Vehicle number is required</span>
+                            }
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group" [class.error]="submitted && f['password'].invalid">
+                            <label>Password</label>
+                            <div class="input-wrap">
+                                <span class="input-prefix">🔒</span>
+                                <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                                    placeholder="min. 6 characters">
+                                <button type="button" class="toggle" (click)="showPassword = !showPassword">
+                                    {{ showPassword ? '🙈' : '👁️' }}
+                                </button>
+                            </div>
+                            @if (submitted && f['password'].invalid) {
+                            <span class="err">Password must be at least 6 characters</span>
+                            }
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group"
+                            [class.error]="submitted && (f['confirmPassword'].invalid || form.errors?.['passwordMismatch'])">
+                            <label>Confirm Password</label>
+                            <div class="input-wrap">
+                                <span class="input-prefix">🔒</span>
+                                <input [type]="showConfirm ? 'text' : 'password'" formControlName="confirmPassword"
+                                    placeholder="Re-enter password">
+                                <button type="button" class="toggle" (click)="showConfirm = !showConfirm">
+                                    {{ showConfirm ? '🙈' : '👁️' }}
+                                </button>
+                            </div>
+                            @if (submitted && form.errors?.['passwordMismatch']) {
+                            <span class="err">Passwords do not match</span>
+                            }
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" [disabled]="loading">
+                        @if (loading) {
+                        <span class="spinner"></span> Creating Account...
+                        } @else {
+                        🚀 Create Shipper Account
+                        }
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a routerLink="/shipper-login">Sign In</a></p>
+                    <p>Not a shipper? <a routerLink="/login">Buyer / Seller Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

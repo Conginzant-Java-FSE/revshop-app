@@ -1,20 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DashboardComponent } from './dashboard';
+import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
+import { OrderService } from '../../services/order';
+import { ProductService } from '../../services/product';
 
-import { Dashboard } from './dashboard';
-
-describe('Dashboard', () => {
-  let component: Dashboard;
-  let fixture: ComponentFixture<Dashboard>;
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dashboard]
+      imports: [DashboardComponent],
+      providers: [
+        { provide: AuthService, useValue: { userRole: () => 'BUYER' } },
+        { provide: Router, useValue: { navigate: () => { } } },
+        { provide: OrderService, useValue: {} },
+        { provide: ProductService, useValue: {} }
+      ]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(Dashboard);
+    fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create', () => {

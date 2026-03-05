@@ -1,7 +1,8 @@
 <div class="input-group search-bar-group">
-  <input type="search" name="search_query" autocomplete="off" class="form-control rounded-pill-start search-input"
-    placeholder="Search for products..." aria-label="Search products" [(ngModel)]="keyword"
-    (keyup.enter)="onSearch()" />
+  <input type="text" name="revshop_product_search" autocomplete="new-password"
+    [attr.readonly]="isReadonly ? true : null" (focus)="isReadonly = false"
+    class="form-control rounded-pill-start search-input" placeholder="Search for products..."
+    aria-label="Search products" [(ngModel)]="keyword" (keyup.enter)="onSearch()" />
   <button class="btn btn-warning search-btn rounded-pill-end" type="button" (click)="onSearch()" aria-label="Search">
     <i class="fa-solid fa-search"></i>
   </button>

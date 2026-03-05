@@ -5,13 +5,12 @@ import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../services/product';
 import { CategoryService, CategoryDTO } from '../../../services/category';
 import { ToastService } from '../../../services/toast';
-import { Navbar } from '../../shared/navbar/navbar';
 import { Header } from '../../shared/header/header';
 
 @Component({
     selector: 'app-product-edit',
     standalone: true,
-    imports: [ReactiveFormsModule, CommonModule, RouterLink, Navbar, Header],
+    imports: [ReactiveFormsModule, CommonModule, RouterLink, Header],
     templateUrl: './product-edit.html',
     styleUrl: './product-edit.css'
 })

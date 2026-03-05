@@ -20,7 +20,7 @@ export class CheckoutComponent implements OnInit {
     loading = signal<boolean>(true);
     addresses = signal<AddressDTO[]>([]);
     cart = signal<CartDTO | null>(null);
-    selectedAddressId = signal<number | null>(null);
+    selectedAddressId: number | null = null;
     paymentMethod = signal<string>('RAZORPAY');
 
     // Coupon state
@@ -66,7 +66,14 @@ export class CheckoutComponent implements OnInit {
         }
 
         this.addressService.getAddressesByUserId(userId).subscribe({
-            next: (res) => this.addresses.set(res.data ?? []),
+            next: (res: any) => {
+                // Backend returns bare List<AddressDTO> not wrapped in ApiResponse
+                const addrs: AddressDTO[] = Array.isArray(res) ? res : (res.data ?? []);
+                this.addresses.set(addrs);
+                // Auto-select default address or first address
+                const def = addrs.find((a: any) => a.isDefault) ?? addrs[0];
+                if (def?.addressId) this.selectedAddressId = def.addressId;
+            },
             error: () => { }
         });
 
@@ -82,7 +89,11 @@ export class CheckoutComponent implements OnInit {
     get subtotal(): number {
         const cart = this.cart();
         if (!cart || !cart.items) return 0;
-        return cart.items.reduce((sum: number, item: any) => sum + (item.sellingPrice * item.quantity), 0);
+        return cart.items.reduce((sum: number, item: any) => {
+            const unitPrice = item.price ?? item.sellingPrice ?? item.subtotal ?? 0;
+            const qty = item.quantity ?? 1;
+            return sum + (unitPrice * qty);
+        }, 0);
     }
 
     get finalTotal(): number {
@@ -128,10 +139,13 @@ export class CheckoutComponent implements OnInit {
     /** Main pay flow — places order then triggers Razorpay popup */
     placeOrder(): void {
         const userId = Number(localStorage.getItem('userId'));
-        const addrId = this.selectedAddressId();
+        const addrId = this.selectedAddressId;
         const cart = this.cart();
 
-        if (!addrId) { this.toastService.error('Please select a shipping address.'); return; }
+        if (addrId === null || addrId === undefined) {
+            this.toastService.error('Please select a shipping address.');
+            return;
+        }
         if (!cart || !cart.items || cart.items.length === 0) { this.toastService.error('Your cart is empty.'); return; }
 
         const request = {
@@ -226,9 +240,10 @@ export class CheckoutComponent implements OnInit {
         this.submittingAddress.set(true);
         this.addressService.addAddress(this.addressForm, userId).subscribe({
             next: (res) => {
-                const newAddress = res.data;
+                // Backend returns bare AddressDTO (not wrapped in ApiResponse)
+                const newAddress: AddressDTO = res.data ?? res;
                 this.addresses.update(prev => [...prev, newAddress]);
-                this.selectedAddressId.set(newAddress.addressId!);
+                this.selectedAddressId = newAddress.addressId ?? null;
                 this.toastService.success('Address added successfully');
                 this.submittingAddress.set(false);
                 this.closeAddressModal();
@@ -243,10 +258,6 @@ export class CheckoutComponent implements OnInit {
     onSavedAddressSelect(event: Event): void {
         const select = event.target as HTMLSelectElement;
         const addrId = Number(select.value);
-        if (addrId) {
-            this.selectedAddressId.set(addrId);
-        } else {
-            this.selectedAddressId.set(null);
-        }
+        this.selectedAddressId = addrId || null;
     }
 }

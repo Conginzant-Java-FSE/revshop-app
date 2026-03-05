@@ -24,19 +24,19 @@ export class AddressService {
 
     constructor(private http: HttpClient) { }
 
-    getAddressesByUserId(userId: number): Observable<ApiResponse<AddressDTO[]>> {
-        return this.http.get<ApiResponse<AddressDTO[]>>(`${this.apiUrl}/user/${userId}`);
+    getAddressesByUserId(userId: number): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/user/${userId}`);
     }
 
-    addAddress(address: AddressDTO, userId: number): Observable<ApiResponse<AddressDTO>> {
-        return this.http.post<ApiResponse<AddressDTO>>(`${this.apiUrl}/${userId}`, address);
+    addAddress(address: AddressDTO, userId: number): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/${userId}`, address);
     }
 
-    updateAddress(id: number, address: AddressDTO): Observable<ApiResponse<AddressDTO>> {
-        return this.http.put<ApiResponse<AddressDTO>>(`${this.apiUrl}/${id}`, address);
+    updateAddress(id: number, address: AddressDTO): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/${id}`, address);
     }
 
-    deleteAddress(id: number): Observable<ApiResponse<string>> {
-        return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${id}`);
+    deleteAddress(id: number): Observable<any> {
+        return this.http.delete<any>(`${this.apiUrl}/${id}`);
     }
 }

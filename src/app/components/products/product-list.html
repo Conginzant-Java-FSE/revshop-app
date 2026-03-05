@@ -35,7 +35,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                     <h4 class="fw-bold mb-0">Our Products</h4>
                     <div class="d-flex align-items-center gap-3">
-                        <span class="text-muted">{{ totalElements() }} Products Found</span>
+                        <span class="text-secondary fw-semibold">{{ totalElements() }} Products Found</span>
                         <select class="form-select form-select-sm rounded-pill" style="width: auto;"
                             [(ngModel)]="sortOption" (ngModelChange)="onSortChange()">
                             <option value="productId_asc">Default</option>
@@ -54,7 +54,7 @@
 
                 <div *ngIf="!loading() && products().length === 0" class="text-center py-5">
                     <i class="fa-solid fa-box-open fs-1 text-muted mb-3 d-block"></i>
-                    <p class="text-muted">No products found matching your criteria.</p>
+                    <p class="text-dark fw-medium">No products found matching your criteria.</p>
                 </div>
 
                 <div class="row g-4" *ngIf="!loading()">
@@ -65,8 +65,9 @@
                                 class="product-badge bg-primary text-white position-absolute px-3 py-1 rounded-pill small m-3">
                                 New
                             </div>
-                            <img [src]="product.imageUrl || 'https://placehold.co/300x200?text=No+Image'" class="card-img-top p-4"
-                                [alt]="product.name" style="height: 250px; object-fit: contain;">
+                            <img [src]="product.imageUrl || 'https://placehold.co/300x200?text=No+Image'"
+                                class="card-img-top p-4" [alt]="product.name"
+                                style="height: 250px; object-fit: contain;">
                             <div class="card-body p-4 d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title fw-bold mb-0">{{ product.name }}</h5>
@@ -94,17 +95,16 @@
                 </div>
 
                 <!-- Pagination Controls -->
-                <div class="d-flex justify-content-center align-items-center gap-3 mt-5" *ngIf="!loading() && totalPages() > 1">
-                    <button class="btn btn-outline-primary rounded-pill px-4"
-                        (click)="previousPage()"
+                <div class="d-flex justify-content-center align-items-center gap-3 mt-5"
+                    *ngIf="!loading() && totalPages() > 1">
+                    <button class="btn btn-outline-primary rounded-pill px-4" (click)="previousPage()"
                         [disabled]="currentPage() === 0">
                         <i class="fa-solid fa-chevron-left me-2"></i> Previous
                     </button>
                     <span class="text-muted fw-bold">
                         Page {{ currentPage() + 1 }} of {{ totalPages() }}
                     </span>
-                    <button class="btn btn-outline-primary rounded-pill px-4"
-                        (click)="nextPage()"
+                    <button class="btn btn-outline-primary rounded-pill px-4" (click)="nextPage()"
                         [disabled]="currentPage() >= totalPages() - 1">
                         Next <i class="fa-solid fa-chevron-right ms-2"></i>
                     </button>

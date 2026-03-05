@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService, ProductDTO } from '../../services/product';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { CartService } from '../../services/cart';
@@ -34,7 +34,8 @@ export class ProductListComponent implements OnInit {
         private productService: ProductService,
         private cartService: CartService,
         private toastService: ToastService,
-        private location: Location
+        private location: Location,
+        private route: ActivatedRoute
     ) { }
 
     goBack(): void {
@@ -42,7 +43,16 @@ export class ProductListComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.loadProducts();
+        // Read search/category query params (e.g. from category card navigation)
+        this.route.queryParams.subscribe(params => {
+            if (params['search']) {
+                this.keyword.set(params['search']);
+                this.currentPage.set(0);
+                this.onSearch();
+            } else {
+                this.loadProducts();
+            }
+        });
     }
 
     private getSortParams(): { sortBy: string; direction: string } {

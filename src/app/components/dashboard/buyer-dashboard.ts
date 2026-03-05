@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { OrderService, OrderResponseDTO } from '../../services/order';
 import { Header } from '../shared/header/header';
+import { ApiResponse } from '../../models/api-response.model';
 
 @Component({
     selector: 'app-buyer-dashboard',
@@ -31,7 +32,7 @@ export class BuyerDashboardComponent implements OnInit {
         const userId = localStorage.getItem('userId');
         if (userId) {
             this.orderService.getOrdersByUserId(Number(userId)).subscribe({
-                next: (res) => {
+                next: (res: ApiResponse<OrderResponseDTO[]>) => {
                     this.recentOrders.set(res.data.slice(0, 5));
                     this.loading.set(false);
                 },
@@ -39,6 +40,7 @@ export class BuyerDashboardComponent implements OnInit {
             });
         }
     }
+
 
     onLogout(): void {
         this.authService.logout();

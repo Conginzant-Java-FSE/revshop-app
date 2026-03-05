@@ -8,6 +8,8 @@ import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
 import { CouponService } from '../../services/coupon.service';
 import { PaymentService } from '../../services/payment.service';
+import { ApiResponse } from '../../models/api-response.model';
+
 
 @Component({
     selector: 'app-checkout',
@@ -24,7 +26,7 @@ export class CheckoutComponent implements OnInit {
     paymentMethod = signal<string>('RAZORPAY');
 
     // Coupon state
-    couponCode = '';
+    couponCode = signal<string>('');
     appliedCouponCode = '';
     couponMessage = '';
     couponSuccess = false;
@@ -39,6 +41,7 @@ export class CheckoutComponent implements OnInit {
     // Address Modal State
     showAddressModal = signal<boolean>(false);
     submittingAddress = signal<boolean>(false);
+    submitting: boolean = false;
     addressForm: AddressDTO = {
         addressLine: '',
         city: '',
@@ -78,7 +81,7 @@ export class CheckoutComponent implements OnInit {
         });
 
         this.cartService.getCartByUserId(userId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<CartDTO>) => {
                 this.cart.set(res.data);
                 this.loading.set(false);
             },
@@ -101,16 +104,19 @@ export class CheckoutComponent implements OnInit {
     }
 
     applyCoupon(): void {
-        if (!this.couponCode.trim()) return;
+        const code = this.couponCode().trim();
+        if (!code) {
+            return;
+        }
         this.applyingCoupon = true;
         this.couponMessage = '';
-        this.couponService.validateCoupon(this.couponCode.trim(), this.subtotal).subscribe({
-            next: (res) => {
+        this.couponService.validateCoupon(code, this.subtotal).subscribe({
+            next: (res: ApiResponse<any>) => {
                 const result = res.data;
                 this.applyingCoupon = false;
                 if (result.valid) {
                     this.discountAmount = result.discountAmount;
-                    this.appliedCouponCode = this.couponCode;
+                    this.appliedCouponCode = this.couponCode();
                     this.couponSuccess = true;
                     this.couponMessage = result.message;
                 } else {
@@ -129,7 +135,7 @@ export class CheckoutComponent implements OnInit {
     }
 
     removeCoupon(): void {
-        this.couponCode = '';
+        this.couponCode.set('');
         this.appliedCouponCode = '';
         this.discountAmount = 0;
         this.couponMessage = '';
@@ -152,12 +158,23 @@ export class CheckoutComponent implements OnInit {
             userId,
             shippingAddressId: addrId,
             billingAddressId: addrId,
-            paymentMethod: 'RAZORPAY',
+            paymentMethod: this.paymentMethod(),
             items: cart.items.map((i: any) => ({ productId: i.productId, quantity: i.quantity }))
         };
 
         this.orderService.placeOrder(userId, request).subscribe({
             next: (res: any) => {
+                if (this.paymentMethod() === 'COD') {
+                    this.toastService.success('Order placed successfully (Cash on Delivery)');
+                    this.submitting = false;
+                    // Clear cart properly after COD
+                    this.cartService.clearCart(userId).subscribe({
+                        next: () => this.router.navigate(['/profile']),
+                        error: () => this.router.navigate(['/profile'])
+                    });
+                    return;
+                }
+
                 const orderId = res.data?.orderId ?? res.data?.order?.orderId;
                 if (!orderId) {
                     this.toastService.error('Order placed but payment initialization failed.');
@@ -171,7 +188,7 @@ export class CheckoutComponent implements OnInit {
 
     private initiateRazorpayPayment(orderId: number, amount: number, userId: number): void {
         this.paymentService.createRazorpayOrder(amount, orderId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<any>) => {
                 const rzpData = res.data;
                 const script = document.createElement('script');
                 script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -190,9 +207,28 @@ export class CheckoutComponent implements OnInit {
                             name: localStorage.getItem('userName') ?? '',
                             email: localStorage.getItem('userEmail') ?? ''
                         },
-                        theme: { color: '#0d6efd' }
+                        theme: { color: '#0d6efd' },
+                        modal: {
+                            ondismiss: () => {
+                                this.orderService.cancelOrder(orderId, userId).subscribe({
+                                    next: () => {
+                                        this.toastService.error('Payment window closed. Order cancelled.');
+                                        this.submitting = false;
+                                    },
+                                    error: () => {
+                                        this.toastService.error('Payment cancelled. (Order cancellation failed)');
+                                        this.submitting = false;
+                                    }
+                                });
+                            }
+                        }
                     };
                     const rzp = new (window as any).Razorpay(options);
+                    rzp.on('payment.failed', (response: any) => {
+                        this.toastService.error(response.error.description || 'Payment Failed');
+                        this.submitting = false;
+                        this.orderService.cancelOrder(orderId, userId).subscribe();
+                    });
                     rzp.open();
                 };
                 document.body.appendChild(script);
@@ -239,7 +275,7 @@ export class CheckoutComponent implements OnInit {
 
         this.submittingAddress.set(true);
         this.addressService.addAddress(this.addressForm, userId).subscribe({
-            next: (res) => {
+            next: (res: ApiResponse<AddressDTO>) => {
                 // Backend returns bare AddressDTO (not wrapped in ApiResponse)
                 const newAddress: AddressDTO = res.data ?? res;
                 this.addresses.update(prev => [...prev, newAddress]);

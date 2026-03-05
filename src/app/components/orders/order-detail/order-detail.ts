@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { OrderService } from '../../../services/order';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../../models/api-response.model';
+
 
 @Component({
     selector: 'app-order-detail',
@@ -45,11 +47,11 @@ export class OrderDetailComponent implements OnInit {
 
     loadData(): void {
         this.loading.set(true);
-        forkJoin([
-            this.orderService.getOrderById(this.orderId),
-            this.orderService.getOrderTracking(this.orderId)
-        ]).subscribe({
-            next: ([orderRes, trackingRes]) => {
+        forkJoin({
+            orderRes: this.orderService.getOrderById(this.orderId),
+            trackingRes: this.orderService.getOrderTracking(this.orderId)
+        }).subscribe({
+            next: ({ orderRes, trackingRes }: { orderRes: ApiResponse<any>, trackingRes: ApiResponse<any[]> }) => {
                 this.order.set(orderRes.data);
                 const sorted = (trackingRes.data || []).slice().sort(
                     (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -69,6 +71,7 @@ export class OrderDetailComponent implements OnInit {
             case 'PENDING': return 0;
             case 'PROCESSING': return 1;
             case 'SHIPPED': return 2;
+            case 'OUT_FOR_DELIVERY': return 3;
             case 'DELIVERED': return 4;
             default: return -1; // CANCELLED, RETURN_REQUESTED etc.
         }
@@ -83,6 +86,7 @@ export class OrderDetailComponent implements OnInit {
             case 'PENDING': return 'badge-pending';
             case 'PROCESSING': return 'badge-processing';
             case 'SHIPPED': return 'badge-shipped';
+            case 'OUT_FOR_DELIVERY': return 'badge-shipped'; // Reuse shipped color
             case 'DELIVERED': return 'badge-delivered';
             case 'CANCELLED': return 'badge-cancelled';
             case 'RETURN_REQUESTED': return 'badge-return';
@@ -94,7 +98,7 @@ export class OrderDetailComponent implements OnInit {
     getTrackingBadgeClass(status: string): string {
         const s = status?.toUpperCase();
         if (s === 'DELIVERED' || s === 'RETURN_APPROVED') return 'track-badge-green';
-        if (s === 'SHIPPED') return 'track-badge-orange';
+        if (s === 'SHIPPED' || s === 'OUT_FOR_DELIVERY') return 'track-badge-orange';
         if (s === 'PROCESSING') return 'track-badge-blue';
         if (s === 'CANCELLED') return 'track-badge-red';
         if (s === 'RETURN_REQUESTED') return 'track-badge-purple';
@@ -144,7 +148,7 @@ export class OrderDetailComponent implements OnInit {
         const userId = Number(localStorage.getItem('userId'));
         this.actionLoading.set(true);
         this.orderService.requestReturn(this.orderId, userId, this.returnReason).subscribe({
-            next: () => {
+            next: (res: ApiResponse<void>) => {
                 this.showReturnModal.set(false);
                 this.showToastMsg('Return request submitted successfully', 'success');
                 this.actionLoading.set(false);

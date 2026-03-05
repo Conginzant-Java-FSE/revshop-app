@@ -287,7 +287,10 @@
                                             'bg-info-subtle text-info': order.status === 'PROCESSING',
                                             'bg-primary-subtle text-primary': order.status === 'SHIPPED',
                                             'bg-success-subtle text-success': order.status === 'DELIVERED',
-                                            'bg-danger-subtle text-danger': order.status === 'CANCELLED'
+                                            'bg-danger-subtle text-danger': order.status === 'CANCELLED',
+                                            'bg-secondary-subtle text-secondary': order.status === 'RETURN_REQUESTED',
+                                            'bg-success text-white': order.status === 'RETURN_APPROVED',
+                                            'bg-danger text-white': order.status === 'RETURN_REJECTED'
                                         }">
                                         {{ order.status }}
                                     </span>
@@ -299,11 +302,27 @@
                                     <span *ngIf="!order.shipperName" class="text-muted small">—</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
-                                        *ngIf="order.status === 'PENDING'" (click)="openShipperModal(order.orderId)">
-                                        <i class="fa-solid fa-truck me-1"></i>Assign Shipper
-                                    </button>
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                            *ngIf="order.status === 'PENDING'"
+                                            (click)="openShipperModal(order.orderId)">
+                                            <i class="fa-solid fa-truck me-1"></i>Assign Shipper
+                                        </button>
+
+                                        <!-- Return Actions -->
+                                        <button class="btn btn-outline-success btn-sm rounded-pill px-3"
+                                            *ngIf="order.status === 'RETURN_REQUESTED'"
+                                            (click)="acceptReturn(order.orderId)">
+                                            <i class="fa-solid fa-check me-1"></i>Accept Return
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                            *ngIf="order.status === 'RETURN_REQUESTED'"
+                                            (click)="rejectReturn(order.orderId)">
+                                            <i class="fa-solid fa-xmark me-1"></i>Reject Return
+                                        </button>
+                                    </div>
                                 </td>
+
                             </tr>
                         </tbody>
                     </table>

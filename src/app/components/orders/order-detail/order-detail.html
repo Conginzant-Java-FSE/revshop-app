@@ -141,7 +141,7 @@
             <button class="btn-action btn-cancel-order" *ngIf="canCancel()" (click)="cancelOrder()"
                 [disabled]="actionLoading()">
                 <span *ngIf="actionLoading()">Processing…</span>
-                <span *ngIf="!actionLoading()">✕ Cancel Order</span>
+                <span *ngIf="!actionLoading()">Cancel Order</span>
             </button>
 
             <button class="btn-action btn-return" *ngIf="canReturn()" (click)="openReturnModal()"

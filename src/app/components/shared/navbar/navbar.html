@@ -19,17 +19,48 @@
             <app-search-bar class="mx-auto"></app-search-bar>
             <ul
                 class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
-                <li class="nav-item me-lg-3" *ngIf="!authService.authState().token">
+                <li class="nav-item me-lg-3" *ngIf="!authService.authState().token && !isShipper">
                     <a class="nav-link d-flex flex-column align-items-center position-relative" routerLink="/login">
                         <i class="fa-solid fa-user fs-5 mb-1"></i>
                         <span class="small d-none d-lg-block">Login</span>
                     </a>
                 </li>
 
+                <!-- Shipper logged-in section -->
+                <li class="nav-item dropdown me-lg-3" *ngIf="isShipper">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <span
+                            style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:0.85rem;">
+                            {{ shipperName.charAt(0).toUpperCase() }}
+                        </span>
+                        <span class="small fw-bold">{{ shipperName }}</span>
+                        <span class="badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;font-size:0.65rem;">🚚
+                            SHIPPER</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2"
+                        aria-labelledby="shipperDropdown">
+                        <li>
+                            <a class="dropdown-item py-2" routerLink="/shipper-dashboard">
+                                <i class="fa-solid fa-gauge me-2"></i> My Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-danger" (click)="onLogout()" style="cursor:pointer;">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+
                 <!-- Notification Bell -->
                 <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative"
-                        style="cursor:pointer;" (click)="toggleNotifications()">
+                    <a class="nav-link d-flex flex-column align-items-center position-relative" style="cursor:pointer;"
+                        (click)="toggleNotifications()">
                         <i class="fa-solid fa-bell fs-5 mb-1"></i>
                         <span *ngIf="unreadCount() > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
@@ -39,8 +70,8 @@
                     </a>
 
                     <!-- Notification Dropdown -->
-                    <div class="notification-dropdown position-absolute end-0 mt-2 p-0 z-3"
-                        *ngIf="showNotifications()" style="top: 100%;">
+                    <div class="notification-dropdown position-absolute end-0 mt-2 p-0 z-3" *ngIf="showNotifications()"
+                        style="top: 100%;">
                         <div class="d-flex justify-content-between align-items-center p-3 border-bottom"
                             style="border-color: rgba(255,255,255,0.1) !important;">
                             <span class="dropdown-header fw-bold p-0">Notifications</span>
@@ -59,8 +90,7 @@
                             [class.unread]="!notif.isRead">
                             <a class="dropdown-item py-2 px-3 d-flex gap-2 align-items-start"
                                 style="cursor:pointer;white-space:normal;" (click)="markAsRead(notif.notificationId)">
-                                <i class="fa-solid fa-circle notification-icon mt-1"
-                                    [style.font-size]="'0.5rem'"
+                                <i class="fa-solid fa-circle notification-icon mt-1" [style.font-size]="'0.5rem'"
                                     [style.color]="notif.isRead ? 'transparent' : '#ffc107'"></i>
                                 <div class="flex-grow-1">
                                     <div class="fw-bold small" style="color: #F8FAFC;">{{ notif.title }}</div>
@@ -105,7 +135,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" *ngIf="!isShipper">
                     <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
                         routerLink="/cart">
                         <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>

@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { CartService } from '../../services/cart';
+import { CategoryService, CategoryDTO } from '../../services/category';
 import { ToastService } from '../../services/toast';
 
 @Component({
@@ -19,6 +20,8 @@ export class ProductListComponent implements OnInit {
     keyword = signal<string>('');
     minPrice = signal<number | undefined>(undefined);
     maxPrice = signal<number | undefined>(undefined);
+    categoryId = signal<number | undefined>(undefined);
+    categories = signal<CategoryDTO[]>([]);
     loading = signal<boolean>(false);
 
     // Pagination
@@ -33,6 +36,7 @@ export class ProductListComponent implements OnInit {
     constructor(
         private productService: ProductService,
         private cartService: CartService,
+        private categoryService: CategoryService,
         private toastService: ToastService,
         private location: Location,
         private route: ActivatedRoute
@@ -43,6 +47,7 @@ export class ProductListComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.loadCategories();
         // Read search/category query params (e.g. from category card navigation)
         this.route.queryParams.subscribe(params => {
             if (params['search']) {
@@ -51,6 +56,14 @@ export class ProductListComponent implements OnInit {
                 this.onSearch();
             } else {
                 this.loadProducts();
+            }
+        });
+    }
+
+    loadCategories(): void {
+        this.categoryService.getAllCategories().subscribe({
+            next: (res) => {
+                this.categories.set(res.data);
             }
         });
     }
@@ -96,8 +109,9 @@ export class ProductListComponent implements OnInit {
         this.loading.set(true);
         this.currentPage.set(0);
         this.productService.filterProducts({
-            minPrice: this.minPrice(),
-            maxPrice: this.maxPrice()
+            minPrice: this.minPrice() || undefined,
+            maxPrice: this.maxPrice() || undefined,
+            categoryId: this.categoryId() === null ? undefined : this.categoryId()!
         }, this.currentPage(), this.pageSize).subscribe({
             next: (res) => {
                 this.products.set(res.data.content);
@@ -139,5 +153,14 @@ export class ProductListComponent implements OnInit {
             next: () => this.toastService.success('Product added to cart!'),
             error: (err) => console.error(err)
         });
+    }
+
+    clearFilters(): void {
+        this.keyword.set('');
+        this.minPrice.set(undefined);
+        this.maxPrice.set(undefined);
+        this.categoryId.set(undefined);
+        this.currentPage.set(0);
+        this.loadProducts();
     }
 }

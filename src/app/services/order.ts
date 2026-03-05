@@ -56,9 +56,7 @@ export class OrderService {
     }
 
     updateOrderStatus(orderId: number, status: string, sellerId: number): Observable<ApiResponse<OrderResponseDTO>> {
-        return this.http.put<ApiResponse<OrderResponseDTO>>(`${this.apiUrl}/${orderId}/status`, null, {
-            params: { status, sellerId: sellerId.toString() }
-        });
+        return this.http.put<ApiResponse<OrderResponseDTO>>(`${this.apiUrl}/${orderId}/status`, { status, sellerId });
     }
 
     getSellerOrders(sellerId: number): Observable<ApiResponse<OrderResponseDTO[]>> {

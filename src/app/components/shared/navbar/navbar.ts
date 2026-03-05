@@ -18,6 +18,23 @@ export class Navbar implements OnInit, OnDestroy {
   showNotifications = signal<boolean>(false);
   private pollInterval: any;
 
+  // Shipper session (stored separately from buyer/seller auth)
+  get isShipper(): boolean {
+    return !!localStorage.getItem('shipperId');
+  }
+
+  get shipperName(): string {
+    return localStorage.getItem('shipperName') || 'Shipper';
+  }
+
+  get shipperId(): string {
+    return localStorage.getItem('shipperId') || '';
+  }
+
+  get isAnyUserLoggedIn(): boolean {
+    return !!this.authService.authState().token || this.isShipper;
+  }
+
   constructor(
     public authService: AuthService,
     private router: Router,
@@ -83,7 +100,17 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   onLogout(): void {
-    this.authService.logout();
+    if (this.isShipper) {
+      // Clear shipper session
+      localStorage.removeItem('shipperId');
+      localStorage.removeItem('shipperName');
+      localStorage.removeItem('shipperEmail');
+      localStorage.removeItem('shipperVehicle');
+      localStorage.removeItem('shipperToken');
+      localStorage.removeItem('role');
+    } else {
+      this.authService.logout();
+    }
     this.router.navigate(['/']);
   }
 }

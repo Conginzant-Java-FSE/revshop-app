@@ -17,12 +17,18 @@ import { SellerDashboardComponent } from './components/dashboard/seller-dashboar
 import { ProductAddComponent } from './components/products/product-add';
 import { ForgotPasswordComponent } from './components/login/forgot-password';
 import { ProductEditComponent } from './components/products/product-edit/product-edit';
+import { ShipperLoginComponent } from './components/shipper-login/shipper-login';
+import { ShipperDashboardComponent } from './components/shipper-dashboard/shipper-dashboard';
+import { ShipperRegisterComponent } from './components/shipper-register/shipper-register';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'shipper-login', component: ShipperLoginComponent },
+  { path: 'shipper-register', component: ShipperRegisterComponent },
+  { path: 'shipper-dashboard', component: ShipperDashboardComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'buyer-dashboard', component: BuyerDashboardComponent, canActivate: [authGuard] },
   { path: 'seller-dashboard', component: SellerDashboardComponent, canActivate: [authGuard] },
@@ -38,4 +44,3 @@ export const routes: Routes = [
   { path: 'products/edit/:id', component: ProductEditComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
-

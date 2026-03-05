@@ -296,7 +296,7 @@ export class ProfileComponent implements OnInit {
 
   loadAddresses(userId: number): void {
     this.loadingAddresses.set(true);
-    this.addressService.getAddressesByUserId(userId).subscribe({
+    this.addressService.getAddressesByUser(userId).subscribe({
       next: (res: any) => {
         // Backend may return bare array or ApiResponse-wrapped
         const list: AddressDTO[] = Array.isArray(res) ? res : (res.data ?? []);
@@ -422,7 +422,8 @@ export class ProfileComponent implements OnInit {
         }
       });
     } else {
-      this.addressService.addAddress(data, Number(userId)).subscribe({
+      data.userId = Number(userId);
+      this.addressService.addAddress(data).subscribe({
         next: (res) => {
           // Backend returns bare AddressDTO (not wrapped in ApiResponse)
           this.toastService.success('Address added successfully');

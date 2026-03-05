@@ -24,12 +24,12 @@ export class AddressService {
 
     constructor(private http: HttpClient) { }
 
-    getAddressesByUserId(userId: number): Observable<any> {
+    getAddressesByUser(userId: number): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/user/${userId}`);
     }
 
-    addAddress(address: AddressDTO, userId: number): Observable<any> {
-        return this.http.post<any>(`${this.apiUrl}/${userId}`, address);
+    addAddress(address: AddressDTO): Observable<any> {
+        return this.http.post<any>(this.apiUrl, address);
     }
 
     updateAddress(id: number, address: AddressDTO): Observable<any> {

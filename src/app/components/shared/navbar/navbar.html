@@ -60,7 +60,7 @@
                 <!-- Notification Bell -->
                 <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token">
                     <a class="nav-link d-flex flex-column align-items-center position-relative" style="cursor:pointer;"
-                        (click)="toggleNotifications()">
+                        (click)="toggleNotifications($event)">
                         <i class="fa-solid fa-bell fs-5 mb-1"></i>
                         <span *ngIf="unreadCount() > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">

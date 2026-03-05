@@ -1,8 +1,9 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { Navbar } from '../../shared/navbar/navbar'; // Although Navbar is standalone, we can just use NotificationService
 import { OrderService } from '../../../services/order';
+import { NotificationService } from '../../../services/notification.service';
 import { FormsModule } from '@angular/forms';
 import { ApiResponse } from '../../../models/api-response.model';
 
@@ -18,6 +19,7 @@ export class OrderDetailComponent implements OnInit {
     order = signal<any>(null);
     trackingHistory = signal<any[]>([]);
     loading = signal<boolean>(true);
+    trackingLoading = signal<boolean>(true);
     toastMessage = signal<string>('');
     toastType = signal<'success' | 'error'>('success');
     showToast = signal<boolean>(false);
@@ -37,7 +39,8 @@ export class OrderDetailComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private orderService: OrderService
+        private orderService: OrderService,
+        private notificationService: NotificationService
     ) { }
 
     ngOnInit(): void {
@@ -47,21 +50,38 @@ export class OrderDetailComponent implements OnInit {
 
     loadData(): void {
         this.loading.set(true);
-        forkJoin({
-            orderRes: this.orderService.getOrderById(this.orderId),
-            trackingRes: this.orderService.getOrderTracking(this.orderId)
-        }).subscribe({
-            next: ({ orderRes, trackingRes }: { orderRes: ApiResponse<any>, trackingRes: ApiResponse<any[]> }) => {
+        this.trackingLoading.set(true);
+
+        // Fetch Order first so UI can render immediately
+        this.orderService.getOrderById(this.orderId).subscribe({
+            next: (orderRes: ApiResponse<any>) => {
                 this.order.set(orderRes.data);
+                this.loading.set(false); // Order card + Cancel button now visible
+
+                // Fetch Tracking independently
+                this.loadTracking();
+            },
+            error: () => {
+                this.loading.set(false);
+                this.trackingLoading.set(false);
+                this.showToastMsg('Failed to load order details', 'error');
+            }
+        });
+    }
+
+    private loadTracking(): void {
+        this.orderService.getOrderTracking(this.orderId).subscribe({
+            next: (trackingRes: ApiResponse<any[]>) => {
                 const sorted = (trackingRes.data || []).slice().sort(
                     (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
                 );
                 this.trackingHistory.set(sorted);
-                this.loading.set(false);
+                this.trackingLoading.set(false);
             },
             error: () => {
-                this.loading.set(false);
-                this.showToastMsg('Failed to load order details', 'error');
+                this.trackingLoading.set(false);
+                // We don't block the UI if tracking fails, maybe just show empty tracking or error state
+                console.error('Failed to load tracking data');
             }
         });
     }
@@ -126,6 +146,7 @@ export class OrderDetailComponent implements OnInit {
             next: () => {
                 this.showToastMsg('Order cancelled successfully', 'success');
                 this.actionLoading.set(false);
+                this.notificationService.triggerRefresh();
                 this.loadData();
             },
             error: () => {
@@ -152,6 +173,7 @@ export class OrderDetailComponent implements OnInit {
                 this.showReturnModal.set(false);
                 this.showToastMsg('Return request submitted successfully', 'success');
                 this.actionLoading.set(false);
+                this.notificationService.triggerRefresh();
                 this.loadData();
             },
             error: () => {

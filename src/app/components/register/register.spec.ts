@@ -3,17 +3,15 @@ import { RegisterComponent } from './register';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
+import { RegisterComponent } from './register';
+
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RegisterComponent],
-      providers: [
-        provideRouter([]),
-        provideHttpClient()
-      ]
+      imports: [RegisterComponent]
     })
       .compileComponents();
 

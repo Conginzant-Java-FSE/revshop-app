@@ -3,21 +3,15 @@ import { DashboardComponent } from './dashboard';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
+import { DashboardComponent } from './dashboard';
+
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent],
-      providers: [
-        provideRouter([
-          { path: 'login', children: [] },
-          { path: 'buyer-dashboard', children: [] },
-          { path: 'seller-dashboard', children: [] }
-        ]),
-        provideHttpClient()
-      ]
+      imports: [DashboardComponent]
     })
       .compileComponents();
 

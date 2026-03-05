@@ -3,20 +3,15 @@ import { LoginComponent } from './login';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
+import { LoginComponent } from './login';
+
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginComponent],
-      providers: [
-        provideRouter([
-          { path: 'dashboard', children: [] },
-          { path: '', children: [] }
-        ]),
-        provideHttpClient()
-      ]
+      imports: [LoginComponent]
     })
       .compileComponents();
 

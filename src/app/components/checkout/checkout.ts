@@ -68,7 +68,7 @@ export class CheckoutComponent implements OnInit {
             return;
         }
 
-        this.addressService.getAddressesByUserId(userId).subscribe({
+        this.addressService.getAddressesByUser(userId).subscribe({
             next: (res: any) => {
                 // Backend returns bare List<AddressDTO> not wrapped in ApiResponse
                 const addrs: AddressDTO[] = Array.isArray(res) ? res : (res.data ?? []);
@@ -274,7 +274,8 @@ export class CheckoutComponent implements OnInit {
         }
 
         this.submittingAddress.set(true);
-        this.addressService.addAddress(this.addressForm, userId).subscribe({
+        this.addressForm.userId = userId; // Ensure userId is set
+        this.addressService.addAddress(this.addressForm).subscribe({
             next: (res: ApiResponse<AddressDTO>) => {
                 // Backend returns bare AddressDTO (not wrapped in ApiResponse)
                 const newAddress: AddressDTO = res.data ?? res;

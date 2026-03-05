@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
-import { RouterLink, Router, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, OnDestroy, signal, HostListener, ElementRef } from '@angular/core';
+import { RouterLink, Router, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from '../../search-bar/search-bar';
 import { NotificationService, NotificationDTO } from '../../../services/notification.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -17,6 +18,8 @@ export class Navbar implements OnInit, OnDestroy {
   unreadCount = signal<number>(0);
   showNotifications = signal<boolean>(false);
   private pollInterval: any;
+  private refreshSubscription?: Subscription;
+  private routerSubscription?: Subscription;
 
   // Shipper session (stored separately from buyer/seller auth)
   get isShipper(): boolean {
@@ -38,19 +41,38 @@ export class Navbar implements OnInit, OnDestroy {
   constructor(
     public authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private elementRef: ElementRef
   ) { }
 
   ngOnInit(): void {
     if (this.authService.authState().token) {
       this.loadNotifications();
       this.pollInterval = setInterval(() => this.loadNotifications(), 60000);
+
+      // Subscribe to instant refresh events
+      this.refreshSubscription = this.notificationService.refresh$.subscribe(() => {
+        this.loadNotifications();
+      });
+
+      // Close dropdown on route change
+      this.routerSubscription = this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          this.showNotifications.set(false);
+        }
+      });
     }
   }
 
   ngOnDestroy(): void {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
+    }
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
   }
 
@@ -68,8 +90,19 @@ export class Navbar implements OnInit, OnDestroy {
     });
   }
 
-  toggleNotifications(): void {
+  toggleNotifications(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.showNotifications.update(v => !v);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const clickedInside = this.elementRef.nativeElement.contains(event.target);
+    if (!clickedInside && this.showNotifications()) {
+      this.showNotifications.set(false);
+    }
   }
 
   markAsRead(notificationId: number): void {

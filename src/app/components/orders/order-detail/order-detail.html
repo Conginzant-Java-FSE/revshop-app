@@ -73,9 +73,18 @@
         </div>
 
         <!-- ===== c) TRACKING HISTORY LOG ===== -->
-        <div class="od-card" *ngIf="trackingHistory().length > 0">
+        <div class="od-card" *ngIf="trackingHistory().length > 0 || trackingLoading()">
             <h2 class="od-section-title">Tracking History</h2>
-            <div class="timeline">
+
+            <!-- Independent Tracking Loader -->
+            <div *ngIf="trackingLoading()" class="d-flex align-items-center py-3">
+                <div class="spinner border-sm text-primary me-2"
+                    style="width: 1.5rem; height: 1.5rem; border-width: 0.2rem;"></div>
+                <span class="text-muted small">Loading tracking details...</span>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline" *ngIf="!trackingLoading() && trackingHistory().length > 0">
                 <div class="timeline-item" *ngFor="let event of trackingHistory(); let last = last">
                     <div class="timeline-dot" [ngClass]="getTrackingBadgeClass(event.status)"></div>
                     <div class="timeline-line" *ngIf="!last"></div>
@@ -87,6 +96,10 @@
                         <p class="track-time">{{ event.createdAt | date:'MMM d, y, h:mm a' }}</p>
                     </div>
                 </div>
+            </div>
+
+            <div *ngIf="!trackingLoading() && trackingHistory().length === 0" class="text-muted small py-2">
+                No tracking events found yet.
             </div>
         </div>
 

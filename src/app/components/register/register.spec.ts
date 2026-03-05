@@ -1,5 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+
+import { RegisterComponent } from './register';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, ActivatedRoute } from '@angular/router';

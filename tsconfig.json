@@ -21,6 +21,9 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
+  "types": [
+    "jasmine"
+  ],
   "files": [],
   "references": [
     {

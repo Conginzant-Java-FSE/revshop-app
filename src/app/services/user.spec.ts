@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { UserService, UserDTO, PasswordUpdateRequest } from './user';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 describe('UserService', () => {
     let service: UserService;

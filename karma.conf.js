@@ -1,24 +1,3 @@
-module.exports = function (config) {
-  config.set({
-    basePath: '',
-    frameworks: ['jasmine', '@angular-devkit/build-angular'],
-    plugins: [
-      require('karma-jasmine'),
-      require('karma-chrome-launcher'),
-      require('@angular-devkit/build-angular/plugins/karma')
-    ],
-    client: {
-      clearContext: false
-    },
-    reporters: ['progress'],
-    port: 9876,
-    colors: true,
-    logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: ['ChromeHeadless'],
-    singleRun: true,
-    restartOnFileChange: true
-  });
 // Karma configuration file
 // See link for more information: https://karma-runner.github.io/6.4/config/configuration-file.html
 
@@ -34,15 +13,11 @@ module.exports = function (config) {
             require('@angular-devkit/build-angular/plugins/karma')
         ],
         client: {
-            jasmine: {
-                // You can add configuration options for Jasmine here.
-                // For example: `random: true` to run tests in random order.
-                // For more information, see https://jasmine.github.io/api/edge/Configuration.html
-            },
-            clearContext: false // leave Jasmine Spec Runner output visible in browser
+            jasmine: {},
+            clearContext: false
         },
         jasmineHtmlReporter: {
-            suppressAll: true // removes the duplicated traces
+            suppressAll: true
         },
         coverageReporter: {
             dir: require('path').join(__dirname, './coverage/revshop-app'),
@@ -53,19 +28,12 @@ module.exports = function (config) {
             ]
         },
         reporters: ['progress', 'kjhtml'],
-        browsers: ['Chrome'],
-        customLaunchers: {
-            ChromeHeadless: {
-                base: 'Chrome',
-                flags: [
-                    '--headless',
-                    '--disable-gpu',
-                    '--no-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--remote-debugging-port=9222'
-                ]
-            }
-        },
+        port: 9876,
+        colors: true,
+        logLevel: config.LOG_INFO,
+        autoWatch: true,
+        browsers: ['ChromeHeadless'],
+        singleRun: true,
         restartOnFileChange: true
     });
 };

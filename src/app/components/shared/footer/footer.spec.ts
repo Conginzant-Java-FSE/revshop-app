@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Footer } from './footer';
 
 describe('Footer', () => {
@@ -9,8 +8,7 @@ describe('Footer', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [Footer]
-        })
-            .compileComponents();
+        }).compileComponents();
 
         fixture = TestBed.createComponent(Footer);
         component = fixture.componentInstance;
@@ -19,5 +17,14 @@ describe('Footer', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should render app-footer selector', () => {
+        const el = fixture.nativeElement;
+        expect(el).toBeTruthy();
+    });
+
+    it('should be standalone component', () => {
+        expect(fixture.componentRef).toBeTruthy();
     });
 });

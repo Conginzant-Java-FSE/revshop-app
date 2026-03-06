@@ -44,12 +44,13 @@ describe('AddressService', () => {
     });
 
     it('should add a new address', () => {
-        service.addAddress(mockAddress).subscribe(res => {
-            expect(res).toEqual(mockAddress);
+        const addressWithUser = { ...mockAddress, userId: 1 };
+        service.addAddress(addressWithUser).subscribe(res => {
+            expect(res).toEqual(addressWithUser);
         });
 
-        const req = httpMock.expectOne('/api/addresses');
+        const req = httpMock.expectOne('/api/addresses/1');
         expect(req.request.method).toBe('POST');
-        req.flush(mockAddress);
+        req.flush(addressWithUser);
     });
 });

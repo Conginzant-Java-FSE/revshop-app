@@ -26,7 +26,9 @@ export class ProductDetailComponent implements OnInit {
     loading = signal<boolean>(true);
     averageRating = signal<number>(0);
     reviewCount = signal<number>(0);
+    hasPurchased = signal<boolean>(false);
     hasUserReviewed = signal<boolean>(false);
+    canReview = signal<boolean>(false);
     stars = [1, 2, 3, 4, 5];
 
     newReview = {
@@ -58,7 +60,7 @@ export class ProductDetailComponent implements OnInit {
             this.loadAverageRating(productId);
             if (userId) {
                 this.checkIfFavorite(productId);
-                this.checkHasUserReviewed(productId, Number(userId));
+                this.checkReviewEligibility(productId, Number(userId));
             }
         }
     }
@@ -90,9 +92,13 @@ export class ProductDetailComponent implements OnInit {
         });
     }
 
-    checkHasUserReviewed(productId: number, userId: number): void {
-        this.reviewService.hasUserReviewed(userId, productId).subscribe({
-            next: (res) => this.hasUserReviewed.set(res.data),
+    checkReviewEligibility(productId: number, userId: number): void {
+        this.reviewService.checkReviewEligibility(userId, productId).subscribe({
+            next: (res) => {
+                this.hasPurchased.set(res.data.hasPurchased);
+                this.hasUserReviewed.set(res.data.hasReviewed);
+                this.canReview.set(res.data.canReview);
+            },
             error: () => { /* ignore */ }
         });
     }
@@ -162,6 +168,7 @@ export class ProductDetailComponent implements OnInit {
                     this.newReview.reviewText = '';
                     this.newReview.rating = 5;
                     this.hasUserReviewed.set(true);
+                    this.canReview.set(false);
                     if (prod && prod.productId) {
                         this.loadReviews(prod.productId);
                         this.loadAverageRating(prod.productId);

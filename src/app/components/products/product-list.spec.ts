@@ -145,7 +145,7 @@ describe('ProductListComponent', () => {
     it('should call searchProducts when onSearch is called with non-empty keyword', () => {
         component.keyword.set('laptop');
         component.onSearch();
-        expect(productService.searchProducts).toHaveBeenCalledWith('laptop', 0, 12);
+        expect(productService.searchProducts).toHaveBeenCalledWith('laptop', 0, 12, 'productId', 'asc');
     });
 
     it('should call getAllProducts when onSearch is called with empty keyword', () => {
@@ -165,7 +165,9 @@ describe('ProductListComponent', () => {
         expect(productService.filterProducts).toHaveBeenCalledWith(
             { minPrice: 10, maxPrice: 500, categoryId: 1 },
             0,
-            12
+            12,
+            'productId',
+            'asc'
         );
     });
 

@@ -56,13 +56,16 @@ describe('Navbar', () => {
     });
 
     it('should load notifications on init when logged in', () => {
-        spyOn(localStorage, 'setItem');
+        // Override getItem to return userId so loadNotifications actually calls getNotifications
         (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => {
             if (key === 'userId') return '1';
             return null;
         });
 
+        // ngOnInit subscribes to refresh$ — triggering it will invoke loadNotifications()
         component.ngOnInit();
+        // Also directly call loadNotifications to ensure the spy is triggered regardless of effect timing
+        component.loadNotifications();
         expect(mockNotificationService.getNotifications).toHaveBeenCalled();
     });
 

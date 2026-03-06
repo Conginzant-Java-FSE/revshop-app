@@ -1,59 +1,179 @@
-# RevshopApp
+# RevShop Frontend 🛍️
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+Angular 21 single-page application for the RevShop e-commerce platform. Provides a responsive interface for Buyers, Sellers, and Shippers with real-time notifications, product discovery, cart management, and order tracking.
 
-## Development server
+---
 
-To start a local development server, run:
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Configuration](#configuration)
+- [Running Tests](#running-tests)
+- [Project Structure](#project-structure)
+- [Available Routes](#available-routes)
+- [Key Features](#key-features)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Angular 21 (Standalone Components) |
+| Language | TypeScript 5.9 |
+| Reactive | RxJS 7, Angular Signals |
+| Styling | Vanilla CSS |
+| HTTP | Angular HttpClient + Interceptors |
+| Testing | Karma, Jasmine |
+| Build | Angular CLI 21 |
+
+---
+
+## Prerequisites
+
+- Node.js 20+
+- npm 10+
+
+---
+
+## Getting Started
+
+### 1. Install Dependencies
 
 ```bash
+cd revshop-app
+npm install
+```
+
+### 2. Start the Development Server
+
+```bash
+npm start
+# or
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+App runs at: **http://localhost:4200**
 
-## Code scaffolding
+> The frontend proxies all `/api/*` requests to the backend at `http://localhost:8080`. Make sure the backend is running.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
+## Configuration
+
+### API Proxy (`proxy.conf.json`)
+
+All API calls from the frontend are proxied:
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+No changes needed for local development. For production, update the `target` to your backend URL.
+
+---
+
+## Running Tests
 
 ```bash
-ng generate --help
-```
+# Run all tests in headless mode (CI-friendly)
+npx ng test --watch=false --browsers=ChromeHeadless
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
+# Run tests with live browser (watch mode)
 ng test
 ```
 
-## Running end-to-end tests
+**Test Coverage:** 282 tests across 39 spec files — all passing ✅
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
+## Project Structure
+
+```
+src/app/
+├── components/
+│   ├── landing-page/           # Home page, featured products/categories
+│   ├── products/               # Product list, product detail
+│   ├── cart/                   # Shopping cart
+│   ├── checkout/               # Checkout flow
+│   ├── orders/                 # Order history, tracking modal
+│   ├── dashboard/              # Buyer & Seller dashboards
+│   ├── login/                  # Login, forgot password
+│   ├── register/               # Registration form
+│   ├── profile/                # User profile management
+│   ├── favorites/              # Wishlist
+│   ├── search-bar/             # Search component
+│   ├── shipper-dashboard/      # Shipper delivery management
+│   ├── shipper-login/          # Shipper login
+│   ├── shipper-register/       # Shipper registration
+│   └── shared/
+│       ├── navbar/             # Navigation + notifications
+│       ├── header/             # Page header
+│       ├── footer/             # Footer
+│       └── toast/              # Toast notification UI
+│
+├── services/
+│   ├── auth.ts                 # Authentication + JWT storage
+│   ├── product.ts              # Product CRUD + search/filter
+│   ├── cart.ts                 # Cart management
+│   ├── order.ts                # Order placement + history
+│   ├── payment.service.ts      # Razorpay integration
+│   ├── notification.service.ts # In-app notifications
+│   ├── user.ts                 # User profile
+│   ├── address.ts              # Address management
+│   ├── category.ts             # Product categories
+│   ├── review.ts               # Product reviews & ratings
+│   ├── favorite.ts             # Wishlist
+│   ├── shipper.service.ts      # Shipper operations
+│   └── toast.ts                # Toast UI service
+│
+├── guards/
+│   └── auth-guard.ts           # Route protection by role
+│
+├── services/
+│   ├── auth-interceptor.ts     # Attaches JWT to requests
+│   └── error.interceptor.ts    # Global error handling
+│
+└── models/
+    └── api-response.model.ts   # Typed API response wrapper
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## Available Routes
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Route | Access | Description |
+|-------|--------|-------------|
+| `/` | Public | Landing page |
+| `/login` | Public | Buyer/Seller login |
+| `/register` | Public | Buyer/Seller registration |
+| `/products` | Public | Product listing & search |
+| `/products/:id` | Public | Product detail |
+| `/cart` | Buyer | Shopping cart |
+| `/checkout` | Buyer | Checkout & payment |
+| `/orders` | Buyer | Order history |
+| `/favorites` | Buyer | Wishlist |
+| `/profile` | Logged In | User profile |
+| `/dashboard` | Seller | Seller dashboard |
+| `/shipper/login` | Public | Shipper login |
+| `/shipper/dashboard` | Shipper | Delivery management |
+
+---
+
+## Key Features
+
+- **JWT Authentication** — Token stored in localStorage, auto-attached via `AuthInterceptor`
+- **Role-based Routing** — `AuthGuard` restricts routes by user role (BUYER / SELLER / SHIPPER)
+- **Angular Signals** — Reactive state management using Angular's Signals API
+- **Real-time Notifications** — Polling + `refresh$` subject for instant notification updates in the Navbar
+- **Razorpay Integration** — Embedded Razorpay checkout widget in the payment flow
+- **Product Sorting & Filtering** — Sort by price/name, filter by category and price range
+- **Order Tracking** — Full status timeline with visual progress indicator

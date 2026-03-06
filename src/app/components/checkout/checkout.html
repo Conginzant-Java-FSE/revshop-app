@@ -104,6 +104,19 @@
                             [class.text-danger]="!couponSuccess">
                             {{ couponMessage }}
                         </div>
+
+                        <!-- Available Coupons List -->
+                        <div *ngIf="coupons().length > 0 && !appliedCouponCode" class="mt-3">
+                            <label class="form-label small fw-bold text-muted mb-2">Available Coupons</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div *ngFor="let coupon of coupons()" (click)="selectCoupon(coupon.code)"
+                                    class="coupon-badge border rounded-pill px-3 py-1 small cursor-pointer transition-all"
+                                    [title]="coupon.discountType === 'PERCENT' ? coupon.discountValue + '% off' : '₹' + coupon.discountValue + ' off'">
+                                    <i class="fa-solid fa-tag me-1 text-primary"></i>
+                                    <span class="fw-bold">{{ coupon.code }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-between mb-2 text-success" *ngIf="discountAmount > 0">

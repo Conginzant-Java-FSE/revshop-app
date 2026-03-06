@@ -5,4 +5,6 @@ export interface TrackingDetail {
     orderId: number;
     createdAt: string;
     updatedAt: string;
+    shipperName?: string;
+    vehicleNumber?: string;
 }

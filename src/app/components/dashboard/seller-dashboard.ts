@@ -6,6 +6,7 @@ import { ProductService, ProductDTO } from '../../services/product';
 import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
 import { ShipperService, ShipperDTO } from '../../services/shipper.service';
+import { NotificationService } from '../../services/notification.service';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
 import { ApiResponse } from '../../models/api-response.model';
@@ -44,7 +45,8 @@ export class SellerDashboardComponent implements OnInit {
         private productService: ProductService,
         private orderService: OrderService,
         private toastService: ToastService,
-        private shipperService: ShipperService
+        private shipperService: ShipperService,
+        private notificationService: NotificationService
     ) { }
 
     ngOnInit(): void {
@@ -158,6 +160,7 @@ export class SellerDashboardComponent implements OnInit {
                 this.toastService.success('Shipper assigned successfully!');
                 this.assigningShipper.set(false);
                 this.closeShipperModal();
+                this.notificationService.triggerRefresh();
                 this.loadSellerOrders();
                 this.loadStats();
             },
@@ -172,6 +175,7 @@ export class SellerDashboardComponent implements OnInit {
         this.orderService.updateOrderStatus(orderId, 'RETURN_APPROVED', this.sellerId).subscribe({
             next: () => {
                 this.toastService.success('Return accepted');
+                this.notificationService.triggerRefresh();
                 this.loadSellerOrders();
                 this.loadStats();
             },
@@ -183,6 +187,7 @@ export class SellerDashboardComponent implements OnInit {
         this.orderService.updateOrderStatus(orderId, 'RETURN_REJECTED', this.sellerId).subscribe({
             next: () => {
                 this.toastService.success('Return rejected');
+                this.notificationService.triggerRefresh();
                 this.loadSellerOrders();
                 this.loadStats();
             },

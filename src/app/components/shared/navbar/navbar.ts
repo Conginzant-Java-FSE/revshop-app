@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, HostListener, ElementRef, effect, inject } from '@angular/core';
 import { RouterLink, Router, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 import { CommonModule } from '@angular/common';
@@ -43,25 +43,42 @@ export class Navbar implements OnInit, OnDestroy {
     private router: Router,
     private notificationService: NotificationService,
     private elementRef: ElementRef
-  ) { }
+  ) {
+    // Watch authState signal — fires instantly when token changes (login/logout)
+    effect(() => {
+      const token = this.authService.authState().token;
+      if (token) {
+        // User just logged in (or page refreshed while logged in) — load immediately
+        this.loadNotifications();
+        // Start polling if not already running
+        if (!this.pollInterval) {
+          this.pollInterval = setInterval(() => this.loadNotifications(), 60000);
+        }
+      } else {
+        // User logged out — clear notifications and stop polling
+        this.notifications.set([]);
+        this.unreadCount.set(0);
+        this.showNotifications.set(false);
+        if (this.pollInterval) {
+          clearInterval(this.pollInterval);
+          this.pollInterval = null;
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
-    if (this.authService.authState().token) {
+    // Subscribe to instant refresh events (called after order placement, status changes, etc.)
+    this.refreshSubscription = this.notificationService.refresh$.subscribe(() => {
       this.loadNotifications();
-      this.pollInterval = setInterval(() => this.loadNotifications(), 60000);
+    });
 
-      // Subscribe to instant refresh events
-      this.refreshSubscription = this.notificationService.refresh$.subscribe(() => {
-        this.loadNotifications();
-      });
-
-      // Close dropdown on route change
-      this.routerSubscription = this.router.events.subscribe(event => {
-        if (event instanceof NavigationEnd) {
-          this.showNotifications.set(false);
-        }
-      });
-    }
+    // Close dropdown on route change
+    this.routerSubscription = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.showNotifications.set(false);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -82,7 +99,7 @@ export class Navbar implements OnInit, OnDestroy {
 
     this.notificationService.getNotifications(Number(userId)).subscribe({
       next: (res) => {
-        const list = res.data ?? [];
+        const list = (res.data ?? []).filter(n => n.title && n.message);
         this.notifications.set(list);
         this.unreadCount.set(list.filter(n => !n.isRead).length);
       },

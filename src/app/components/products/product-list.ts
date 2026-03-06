@@ -48,90 +48,112 @@ export class ProductListComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadCategories();
-        // Read search/category query params (e.g. from category card navigation)
         this.route.queryParams.subscribe(params => {
             if (params['search']) {
                 this.keyword.set(params['search']);
-                this.currentPage.set(0);
-                this.onSearch();
-            } else {
-                this.loadProducts();
             }
+            this.currentPage.set(0);
+            this.fetchProducts();
         });
     }
 
     loadCategories(): void {
         this.categoryService.getAllCategories().subscribe({
-            next: (res) => {
-                this.categories.set(res.data);
-            }
+            next: (res) => this.categories.set(res.data)
         });
     }
 
     private getSortParams(): { sortBy: string; direction: string } {
-        const [sortBy, direction] = this.sortOption().split('_');
+        const parts = this.sortOption().split('_');
+        const direction = parts[parts.length - 1]; // 'asc' or 'desc'
+        const sortBy = parts.slice(0, parts.length - 1).join('_'); // handle compound names
         return { sortBy, direction };
     }
 
-    loadProducts(): void {
+    /**
+     * Single unified fetch method — always respects all active state:
+     * keyword, categoryId, minPrice, maxPrice, sortBy, direction, currentPage.
+     *
+     * Decision logic:
+     *   - If keyword is set AND no price/category filters → searchProducts (with sort)
+     *   - If category or price filters are set (with or without keyword) → filterProducts (with sort + keyword)
+     *   - Otherwise → getAllProducts (with sort)
+     */
+    fetchProducts(): void {
         this.loading.set(true);
         const { sortBy, direction } = this.getSortParams();
-        this.productService.getAllProducts(this.currentPage(), this.pageSize, sortBy, direction).subscribe({
-            next: (res) => {
-                this.products.set(res.data.content);
-                this.totalPages.set(res.data.totalPages);
-                this.totalElements.set(res.data.totalElements);
-                this.loading.set(false);
-            },
-            error: () => this.loading.set(false)
-        });
-    }
+        const kw = this.keyword().trim();
+        const hasFilters = this.categoryId() !== undefined ||
+            this.minPrice() !== undefined ||
+            this.maxPrice() !== undefined;
 
-    onSearch(): void {
-        if (!this.keyword().trim()) {
-            this.currentPage.set(0);
-            this.loadProducts();
-            return;
+        if (hasFilters) {
+            // Use filterProducts — supports category, price, keyword (via backend search+filter)
+            this.productService.filterProducts(
+                {
+                    minPrice: this.minPrice(),
+                    maxPrice: this.maxPrice(),
+                    categoryId: this.categoryId(),
+                    // pass keyword too if present
+                    ...(kw ? { keyword: kw } : {})
+                },
+                this.currentPage(), this.pageSize, sortBy, direction
+            ).subscribe({
+                next: (res) => {
+                    this.products.set(res.data.content);
+                    this.totalPages.set(res.data.totalPages);
+                    this.totalElements.set(res.data.totalElements);
+                    this.loading.set(false);
+                },
+                error: () => this.loading.set(false)
+            });
+        } else if (kw) {
+            // Keyword-only search with sort
+            this.productService.searchProducts(kw, this.currentPage(), this.pageSize, sortBy, direction).subscribe({
+                next: (res) => {
+                    this.products.set(res.data.content);
+                    this.totalPages.set(res.data.totalPages);
+                    this.totalElements.set(res.data.totalElements);
+                    this.loading.set(false);
+                },
+                error: () => this.loading.set(false)
+            });
+        } else {
+            // No filters, no keyword — load all with sort
+            this.productService.getAllProducts(this.currentPage(), this.pageSize, sortBy, direction).subscribe({
+                next: (res) => {
+                    this.products.set(res.data.content);
+                    this.totalPages.set(res.data.totalPages);
+                    this.totalElements.set(res.data.totalElements);
+                    this.loading.set(false);
+                },
+                error: () => this.loading.set(false)
+            });
         }
-        this.loading.set(true);
-        this.productService.searchProducts(this.keyword(), this.currentPage(), this.pageSize).subscribe({
-            next: (res) => {
-                this.products.set(res.data.content);
-                this.totalPages.set(res.data.totalPages);
-                this.totalElements.set(res.data.totalElements);
-                this.loading.set(false);
-            },
-            error: () => this.loading.set(false)
-        });
     }
 
-    onFilter(): void {
-        this.loading.set(true);
+    /** Called when user types in search box and submits */
+    onSearch(): void {
         this.currentPage.set(0);
-        this.productService.filterProducts({
-            minPrice: this.minPrice() || undefined,
-            maxPrice: this.maxPrice() || undefined,
-            categoryId: this.categoryId() === null ? undefined : this.categoryId()!
-        }, this.currentPage(), this.pageSize).subscribe({
-            next: (res) => {
-                this.products.set(res.data.content);
-                this.totalPages.set(res.data.totalPages);
-                this.totalElements.set(res.data.totalElements);
-                this.loading.set(false);
-            },
-            error: () => this.loading.set(false)
-        });
+        this.fetchProducts();
     }
 
+    /** Called when user applies price/category filters */
+    onFilter(): void {
+        this.currentPage.set(0);
+        this.fetchProducts();
+    }
+
+    /** Called when sort dropdown changes — keeps all active filters */
     onSortChange(): void {
         this.currentPage.set(0);
-        this.loadProducts();
+        this.fetchProducts();
     }
 
     goToPage(page: number): void {
         if (page >= 0 && page < this.totalPages()) {
             this.currentPage.set(page);
-            this.loadProducts();
+            this.fetchProducts();
         }
     }
 
@@ -161,6 +183,6 @@ export class ProductListComponent implements OnInit {
         this.maxPrice.set(undefined);
         this.categoryId.set(undefined);
         this.currentPage.set(0);
-        this.loadProducts();
+        this.fetchProducts();
     }
 }

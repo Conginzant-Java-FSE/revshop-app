@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService, ShipperOrder } from '../../services/shipper.service';
 import { ToastService } from '../../services/toast';
+import { NotificationService } from '../../services/notification.service';
 import { ApiResponse } from '../../models/api-response.model';
 
 
@@ -40,7 +41,8 @@ export class ShipperDashboardComponent implements OnInit {
     constructor(
         private shipperService: ShipperService,
         private router: Router,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private notificationService: NotificationService
     ) { }
 
     ngOnInit(): void {
@@ -83,6 +85,7 @@ export class ShipperDashboardComponent implements OnInit {
             next: () => {
                 this.toastService.success(`Order #${order.orderNumber} updated to ${status}`);
                 this.updatingOrderId.set(null);
+                this.notificationService.triggerRefresh();
                 this.loadOrders();
             },
             error: () => {

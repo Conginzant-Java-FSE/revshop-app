@@ -122,11 +122,46 @@ export class Navbar implements OnInit, OnDestroy {
     }
   }
 
-  markAsRead(notificationId: number): void {
+  markAsRead(notificationId: number, notif?: NotificationDTO): void {
     this.notificationService.markAsRead(notificationId).subscribe({
-      next: () => this.loadNotifications(),
+      next: () => {
+        this.loadNotifications();
+        if (notif) {
+          this.handleNotificationClick(notif);
+        }
+      },
       error: () => { }
     });
+  }
+
+  handleNotificationClick(notif: NotificationDTO): void {
+    if (!notif.type) return;
+
+    switch (notif.type.toUpperCase()) {
+      case 'ORDER':
+        if (notif.targetId) {
+          this.router.navigate(['/orders', notif.targetId]);
+        } else {
+          this.router.navigate(['/orders']);
+        }
+        break;
+      case 'PRODUCT':
+        if (notif.targetId) {
+          this.router.navigate(['/product', notif.targetId]);
+        } else {
+          this.router.navigate(['/products']);
+        }
+        break;
+      case 'PROFILE':
+        this.router.navigate(['/profile']);
+        break;
+      case 'WALLET':
+        this.router.navigate(['/wallet']);
+        break;
+      default:
+        // No specific route, stay current
+        break;
+    }
   }
 
   markAllRead(): void {

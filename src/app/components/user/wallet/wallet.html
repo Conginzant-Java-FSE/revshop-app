@@ -1,0 +1,172 @@
+<app-header></app-header>
+<div class="container py-5">
+
+    <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <div *ngIf="!loading()">
+
+        <!-- Alerts -->
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" *ngIf="successMsg()" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>{{ successMsg() }}
+            <button type="button" class="btn-close" (click)="successMsg.set('')"></button>
+        </div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" *ngIf="errorMsg()" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>{{ errorMsg() }}
+            <button type="button" class="btn-close" (click)="errorMsg.set('')"></button>
+        </div>
+
+        <!-- KYC REQUIRED VIEW -->
+        <div *ngIf="!wallet() || !wallet()?.kycVerified" class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="bg-primary text-white p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fa-solid fa-shield-halved fa-4x opacity-75"></i>
+                        </div>
+                        <h3 class="fw-bold mb-0">Activate Your Wallet</h3>
+                        <p class="mb-0 opacity-75 small mt-2">Complete KYC to start adding funds via Real SMS OTP</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <form (ngSubmit)="showOtpField ? verifyOtp() : sendOtp()">
+
+                            <div class="mb-4" *ngIf="!showOtpField">
+                                <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">Mobile
+                                    Number</label>
+                                <div
+                                    class="input-group input-group-lg border rounded-3 overflow-hidden shadow-sm form-group-dynamic">
+                                    <span class="input-group-text bg-white border-0 text-muted ps-3"><i
+                                            class="fa-solid fa-mobile-screen"></i></span>
+                                    <input type="tel" class="form-control border-0 px-2"
+                                        placeholder="e.g. +91 9876543210" name="mobile" [(ngModel)]="mobileNumber"
+                                        required>
+                                </div>
+                                <div class="form-text mt-2"><i class="fa-solid fa-info-circle me-1"></i>We'll send a
+                                    real Twilio OTP to this number.</div>
+                            </div>
+
+                            <div class="mb-4" *ngIf="showOtpField">
+                                <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">Enter
+                                    OTP</label>
+                                <div
+                                    class="input-group input-group-lg border rounded-3 overflow-hidden shadow-sm form-group-dynamic">
+                                    <span class="input-group-text bg-white border-0 text-muted ps-3"><i
+                                            class="fa-solid fa-key"></i></span>
+                                    <input type="text" class="form-control border-0 px-2 letter-spacing-custom"
+                                        placeholder="------" name="otp" [(ngModel)]="otp" maxlength="6" required>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm py-3 fw-bold btn-transition"
+                                [disabled]="kycLoading">
+                                <span *ngIf="kycLoading" class="spinner-border spinner-border-sm me-2"></span>
+                                {{ showOtpField ? 'Verify & Activate Wallet' : 'Send SMS OTP' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- WALLET DASHBOARD VIEW -->
+        <div *ngIf="wallet() && wallet()?.kycVerified" class="row g-4">
+
+            <!-- Left Column: Balance & Add Money -->
+            <div class="col-lg-4">
+
+                <!-- Balance Card -->
+                <div
+                    class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white mb-4 position-relative overflow-hidden">
+                    <div class="position-absolute end-0 top-0 p-4 opacity-10">
+                        <i class="fa-solid fa-wallet"
+                            style="font-size: 8rem; transform: rotate(-15deg) translateY(-20px);"></i>
+                    </div>
+                    <div class="position-relative z-1">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <p class="text-uppercase mb-1 small fw-bold opacity-75"><i
+                                        class="fa-solid fa-wallet me-2"></i>My Wallet</p>
+                                <h2 class="display-5 fw-bold mb-0">₹{{ wallet()?.balance }}</h2>
+                            </div>
+                        </div>
+                        <div
+                            class="d-flex align-items-center gap-2 mt-4 pt-4 border-top border-white border-opacity-25">
+                            <span class="badge bg-white text-primary rounded-pill px-3 py-2"><i
+                                    class="fa-solid fa-check-circle me-1"></i>Active</span>
+                            <span class="small opacity-75">KYC Verified: {{ wallet()?.mobileNumber }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Money Form -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle text-primary me-2"></i>Add Funds</h5>
+                        <form (ngSubmit)="initiateAddMoney()">
+                            <label class="form-label small text-muted fw-bold text-uppercase">Amount</label>
+                            <div class="input-group input-group-lg border rounded-3 overflow-hidden shadow-sm mb-3">
+                                <span class="input-group-text bg-light border-0 fw-bold">₹</span>
+                                <input type="number" class="form-control border-0" placeholder="1000" name="amount"
+                                    [(ngModel)]="addAmount" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100 rounded-pill py-2 fw-bold shadow-sm"
+                                [disabled]="addMoneyLoading()">
+                                <span *ngIf="addMoneyLoading()" class="spinner-border spinner-border-sm me-2"></span>
+                                Proceed to Pay
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Transactions -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-0 overflow-hidden">
+                    <div class="d-flex justify-content-between align-items-center p-4 border-bottom bg-light">
+                        <h5 class="fw-bold mb-0"><i
+                                class="fa-solid fa-clock-rotate-left text-secondary me-2"></i>Transaction History</h5>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="text-center py-5" *ngIf="transactions().length === 0">
+                            <div class="mb-3"><i class="fa-solid fa-receipt fa-3x text-muted opacity-25"></i></div>
+                            <h5 class="text-muted fw-bold">No Transactions Yet</h5>
+                            <p class="text-muted small">Add money to your wallet to get started.</p>
+                        </div>
+
+                        <div class="list-group list-group-flush" *ngIf="transactions().length > 0">
+                            <div class="list-group-item p-4 border-bottom" *ngFor="let txn of transactions()">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-3 shadow-sm d-flex justify-content-center align-items-center"
+                                            [ngClass]="{'bg-success-subtle text-success': txn.transactionType === 'CREDIT', 'bg-danger-subtle text-danger': txn.transactionType === 'DEBIT'}"
+                                            style="width: 50px; height: 50px;">
+                                            <i class="fa-solid"
+                                                [ngClass]="{'fa-arrow-down': txn.transactionType === 'CREDIT', 'fa-arrow-up': txn.transactionType === 'DEBIT'}"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ txn.description }}</h6>
+                                            <p class="mb-0 small text-muted">{{ txn.createdAt | date:'MMM d, y, h:mm a'
+                                                }} &bull; Ref: {{ txn.referenceId }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <h5 class="fw-bold mb-0"
+                                            [ngClass]="{'text-success': txn.transactionType === 'CREDIT'}">
+                                            {{ txn.transactionType === 'CREDIT' ? '+' : '-' }}₹{{ txn.amount }}
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

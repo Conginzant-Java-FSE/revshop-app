@@ -89,7 +89,8 @@
                         <div *ngFor="let notif of notifications()" class="notification-item"
                             [class.unread]="!notif.isRead">
                             <a class="dropdown-item py-2 px-3 d-flex gap-2 align-items-start"
-                                style="cursor:pointer;white-space:normal;" (click)="markAsRead(notif.notificationId)">
+                                style="cursor:pointer;white-space:normal;"
+                                (click)="markAsRead(notif.notificationId, notif)">
                                 <i class="fa-solid fa-circle notification-icon mt-1" [style.font-size]="'0.5rem'"
                                     [style.color]="notif.isRead ? 'transparent' : '#ffc107'"></i>
                                 <div class="flex-grow-1">

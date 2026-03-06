@@ -28,7 +28,7 @@
                                 [class.text-muted]="s > averageRating()"></i>
                         </span>
                         <span class="fw-bold">{{ averageRating() | number:'1.1-1' }}</span>
-                        <span class="text-muted small">({{ reviewCount() }} reviews)</span>
+                        <span class="text-light small">({{ reviewCount() }} reviews)</span>
                     </div>
                     <div class="d-flex align-items-center gap-3 mb-4">
                         <h2 class="text-primary fw-bold mb-0">₹{{ product()?.sellingPrice }}</h2>
@@ -41,7 +41,7 @@
 
                     <div class="mb-4">
                         <h5 class="fw-bold mb-2">Description</h5>
-                        <p class="text-muted lh-lg">{{ product()?.description }}</p>
+                        <p class="text-light lh-lg">{{ product()?.description }}</p>
                     </div>
 
                     <div class="mb-4 d-flex align-items-center gap-4">
@@ -110,7 +110,7 @@
                 <div class="col-lg-8">
                     <h3 class="fw-bold mb-4">Customer Reviews</h3>
 
-                    <div *ngIf="reviews().length === 0" class="text-muted py-4">
+                    <div *ngIf="reviews().length === 0" class="text-light-50 py-4 opacity-75">
                         No reviews yet. Be the first to review this product!
                     </div>
 
@@ -127,7 +127,7 @@
                                     </div>
                                     <span class="text-muted small">{{ review.createdAt | date:'mediumDate' }}</span>
                                 </div>
-                                <p class="text-muted mb-0">{{ review.reviewText }}</p>
+                                <p class="text-light mb-0">{{ review.reviewText }}</p>
                             </div>
                         </div>
                     </div>

@@ -4,9 +4,31 @@
     transition: all 0.2s ease;
 }
 
-.address-card:hover,
-.payment-card:hover {
+.address-card:hover {
     background-color: var(--bs-light);
+}
+
+.payment-method-card:hover {
+    border-color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.coupon-badge {
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+    border-style: dashed !important;
+}
+
+.coupon-badge:hover {
+    background-color: var(--bs-primary);
+    color: white !important;
+    border-style: solid !important;
+    transform: scale(1.05);
+}
+
+.coupon-badge:hover i {
+    color: white !important;
 }
 
 .payment-card label {

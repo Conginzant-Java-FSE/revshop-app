@@ -6,7 +6,7 @@ import { AddressService, AddressDTO } from '../../services/address';
 import { CartService, CartDTO } from '../../services/cart';
 import { OrderService } from '../../services/order';
 import { ToastService } from '../../services/toast';
-import { CouponService } from '../../services/coupon.service';
+import { CouponService, Coupon } from '../../services/coupon.service';
 import { PaymentService } from '../../services/payment.service';
 import { NotificationService } from '../../services/notification.service';
 import { ApiResponse } from '../../models/api-response.model';
@@ -25,6 +25,7 @@ export class CheckoutComponent implements OnInit {
     cart = signal<CartDTO | null>(null);
     selectedAddressId: number | null = null;
     paymentMethod = signal<string>('RAZORPAY');
+    coupons = signal<Coupon[]>([]);
 
     // Coupon state
     couponCode = signal<string>('');
@@ -89,6 +90,13 @@ export class CheckoutComponent implements OnInit {
             },
             error: () => this.loading.set(false)
         });
+
+        this.couponService.getActiveCoupons().subscribe({
+            next: (res: ApiResponse<Coupon[]>) => {
+                this.coupons.set(res.data || []);
+            },
+            error: () => { }
+        });
     }
 
     get subtotal(): number {
@@ -142,6 +150,11 @@ export class CheckoutComponent implements OnInit {
         this.discountAmount = 0;
         this.couponMessage = '';
         this.couponSuccess = false;
+    }
+
+    selectCoupon(code: string): void {
+        this.couponCode.set(code);
+        this.applyCoupon();
     }
 
     /** Main pay flow — places order then triggers Razorpay popup */

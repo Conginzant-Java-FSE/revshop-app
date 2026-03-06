@@ -29,7 +29,7 @@ export class AddressService {
     }
 
     addAddress(address: AddressDTO): Observable<any> {
-        return this.http.post<any>(this.apiUrl, address);
+        return this.http.post<any>(`${this.apiUrl}/${address.userId}`, address);
     }
 
     updateAddress(id: number, address: AddressDTO): Observable<any> {

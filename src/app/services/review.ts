@@ -30,10 +30,10 @@ export class ReviewService {
         );
     }
 
-    hasUserReviewed(userId: number, productId: number): Observable<ApiResponse<boolean>> {
+    checkReviewEligibility(userId: number, productId: number): Observable<ApiResponse<any>> {
         const params = new HttpParams()
             .set('userId', userId.toString())
             .set('productId', productId.toString());
-        return this.http.get<ApiResponse<boolean>>(`${this.apiUrl}/check`, { params });
+        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/check`, { params });
     }
 }

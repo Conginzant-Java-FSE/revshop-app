@@ -127,7 +127,7 @@
                                     </div>
                                     <span class="text-muted small">{{ review.createdAt | date:'mediumDate' }}</span>
                                 </div>
-                                <p class="text-light mb-0">{{ review.reviewText }}</p>
+                                <p class="text-dark mb-0">{{ review.reviewText }}</p>
                             </div>
                         </div>
                     </div>
@@ -135,13 +135,25 @@
 
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
-                        <!-- Already reviewed -->
-                        <div *ngIf="hasUserReviewed()" class="text-center py-3">
-                            <i class="fa-solid fa-circle-check text-success fs-2 mb-2"></i>
-                            <p class="text-muted mb-0">You have already reviewed this product.</p>
+                        <!-- Verified Purchase Check -->
+                        <div *ngIf="!hasPurchased()"
+                            class="text-center py-4 bg-light rounded-4 border border-info-subtle">
+                            <i class="fa-solid fa-cart-shopping text-info fs-2 mb-2"></i>
+                            <p class="text-dark fw-medium mb-1">Want to review this product?</p>
+                            <p class="text-muted small px-3 mb-0">Only customers who have purchased and received this
+                                product can leave a review.</p>
                         </div>
+
+                        <!-- Already reviewed -->
+                        <div *ngIf="hasPurchased() && hasUserReviewed()"
+                            class="text-center py-4 bg-light rounded-4 border border-success-subtle">
+                            <i class="fa-solid fa-circle-check text-success fs-2 mb-2"></i>
+                            <p class="text-dark fw-medium mb-1">Thank you for your feedback!</p>
+                            <p class="text-muted small mb-0">You have already reviewed this product.</p>
+                        </div>
+
                         <!-- Review form -->
-                        <div *ngIf="!hasUserReviewed()">
+                        <div *ngIf="hasPurchased() && !hasUserReviewed()">
                             <h5 class="fw-bold mb-4">Write a Review</h5>
                             <form (ngSubmit)="submitReview()">
                                 <div class="mb-3">

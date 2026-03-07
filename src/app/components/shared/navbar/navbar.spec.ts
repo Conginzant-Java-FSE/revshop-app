@@ -109,4 +109,55 @@ describe('Navbar', () => {
         // Should not throw
         expect(true).toBeTrue();
     });
+
+    describe('handleNotificationClick', () => {
+        let router: Router;
+
+        beforeEach(() => {
+            router = TestBed.inject(Router);
+            spyOn(router, 'navigate');
+        });
+
+        it('should navigate to wallet for WALLET type', () => {
+            const notif = { type: 'WALLET', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).toHaveBeenCalledWith(['/wallet']);
+        });
+
+        it('should navigate to profile for PROFILE type', () => {
+            const notif = { type: 'PROFILE', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).toHaveBeenCalledWith(['/profile']);
+        });
+
+        it('should navigate to order detail for ORDER type with targetId', () => {
+            const notif = { type: 'ORDER', targetId: '101', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).toHaveBeenCalledWith(['/orders', '101']);
+        });
+
+        it('should navigate to orders list for ORDER type without targetId', () => {
+            const notif = { type: 'ORDER', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).toHaveBeenCalledWith(['/orders']);
+        });
+
+        it('should navigate to product detail for PRODUCT type with targetId', () => {
+            const notif = { type: 'PRODUCT', targetId: '50', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).toHaveBeenCalledWith(['/product', '50']);
+        });
+
+        it('should navigate to products list for PRODUCT type without targetId', () => {
+            const notif = { type: 'PRODUCT', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).toHaveBeenCalledWith(['/products']);
+        });
+
+        it('should do nothing for unknown type', () => {
+            const notif = { type: 'UNKNOWN', notificationId: 1 } as any;
+            component.handleNotificationClick(notif);
+            expect(router.navigate).not.toHaveBeenCalled();
+        });
+    });
 });

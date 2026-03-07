@@ -18,11 +18,12 @@
             </ul>
             <app-search-bar class="mx-auto"></app-search-bar>
             <ul
-                class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
+                class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-start align-items-lg-center d-flex flex-column flex-lg-row gap-3 gap-lg-0">
                 <li class="nav-item me-lg-3" *ngIf="!authService.authState().token && !isShipper">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative" routerLink="/login">
-                        <i class="fa-solid fa-user fs-5 mb-1"></i>
-                        <span class="small d-none d-lg-block">Login</span>
+                    <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative"
+                        routerLink="/login">
+                        <i class="fa-solid fa-user fs-5 mb-0 mb-lg-1"></i>
+                        <span class="small ms-2 ms-lg-0">Login</span>
                     </a>
                 </li>
 
@@ -60,14 +61,14 @@
                 <!-- Notification Bell -->
                 <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token"
                     #notificationContainer>
-                    <a class="nav-link d-flex flex-column align-items-center position-relative" style="cursor:pointer;"
-                        (click)="toggleNotifications($event)">
-                        <i class="fa-solid fa-bell fs-5 mb-1"></i>
+                    <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative"
+                        style="cursor:pointer;" (click)="toggleNotifications($event)">
+                        <i class="fa-solid fa-bell fs-5 mb-0 mb-lg-1"></i>
                         <span *ngIf="unreadCount() > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
                             {{ unreadCount() > 9 ? '9+' : unreadCount() }}
                         </span>
-                        <span class="small d-none d-lg-block">Alerts</span>
+                        <span class="small ms-2 ms-lg-0">Alerts</span>
                     </a>
 
                     <!-- Notification Dropdown -->
@@ -137,10 +138,10 @@
                     </ul>
                 </li>
                 <li class="nav-item" *ngIf="!isShipper">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
+                    <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative text-warning"
                         routerLink="/cart">
-                        <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
-                        <span class="small d-none d-lg-block text-white">Cart</span>
+                        <i class="fa-solid fa-cart-shopping fs-5 mb-0 mb-lg-1"></i>
+                        <span class="small ms-2 ms-lg-0 text-white">Cart</span>
                     </a>
                 </li>
 

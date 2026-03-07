@@ -123,3 +123,35 @@
 .clear-all-btn:hover {
     opacity: 0.8;
 }
+
+/* Mobile Dropdown Fixes */
+@media (max-width: 991.98px) {
+
+    .dropdown-menu,
+    .notification-dropdown {
+        position: static !important;
+        width: 100%;
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none !important;
+        background-color: transparent !important;
+        border: none !important;
+        padding-left: 2rem;
+        margin-top: 0 !important;
+    }
+
+    .dropdown-item,
+    .notification-item * {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .dropdown-item.text-danger {
+        color: #ef4444 !important;
+    }
+
+    .dropdown-item:hover,
+    .notification-item a:hover {
+        background-color: transparent !important;
+        color: white !important;
+    }
+}

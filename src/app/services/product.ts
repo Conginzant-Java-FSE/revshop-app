@@ -12,6 +12,7 @@ export interface ProductDTO {
     stockQuantity: number;
     thresholdQuantity: number;
     imageUrl?: string;
+    additionalImages?: string[];
     isActive: boolean;
     categoryId: number;
     sellerId: number;
@@ -62,22 +63,31 @@ export class ProductService {
         return this.http.get<ApiResponse<Page<ProductDTO>>>(`${this.apiUrl}/search`, { params });
     }
 
-    filterProducts(filters: { minPrice?: number, maxPrice?: number, categoryId?: number }, page: number = 0, size: number = 10, sortBy: string = 'productId', direction: string = 'asc'): Observable<ApiResponse<Page<ProductDTO>>> {
+    filterProducts(filters: { minPrice?: number, maxPrice?: number, categoryId?: number, minRating?: number, minDiscount?: number, keyword?: string }, page: number = 0, size: number = 10, sortBy: string = 'productId', direction: string = 'asc'): Observable<ApiResponse<Page<ProductDTO>>> {
         let params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString())
             .set('sortBy', sortBy)
             .set('direction', direction);
 
+        if (filters.keyword !== undefined) params = params.set('keyword', filters.keyword);
         if (filters.minPrice !== undefined) params = params.set('minPrice', filters.minPrice.toString());
         if (filters.maxPrice !== undefined) params = params.set('maxPrice', filters.maxPrice.toString());
         if (filters.categoryId !== undefined) params = params.set('categoryId', filters.categoryId.toString());
+        if (filters.minRating !== undefined) params = params.set('minRating', filters.minRating.toString());
+        if (filters.minDiscount !== undefined) params = params.set('minDiscount', filters.minDiscount.toString());
 
         return this.http.get<ApiResponse<Page<ProductDTO>>>(`${this.apiUrl}/filter`, { params });
     }
 
     createProduct(product: ProductDTO): Observable<ApiResponse<ProductDTO>> {
         return this.http.post<ApiResponse<ProductDTO>>(this.apiUrl, product);
+    }
+
+    uploadImage(file: File): Observable<ApiResponse<{ url: string }>> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post<ApiResponse<{ url: string }>>('/api/upload', formData);
     }
 
     updateProduct(id: number, product: ProductDTO): Observable<ApiResponse<ProductDTO>> {

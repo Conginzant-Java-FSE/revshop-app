@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ProductService, ProductDTO } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { ReviewService } from '../../services/review';
@@ -24,6 +24,8 @@ export class ProductDetailComponent implements OnInit {
     isFavorite = signal<boolean>(false);
     quantity = signal<number>(1);
     loading = signal<boolean>(true);
+    allImages = signal<string[]>([]);
+    currentImageIndex = signal<number>(0);
     averageRating = signal<number>(0);
     reviewCount = signal<number>(0);
     hasPurchased = signal<boolean>(false);
@@ -43,7 +45,8 @@ export class ProductDetailComponent implements OnInit {
         private reviewService: ReviewService,
         private favoriteService: FavoriteService,
         private toastService: ToastService,
-        private location: Location
+        private location: Location,
+        private router: Router
     ) { }
 
     goBack(): void {
@@ -68,7 +71,16 @@ export class ProductDetailComponent implements OnInit {
     loadProduct(id: number): void {
         this.productService.getProductById(id).subscribe({
             next: (res) => {
-                this.product.set(res.data);
+                const p = res.data;
+                this.product.set(p);
+
+                const images = [];
+                if (p.imageUrl) images.push(p.imageUrl);
+                if (p.additionalImages && p.additionalImages.length > 0) {
+                    images.push(...p.additionalImages);
+                }
+                this.allImages.set(images);
+
                 this.loading.set(false);
             },
             error: () => this.loading.set(false)
@@ -207,7 +219,44 @@ export class ProductDetailComponent implements OnInit {
         }
     }
 
+    buyNow(): void {
+        const userId = localStorage.getItem('userId');
+        const prod = this.product();
+        if (!userId) {
+            this.toastService.error('Please login to buy items');
+            return;
+        }
+        if (prod && prod.productId) {
+            this.cartService.addItemToCart(Number(userId), prod.productId, this.quantity()).subscribe({
+                next: () => {
+                    this.router.navigate(['/checkout'], {
+                        queryParams: { buyNow: 'true', productId: prod.productId }
+                    });
+                },
+                error: (err) => console.error(err)
+            });
+        }
+    }
+
     getStarArray(): number[] {
         return [1, 2, 3, 4, 5];
+    }
+
+    nextImage(): void {
+        const length = this.allImages().length;
+        if (length > 0) {
+            this.currentImageIndex.set((this.currentImageIndex() + 1) % length);
+        }
+    }
+
+    prevImage(): void {
+        const length = this.allImages().length;
+        if (length > 0) {
+            this.currentImageIndex.set((this.currentImageIndex() - 1 + length) % length);
+        }
+    }
+
+    setCurrentImage(index: number): void {
+        this.currentImageIndex.set(index);
     }
 }

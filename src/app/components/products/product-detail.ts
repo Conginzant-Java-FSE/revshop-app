@@ -157,12 +157,13 @@ export class ProductDetailComponent implements OnInit {
             return;
         }
         if (prod && prod.productId) {
-            this.reviewService.addReview({
+            const reviewData: any = {
                 userId: Number(userId),
                 productId: prod.productId,
                 rating: Number(this.newReview.rating),
                 reviewText: this.newReview.reviewText
-            }).subscribe({
+            };
+            this.reviewService.addReview(reviewData).subscribe({
                 next: () => {
                     this.toastService.success('Review submitted successfully!');
                     this.newReview.reviewText = '';

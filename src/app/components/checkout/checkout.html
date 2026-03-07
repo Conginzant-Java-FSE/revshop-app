@@ -153,11 +153,40 @@
                                     <span class="small text-muted">Pay when your order arrives</span>
                                 </span>
                             </label>
+
+                            <label class="form-check p-3 border rounded-3 payment-method-card"
+                                [class.border-primary]="paymentMethod() === 'WALLET'"
+                                [class.opacity-50]="walletBalance() === null">
+                                <input class="form-check-input ms-1 mt-2" type="radio" name="paymentMethod"
+                                    value="WALLET" [ngModel]="paymentMethod()"
+                                    (ngModelChange)="paymentMethod.set($event)" [disabled]="walletBalance() === null">
+                                <span class="ms-3 d-block">
+                                    <span class="fw-bold d-flex align-items-center">
+                                        RevShop Wallet
+                                        <span class="badge bg-success ms-2" *ngIf="walletBalance() !== null">Balance:
+                                            ₹{{ walletBalance() }}</span>
+                                        <span class="badge bg-danger ms-2" *ngIf="walletBalance() === null">Not
+                                            Activated</span>
+                                    </span>
+                                    <span class="small text-danger"
+                                        *ngIf="walletBalance() !== null && !hasSufficientBalance()">
+                                        Insufficient balance. <a routerLink="/wallet">Add funds</a>
+                                    </span>
+                                    <span class="small text-muted"
+                                        *ngIf="walletBalance() !== null && hasSufficientBalance()">
+                                        Pay seamlessly from your wallet.
+                                    </span>
+                                    <span class="small text-muted" *ngIf="walletBalance() === null">
+                                        Complete KYC to activate your wallet. <a routerLink="/wallet">Activate Now</a>
+                                    </span>
+                                </span>
+                            </label>
                         </div>
                     </div>
 
                     <!-- Final Button -->
-                    <button class="btn btn-primary w-100 rounded-pill py-3 fw-bold fs-5 mt-4" [disabled]="submitting"
+                    <button class="btn btn-primary w-100 rounded-pill py-3 fw-bold fs-5 mt-4"
+                        [disabled]="submitting || (paymentMethod() === 'WALLET' && !hasSufficientBalance())"
                         (click)="placeOrder()">
                         <span *ngIf="paymentMethod() === 'RAZORPAY'">
                             <i class="fa-solid fa-lock me-2"></i>Pay ₹{{ finalTotal | number:'1.0-0' }} with Razorpay
@@ -165,6 +194,9 @@
                         <span *ngIf="paymentMethod() === 'COD'">
                             <i class="fa-solid fa-truck-fast me-2"></i>Place COD Order (₹{{ finalTotal | number:'1.0-0'
                             }})
+                        </span>
+                        <span *ngIf="paymentMethod() === 'WALLET'">
+                            <i class="fa-solid fa-wallet me-2"></i>Pay ₹{{ finalTotal | number:'1.0-0' }} from Wallet
                         </span>
                     </button>
                     <p class="text-center text-muted small mt-2 mb-0">

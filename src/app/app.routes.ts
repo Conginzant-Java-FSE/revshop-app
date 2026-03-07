@@ -21,6 +21,7 @@ import { ShipperLoginComponent } from './components/shipper-login/shipper-login'
 import { ShipperDashboardComponent } from './components/shipper-dashboard/shipper-dashboard';
 import { ShipperRegisterComponent } from './components/shipper-register/shipper-register';
 import { ResetPasswordComponent } from './components/reset-password/reset-password';
+import { WalletComponent } from './components/user/wallet/wallet';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },
@@ -44,5 +45,6 @@ export const routes: Routes = [
   { path: 'favorites', component: FavoritesComponent, canActivate: [authGuard] },
   { path: 'products/new', component: ProductAddComponent, canActivate: [authGuard] },
   { path: 'products/edit/:id', component: ProductEditComponent, canActivate: [authGuard] },
+  { path: 'wallet', component: WalletComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

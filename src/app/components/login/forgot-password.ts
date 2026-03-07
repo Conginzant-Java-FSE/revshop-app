@@ -87,4 +87,25 @@ export class ForgotPasswordComponent {
             }
         });
     }
+
+    sendResetLink() {
+        this.submitted.set(true);
+        if (this.emailForm.invalid) return;
+
+        this.loading.set(true);
+        const email = this.emailForm.get('email')?.value;
+
+        this.authService.sendPasswordResetLink(email).subscribe({
+            next: (res: any) => {
+                this.toastService.success(res.message || 'Reset link sent to your email.');
+                this.step.set(3);
+                this.loading.set(false);
+                this.submitted.set(false);
+            },
+            error: (err) => {
+                this.toastService.error(err.error?.message || 'Failed to send reset link.');
+                this.loading.set(false);
+            }
+        });
+    }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, HostListener, ElementRef, effect, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, HostListener, ElementRef, effect, inject, ViewChild } from '@angular/core';
 import { RouterLink, Router, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 import { CommonModule } from '@angular/common';
@@ -114,11 +114,15 @@ export class Navbar implements OnInit, OnDestroy {
     this.showNotifications.update(v => !v);
   }
 
+  @ViewChild('notificationContainer') notificationContainer!: ElementRef;
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    const clickedInside = this.elementRef.nativeElement.contains(event.target);
-    if (!clickedInside && this.showNotifications()) {
-      this.showNotifications.set(false);
+    if (this.showNotifications() && this.notificationContainer) {
+      const clickedInside = this.notificationContainer.nativeElement.contains(event.target);
+      if (!clickedInside) {
+        this.showNotifications.set(false);
+      }
     }
   }
 

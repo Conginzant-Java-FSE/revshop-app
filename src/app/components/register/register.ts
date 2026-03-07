@@ -17,6 +17,9 @@ export class RegisterComponent implements OnInit {
   submitted: boolean = false;
   errorMessage: string = '';
   showPassword: boolean = false;
+  otpSent: boolean = false;
+  otpVerified: boolean = false;
+  loading: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -45,7 +48,8 @@ export class RegisterComponent implements OnInit {
       securityAnswer: ['', Validators.required],
       businessName: [''],
       taxId: [''],
-      businessDescription: ['']
+      businessDescription: [''],
+      otp: ['']
     });
 
     this.registerForm.get('role')?.valueChanges.subscribe(role => {
@@ -82,7 +86,43 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    const { businessName, taxId, businessDescription, ...commonData } = this.registerForm.value;
+    if (!this.otpSent) {
+      this.loading = true;
+      this.authService.sendOtp(this.registerForm.get('email')?.value).subscribe({
+        next: () => {
+          this.otpSent = true;
+          this.loading = false;
+          this.registerForm.get('otp')?.setValidators([Validators.required, Validators.pattern('^[0-9]{6}$')]);
+          this.registerForm.get('otp')?.updateValueAndValidity();
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = err.error?.message || 'Failed to send OTP';
+        }
+      });
+      return;
+    }
+
+    if (!this.otpVerified) {
+      this.loading = true;
+      this.authService.verifyOtp(this.registerForm.get('email')?.value, this.registerForm.get('otp')?.value).subscribe({
+        next: () => {
+          this.otpVerified = true;
+          this.proceedWithRegistration();
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = err.error?.message || 'Invalid or expired OTP';
+        }
+      });
+      return;
+    }
+
+    this.proceedWithRegistration();
+  }
+
+  proceedWithRegistration() {
+    const { businessName, taxId, businessDescription, otp, ...commonData } = this.registerForm.value;
 
     if (this.isSeller) {
       const payload = {
@@ -96,9 +136,11 @@ export class RegisterComponent implements OnInit {
         next: (res) => {
           console.log('Seller registration successful', res);
           this.router.navigate(['/login']);
+          this.loading = false;
         },
         error: (err) => {
           this.errorMessage = err.error?.message || err.error || 'Registration failed';
+          this.loading = false;
         }
       });
     } else {
@@ -110,12 +152,18 @@ export class RegisterComponent implements OnInit {
         next: (res) => {
           console.log('Buyer registration successful', res);
           this.router.navigate(['/login']);
+          this.loading = false;
         },
         error: (err) => {
           this.errorMessage = err.error?.message || err.error || 'Registration failed';
+          this.loading = false;
         }
       });
     }
+  }
+
+  resendOtp() {
+    this.authService.sendOtp(this.registerForm.get('email')?.value).subscribe();
   }
 
 }

@@ -9,6 +9,8 @@ export interface NotificationDTO {
     title: string;
     message: string;
     isRead: boolean;
+    type?: string;
+    targetId?: string;
     createdAt: string;
 }
 

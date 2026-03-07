@@ -18,11 +18,7 @@
                         <h4 class="mb-1">Welcome, {{ authService.authState().name }}!</h4>
                         <p class="mb-0 opacity-75">Track your orders and manage your profile</p>
                     </div>
-                    <div class="col-auto text-end">
-                        <button class="btn btn-light rounded-pill px-4 shadow-sm" (click)="onLogout()">
-                            <i class="fa-solid fa-right-from-bracket me-2"></i> Log Out
-                        </button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -46,6 +42,10 @@
                     <a routerLink="/orders"
                         class="list-group-item list-group-item-action border-0 py-3 rounded-3 mb-2 d-flex align-items-center gap-3">
                         <i class="fa-solid fa-receipt text-info fs-5"></i> Order History
+                    </a>
+                    <a routerLink="/wallet" routerLinkActive="bg-primary bg-opacity-10 text-primary fw-bold"
+                        class="list-group-item list-group-item-action border-0 py-3 rounded-3 mb-2 d-flex align-items-center gap-3">
+                        <i class="fa-solid fa-wallet text-primary fs-5"></i> RevShop Wallet
                     </a>
                     <a routerLink="/favorites"
                         class="list-group-item list-group-item-action border-0 py-3 rounded-3 d-flex align-items-center gap-3">

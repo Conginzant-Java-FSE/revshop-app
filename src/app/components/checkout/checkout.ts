@@ -9,6 +9,7 @@ import { ToastService } from '../../services/toast';
 import { CouponService, Coupon } from '../../services/coupon.service';
 import { PaymentService } from '../../services/payment.service';
 import { NotificationService } from '../../services/notification.service';
+import { WalletService } from '../../services/wallet.service';
 import { ApiResponse } from '../../models/api-response.model';
 
 
@@ -40,6 +41,9 @@ export class CheckoutComponent implements OnInit {
     expiryDate = signal<string>('');
     cvv = signal<string>('');
 
+    // Wallet Integration
+    walletBalance = signal<number | null>(null);
+
     // Address Modal State
     showAddressModal = signal<boolean>(false);
     submittingAddress = signal<boolean>(false);
@@ -61,6 +65,7 @@ export class CheckoutComponent implements OnInit {
         private couponService: CouponService,
         private paymentService: PaymentService,
         private notificationService: NotificationService,
+        private walletService: WalletService,
         private router: Router
     ) { }
 
@@ -94,6 +99,16 @@ export class CheckoutComponent implements OnInit {
         this.couponService.getActiveCoupons().subscribe({
             next: (res: ApiResponse<Coupon[]>) => {
                 this.coupons.set(res.data || []);
+            },
+            error: () => { }
+        });
+
+        // Load Wallet Balance
+        this.walletService.getBalance().subscribe({
+            next: (res: any) => {
+                if (res.data && res.data.kycVerified) {
+                    this.walletBalance.set(res.data.balance);
+                }
             },
             error: () => { }
         });
@@ -157,6 +172,11 @@ export class CheckoutComponent implements OnInit {
         this.applyCoupon();
     }
 
+    hasSufficientBalance(): boolean {
+        const bal = this.walletBalance();
+        return bal !== null && bal >= this.finalTotal;
+    }
+
     /** Main pay flow — places order then triggers Razorpay popup */
     placeOrder(): void {
         const userId = Number(localStorage.getItem('userId'));
@@ -169,6 +189,13 @@ export class CheckoutComponent implements OnInit {
         }
         if (!cart || !cart.items || cart.items.length === 0) { this.toastService.error('Your cart is empty.'); return; }
 
+        if (this.paymentMethod() === 'WALLET') {
+            if (!this.hasSufficientBalance()) {
+                this.toastService.error('Insufficient wallet balance!');
+                return;
+            }
+        }
+
         const request = {
             userId,
             shippingAddressId: addrId,
@@ -179,11 +206,11 @@ export class CheckoutComponent implements OnInit {
 
         this.orderService.placeOrder(userId, request).subscribe({
             next: (res: any) => {
-                if (this.paymentMethod() === 'COD') {
-                    this.toastService.success('Order placed successfully (Cash on Delivery)');
+                if (this.paymentMethod() === 'COD' || this.paymentMethod() === 'WALLET') {
+                    this.toastService.success(`Order placed successfully (${this.paymentMethod()})`);
                     this.submitting = false;
                     this.notificationService.triggerRefresh();
-                    // Clear cart properly after COD
+                    // Clear cart properly after order
                     this.cartService.clearCart(userId).subscribe({
                         next: () => this.router.navigate(['/profile']),
                         error: () => this.router.navigate(['/profile'])

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product';
 import { CategoryService, CategoryDTO } from '../../services/category';
 import { Router, RouterLink } from '@angular/router';
@@ -45,8 +45,44 @@ export class ProductAddComponent implements OnInit {
             categoryId: ['', [Validators.required]],
             sellerId: [Number(sellerId), [Validators.required]],
             isActive: [true],
-            imageUrl: ['']
+            imageUrl: [''],
+            additionalImages: this.fb.array([])
         });
+    }
+
+    get additionalImages(): FormArray {
+        return this.productForm.get('additionalImages') as FormArray;
+    }
+
+    addAdditionalImage(): void {
+        this.additionalImages.push(this.fb.control(''));
+    }
+
+    removeAdditionalImage(index: number): void {
+        this.additionalImages.removeAt(index);
+    }
+
+    onFileSelected(event: Event, isMain: boolean, index?: number): void {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (file) {
+            this.loading.set(true);
+            this.productService.uploadImage(file).subscribe({
+                next: (res: any) => {
+                    const url = res.url || res.data?.url;
+                    if (isMain) {
+                        this.productForm.get('imageUrl')?.setValue(url);
+                    } else if (index !== undefined) {
+                        this.additionalImages.at(index).setValue(url);
+                    }
+                    this.toastService.success('Image uploaded successfully');
+                    this.loading.set(false);
+                },
+                error: (err) => {
+                    this.toastService.error('Failed to upload image');
+                    this.loading.set(false);
+                }
+            });
+        }
     }
 
     loadCategories(): void {

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AddressService, AddressDTO } from '../../services/address';
 import { CartService, CartDTO } from '../../services/cart';
 import { OrderService } from '../../services/order';
@@ -57,6 +57,10 @@ export class CheckoutComponent implements OnInit {
         isDefault: false
     };
 
+    isBuyNow: boolean = false;
+    buyNowCartItemId: number | null = null;
+    buyNowProductId: number | null = null;
+
     constructor(
         private addressService: AddressService,
         private cartService: CartService,
@@ -66,7 +70,8 @@ export class CheckoutComponent implements OnInit {
         private paymentService: PaymentService,
         private notificationService: NotificationService,
         private walletService: WalletService,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) { }
 
     ngOnInit(): void {
@@ -88,12 +93,29 @@ export class CheckoutComponent implements OnInit {
             error: () => { }
         });
 
-        this.cartService.getCartByUserId(userId).subscribe({
-            next: (res: ApiResponse<CartDTO>) => {
-                this.cart.set(res.data);
-                this.loading.set(false);
-            },
-            error: () => this.loading.set(false)
+        this.route.queryParams.subscribe(params => {
+            const buyNowParam = params['buyNow'];
+            const productId = Number(params['productId']);
+            this.isBuyNow = buyNowParam === 'true';
+            this.buyNowProductId = productId || null;
+
+            this.cartService.getCartByUserId(userId).subscribe({
+                next: (res: ApiResponse<CartDTO>) => {
+                    let cartData = res.data;
+                    if (this.isBuyNow && productId && cartData && cartData.items) {
+                        const targetItem = cartData.items.find(i => i.productId === productId);
+                        if (targetItem) {
+                            cartData.items = [targetItem];
+                            // Re-calculate cart total price if needed
+                            cartData.totalPrice = targetItem.subtotal ?? (targetItem.quantity * (targetItem.sellingPrice ?? 0));
+                            this.buyNowCartItemId = targetItem.cartItemId ?? null;
+                        }
+                    }
+                    this.cart.set(cartData);
+                    this.loading.set(false);
+                },
+                error: () => this.loading.set(false)
+            });
         });
 
         this.couponService.getActiveCoupons().subscribe({
@@ -112,6 +134,14 @@ export class CheckoutComponent implements OnInit {
             },
             error: () => { }
         });
+    }
+
+    goBack(): void {
+        if (this.isBuyNow && this.buyNowProductId) {
+            this.router.navigate(['/product', this.buyNowProductId]);
+        } else {
+            this.router.navigate(['/cart']);
+        }
     }
 
     get subtotal(): number {
@@ -211,10 +241,17 @@ export class CheckoutComponent implements OnInit {
                     this.submitting = false;
                     this.notificationService.triggerRefresh();
                     // Clear cart properly after order
-                    this.cartService.clearCart(userId).subscribe({
-                        next: () => this.router.navigate(['/profile']),
-                        error: () => this.router.navigate(['/profile'])
-                    });
+                    if (this.isBuyNow && this.buyNowCartItemId) {
+                        this.cartService.removeItemFromCart(this.buyNowCartItemId).subscribe({
+                            next: () => this.router.navigate(['/orders']),
+                            error: () => this.router.navigate(['/orders'])
+                        });
+                    } else {
+                        this.cartService.clearCart(userId).subscribe({
+                            next: () => this.router.navigate(['/orders']),
+                            error: () => this.router.navigate(['/orders'])
+                        });
+                    }
                     return;
                 }
 
@@ -290,7 +327,19 @@ export class CheckoutComponent implements OnInit {
             next: () => {
                 this.toastService.success('Payment Successful! 🎉');
                 this.notificationService.triggerRefresh();
-                setTimeout(() => this.router.navigate(['/orders']), 1500);
+
+                const userId = Number(localStorage.getItem('userId'));
+                if (this.isBuyNow && this.buyNowCartItemId) {
+                    this.cartService.removeItemFromCart(this.buyNowCartItemId).subscribe({
+                        next: () => setTimeout(() => this.router.navigate(['/orders']), 1500),
+                        error: () => setTimeout(() => this.router.navigate(['/orders']), 1500)
+                    });
+                } else {
+                    this.cartService.clearCart(userId).subscribe({
+                        next: () => setTimeout(() => this.router.navigate(['/orders']), 1500),
+                        error: () => setTimeout(() => this.router.navigate(['/orders']), 1500)
+                    });
+                }
             },
             error: () => this.toastService.error('Payment verification failed. Contact support with your payment ID.')
         });

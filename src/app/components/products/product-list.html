@@ -33,9 +33,47 @@
                             <span>-</span>
                             <input type="number" class="form-control" placeholder="Max" [(ngModel)]="maxPrice">
                         </div>
-                        <button class="btn btn-primary w-100 mt-3 rounded-pill" (click)="onFilter()">Apply
-                            Filter</button>
                     </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Customer Ratings</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="ratingFilter" [value]="4"
+                                [(ngModel)]="minRating" (change)="onFilter()">
+                            <label class="form-check-label fw-semibold"><i class="fa-solid fa-star text-warning"></i> 4
+                                &amp; up</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="ratingFilter" [value]="3"
+                                [(ngModel)]="minRating" (change)="onFilter()">
+                            <label class="form-check-label fw-semibold"><i class="fa-solid fa-star text-warning"></i> 3
+                                &amp; up</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Discount</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="discountFilter" [value]="50"
+                                [(ngModel)]="minDiscount" (change)="onFilter()">
+                            <label class="form-check-label fw-semibold">50% off or more</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="discountFilter" [value]="30"
+                                [(ngModel)]="minDiscount" (change)="onFilter()">
+                            <label class="form-check-label fw-semibold">30% off or more</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="discountFilter" [value]="10"
+                                [(ngModel)]="minDiscount" (change)="onFilter()">
+                            <label class="form-check-label fw-semibold">10% off or more</label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary w-100 mt-3 rounded-pill" (click)="onFilter()">Apply Filter</button>
+                    <button class="btn btn-outline-secondary w-100 mt-2 rounded-pill" (click)="clearFilters()">Clear
+                        Filters</button>
+
                 </div>
             </div>
 
@@ -85,7 +123,8 @@
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title fw-bold mb-0">{{ product.name }}</h5>
                                 </div>
-                                <p class="card-text text-muted small flex-grow-1 text-truncate-2">{{ product.description
+                                <p class="card-text text-muted small flex-grow-1 text-truncate-2">{{
+                                    product.description
                                     }}</p>
 
                                 <div class="d-flex align-items-center justify-content-between mt-3">

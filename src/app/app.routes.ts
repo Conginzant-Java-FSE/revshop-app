@@ -20,6 +20,7 @@ import { ProductEditComponent } from './components/products/product-edit/product
 import { ShipperLoginComponent } from './components/shipper-login/shipper-login';
 import { ShipperDashboardComponent } from './components/shipper-dashboard/shipper-dashboard';
 import { ShipperRegisterComponent } from './components/shipper-register/shipper-register';
+import { ResetPasswordComponent } from './components/reset-password/reset-password';
 import { WalletComponent } from './components/user/wallet/wallet';
 
 export const routes: Routes = [
@@ -27,6 +28,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'shipper-login', component: ShipperLoginComponent },
   { path: 'shipper-register', component: ShipperRegisterComponent },
   { path: 'shipper-dashboard', component: ShipperDashboardComponent },

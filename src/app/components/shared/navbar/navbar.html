@@ -58,7 +58,8 @@
 
 
                 <!-- Notification Bell -->
-                <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token">
+                <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token"
+                    #notificationContainer>
                     <a class="nav-link d-flex flex-column align-items-center position-relative" style="cursor:pointer;"
                         (click)="toggleNotifications($event)">
                         <i class="fa-solid fa-bell fs-5 mb-1"></i>

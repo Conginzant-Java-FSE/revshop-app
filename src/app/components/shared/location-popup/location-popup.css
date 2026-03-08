@@ -1,0 +1,361 @@
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
+.lp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  backdrop-filter: blur(4px);
+  animation: lp-fade-in 0.2s ease;
+}
+
+@keyframes lp-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.lp-card {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: lp-slide-up 0.25s ease;
+  color: #f8fafc;
+}
+
+@keyframes lp-slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.lp-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.lp-icon {
+  font-size: 2.5rem;
+  color: #fbbf24;
+  margin-bottom: 0.75rem;
+  display: block;
+  animation: lp-pulse 2s infinite;
+}
+
+@keyframes lp-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.12); }
+}
+
+.lp-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.lp-subtitle {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.lp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.lp-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lp-btn-gps {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+}
+
+.lp-btn-gps:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.lp-btn-manual {
+  background: rgba(255, 255, 255, 0.07);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lp-btn-manual:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.lp-btn-add {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border: 1px dashed #6366f1;
+  margin-top: 0.75rem;
+}
+
+.lp-btn-add:hover {
+  background: rgba(99, 102, 241, 0.22);
+}
+
+.lp-btn-retry {
+  background: rgba(234, 179, 8, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  flex: 1;
+}
+
+.lp-btn-retry:hover {
+  background: rgba(234, 179, 8, 0.2);
+}
+
+.lp-link-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.lp-link-btn:hover {
+  color: #f8fafc;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.lp-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.lp-divider::before,
+.lp-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── GPS Loading ─────────────────────────────────────────────────────────── */
+.lp-gps-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.lp-loading-text {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+.lp-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(251, 191, 36, 0.2);
+  border-top-color: #fbbf24;
+  border-radius: 50%;
+  animation: lp-spin 0.7s linear infinite;
+}
+
+.lp-spinner-sm {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.lp-spinner-inline {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes lp-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── GPS Error ───────────────────────────────────────────────────────────── */
+.lp-gps-error {
+  text-align: center;
+  padding: 0.5rem 0 1rem;
+}
+
+.lp-error-icon {
+  font-size: 2rem;
+  color: #f87171;
+  margin-bottom: 0.5rem;
+}
+
+.lp-error-text {
+  color: #fca5a5;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.lp-error-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ── Address List ────────────────────────────────────────────────────────── */
+.lp-address-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.lp-address-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0.75rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lp-address-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lp-addr-icon {
+  color: #fbbf24;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.lp-addr-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.lp-addr-line {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.lp-addr-city {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+}
+
+.lp-addr-arrow {
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.lp-no-address {
+  color: #64748b;
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+.lp-loading-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+/* ── Add New Address Form ────────────────────────────────────────────────── */
+.lp-form {
+  margin-top: 0.5rem;
+}
+
+.lp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.lp-form-group label {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.lp-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.lp-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  color: #f8fafc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lp-input::placeholder {
+  color: #475569;
+}
+
+.lp-input:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.15);
+}
+
+.lp-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* ── Back row ────────────────────────────────────────────────────────────── */
+.lp-back-row {
+  margin-top: 1.25rem;
+  text-align: center;
+}

@@ -5,8 +5,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastComponent } from './components/shared/toast/toast';
 import { Navbar } from './components/shared/navbar/navbar';
-import { LocationPopupComponent } from './components/shared/location-popup/location-popup';
 import { LocationService } from './services/location.service';
+import { AuthService } from './services/auth';
+
+import { LocationPopupComponent } from './components/shared/location-popup/location-popup';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +19,15 @@ import { LocationService } from './services/location.service';
 export class App {
   protected readonly title = signal('revshop-app');
 
-  showLocationPopup = computed(() => !this.locationService.selectedLocation());
+  showLocationPopup = computed(() => {
+    // Check if buyer/seller is logged in via signal, OR if shipper is in localStorage
+    const isLoggedIn = !!this.authService.authState().token || !!localStorage.getItem('shipperId');
+    // Only show popup IF logged in AND no location is currently selected
+    return isLoggedIn && !this.locationService.selectedLocation();
+  });
 
-  constructor(public locationService: LocationService) { }
+  constructor(
+    public locationService: LocationService,
+    public authService: AuthService
+  ) { }
 }

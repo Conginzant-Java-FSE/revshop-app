@@ -17,7 +17,8 @@
                 <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
             </ul>
             <!-- Deliver-to chip -->
-            <div class="deliver-to-chip" (click)="openLocationPopup()" title="Change delivery location">
+            <div *ngIf="isAnyUserLoggedIn" class="deliver-to-chip" (click)="openLocationPopup()"
+                title="Change delivery location">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>{{ deliveryCity ? 'Deliver to: ' + deliveryCity : 'Set location' }}</span>
             </div>

@@ -6,10 +6,15 @@ import { AuthService } from './services/auth';
 import { NotificationService } from './services/notification.service';
 import { of } from 'rxjs';
 
+import { signal } from '@angular/core';
+
 describe('App', () => {
+  let mockAuthService: any;
+  let mockLocationService: jasmine.SpyObj<any>;
+
   beforeEach(async () => {
-    const mockAuthService = {
-      authState: () => ({ token: null, role: null, userId: null, name: null }),
+    mockAuthService = {
+      authState: signal({ token: null, role: null, userId: null, name: null }),
       isLoggedIn: () => false,
       userRole: () => null,
       logout: jasmine.createSpy('logout')
@@ -19,7 +24,10 @@ describe('App', () => {
       refresh$: of()
     });
 
-    spyOn(localStorage, 'getItem').and.returnValue(null);
+    mockLocationService = jasmine.createSpyObj('LocationService', ['selectedLocation']);
+    mockLocationService.selectedLocation.and.returnValue(null);
+
+    spyOn(localStorage, 'getItem').and.callFake((key: string) => null);
 
     await TestBed.configureTestingModule({
       imports: [App],
@@ -27,7 +35,8 @@ describe('App', () => {
         provideRouter([]),
         provideHttpClient(),
         { provide: AuthService, useValue: mockAuthService },
-        { provide: NotificationService, useValue: mockNotificationService }
+        { provide: NotificationService, useValue: mockNotificationService },
+        { provide: import('./services/location.service').then(m => m.LocationService), useValue: mockLocationService }
       ]
     }).compileComponents();
   });
@@ -42,5 +51,33 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     expect((app as any).title()).toBe('revshop-app');
+  });
+
+  it('should not show location popup when logged out', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app.showLocationPopup()).toBeFalse();
+  });
+
+  it('should show location popup when buyer/seller is logged in and no location is set', () => {
+    mockAuthService.authState.set({ token: 'abc', role: 'BUYER', userId: 1, name: 'Test' });
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app.showLocationPopup()).toBeTrue();
+  });
+
+  it('should show location popup when shipper is logged in and no location is set', () => {
+    (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => key === 'shipperId' ? '1' : null);
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app.showLocationPopup()).toBeTrue();
+  });
+
+  it('should hide location popup when location is already set, even if logged in', () => {
+    mockAuthService.authState.set({ token: 'abc', role: 'BUYER', userId: 1, name: 'Test' });
+    mockLocationService.selectedLocation.and.returnValue({ city: 'Test City', source: 'gps', lat: 0, lng: 0 });
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app.showLocationPopup()).toBeFalse();
   });
 });

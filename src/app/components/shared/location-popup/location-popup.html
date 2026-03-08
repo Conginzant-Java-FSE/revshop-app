@@ -1,0 +1,145 @@
+<!-- ── OVERLAY ──────────────────────────────────────────────────────────────── -->
+<div class="lp-overlay">
+    <div class="lp-card" role="dialog" aria-modal="true" aria-labelledby="lp-title">
+
+        <!-- ── CHOOSE VIEW ─────────────────────────────────────────────────────── -->
+        <ng-container *ngIf="currentView() === 'choose'">
+            <div class="lp-header">
+                <i class="fa-solid fa-location-dot lp-icon"></i>
+                <h2 id="lp-title" class="lp-title">Select your location</h2>
+                <p class="lp-subtitle">Choose how you'd like to set your delivery location</p>
+            </div>
+
+            <div class="lp-actions">
+                <button class="lp-btn lp-btn-gps" id="btn-enable-gps" (click)="showGpsView()">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    Enable GPS Location
+                </button>
+                <div class="lp-divider"><span>or</span></div>
+                <button class="lp-btn lp-btn-manual" id="btn-enter-manually" (click)="showManualView()">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Enter Location Manually
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- ── GPS VIEW ────────────────────────────────────────────────────────── -->
+        <ng-container *ngIf="currentView() === 'gps'">
+            <div class="lp-header">
+                <i class="fa-solid fa-location-crosshairs lp-icon"></i>
+                <h2 id="lp-title" class="lp-title">Detecting Location</h2>
+            </div>
+
+            <div *ngIf="gpsLoading()" class="lp-gps-loading">
+                <div class="lp-spinner"></div>
+                <p class="lp-loading-text">Please allow location access in your browser…</p>
+            </div>
+
+            <div *ngIf="gpsError()" class="lp-gps-error">
+                <i class="fa-solid fa-triangle-exclamation lp-error-icon"></i>
+                <p class="lp-error-text">{{ gpsError() }}</p>
+                <div class="lp-error-actions">
+                    <button class="lp-btn lp-btn-retry" (click)="startGps()">
+                        <i class="fa-solid fa-rotate-right"></i> Retry
+                    </button>
+                    <button class="lp-btn lp-btn-manual" (click)="showManualView()">
+                        <i class="fa-solid fa-pen-to-square"></i> Try Manually
+                    </button>
+                </div>
+            </div>
+
+            <div class="lp-back-row">
+                <button class="lp-link-btn" (click)="backToChoose()">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- ── MANUAL VIEW ─────────────────────────────────────────────────────── -->
+        <ng-container *ngIf="currentView() === 'manual'">
+            <div class="lp-header">
+                <i class="fa-solid fa-map-pin lp-icon"></i>
+                <h2 id="lp-title" class="lp-title">Choose Delivery Address</h2>
+            </div>
+
+            <!-- Saved addresses list -->
+            <div *ngIf="!showAddressForm()">
+                <div *ngIf="addressesLoading()" class="lp-loading-row">
+                    <div class="lp-spinner lp-spinner-sm"></div>
+                    <span>Loading addresses…</span>
+                </div>
+
+                <ul class="lp-address-list" *ngIf="!addressesLoading() && savedAddresses().length > 0">
+                    <li *ngFor="let addr of savedAddresses()" class="lp-address-item"
+                        (click)="selectSavedAddress(addr)">
+                        <i class="fa-solid fa-house lp-addr-icon"></i>
+                        <div class="lp-addr-details">
+                            <span class="lp-addr-line">{{ addr.addressLine }}</span>
+                            <span class="lp-addr-city">{{ addr.city }}, {{ addr.state }} – {{ addr.zipCode }}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right lp-addr-arrow"></i>
+                    </li>
+                </ul>
+
+                <p *ngIf="!addressesLoading() && savedAddresses().length === 0" class="lp-no-address">No saved addresses
+                    found.</p>
+
+                <button class="lp-btn lp-btn-add" id="btn-add-address" (click)="openAddressForm()">
+                    <i class="fa-solid fa-plus"></i> Add New Address
+                </button>
+            </div>
+
+            <!-- Add New Address inline form -->
+            <form *ngIf="showAddressForm()" (ngSubmit)="submitNewAddress()" class="lp-form" #addressForm="ngForm">
+                <div class="lp-form-group">
+                    <label for="lp-addressLine">Address Line *</label>
+                    <input id="lp-addressLine" type="text" class="lp-input" [(ngModel)]="newAddress.addressLine"
+                        name="addressLine" placeholder="House / Flat no., Street" required />
+                </div>
+                <div class="lp-form-row">
+                    <div class="lp-form-group">
+                        <label for="lp-city">City *</label>
+                        <input id="lp-city" type="text" class="lp-input" [(ngModel)]="newAddress.city" name="city"
+                            placeholder="City" required />
+                    </div>
+                    <div class="lp-form-group">
+                        <label for="lp-state">State *</label>
+                        <input id="lp-state" type="text" class="lp-input" [(ngModel)]="newAddress.state" name="state"
+                            placeholder="State" required />
+                    </div>
+                </div>
+                <div class="lp-form-row">
+                    <div class="lp-form-group">
+                        <label for="lp-zipCode">ZIP Code *</label>
+                        <input id="lp-zipCode" type="text" class="lp-input" [(ngModel)]="newAddress.zipCode"
+                            name="zipCode" placeholder="PIN Code" required />
+                    </div>
+                    <div class="lp-form-group">
+                        <label for="lp-country">Country</label>
+                        <input id="lp-country" type="text" class="lp-input" [(ngModel)]="newAddress.country"
+                            name="country" placeholder="Country" />
+                    </div>
+                </div>
+                <div class="lp-form-actions">
+                    <button type="button" class="lp-link-btn" (click)="cancelAddressForm()">Cancel</button>
+                    <button type="submit" class="lp-btn lp-btn-gps"
+                        [disabled]="submittingAddress() || !newAddress.addressLine || !newAddress.city || !newAddress.state || !newAddress.zipCode">
+                        <span *ngIf="submittingAddress()">
+                            <span class="lp-spinner lp-spinner-inline"></span> Saving…
+                        </span>
+                        <span *ngIf="!submittingAddress()">
+                            <i class="fa-solid fa-check"></i> Save & Deliver Here
+                        </span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="lp-back-row">
+                <button class="lp-link-btn" (click)="backToChoose()">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </ng-container>
+
+    </div>
+</div>

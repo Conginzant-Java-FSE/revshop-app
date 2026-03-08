@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, RouterLink } from '@angular/router';
-import { Location } from '@angular/common';
-import { CommonModule } from '@angular/common';
+import { Location, CommonModule } from '@angular/common';
+import { LocationService } from '../../services/location.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +22,8 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private locationService: LocationService
   ) { }
 
   goBack(): void {
@@ -53,6 +54,7 @@ export class LoginComponent implements OnInit {
         next: (res) => {
           const data = res.data || res;
           this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
+          this.locationService.clearLocation();
           this.router.navigate(['/']);
         },
         error: (err) => {
@@ -64,6 +66,7 @@ export class LoginComponent implements OnInit {
         next: (res) => {
           const data = res.data || res;
           this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
+          this.locationService.clearLocation();
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {

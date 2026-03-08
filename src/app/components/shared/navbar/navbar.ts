@@ -4,6 +4,7 @@ import { AuthService } from '../../../services/auth';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from '../../search-bar/search-bar';
 import { NotificationService, NotificationDTO } from '../../../services/notification.service';
+import { LocationService } from '../../../services/location.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -38,11 +39,20 @@ export class Navbar implements OnInit, OnDestroy {
     return !!this.authService.authState().token || this.isShipper;
   }
 
+  get deliveryCity(): string | null {
+    return this.locationService.selectedLocation()?.city ?? null;
+  }
+
+  openLocationPopup(): void {
+    this.locationService.clearLocation();
+  }
+
   constructor(
     public authService: AuthService,
     private router: Router,
     private notificationService: NotificationService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    public locationService: LocationService
   ) {
     // Watch authState signal — fires instantly when token changes (login/logout)
     effect(() => {

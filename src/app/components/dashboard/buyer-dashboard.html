@@ -18,7 +18,11 @@
                         <h4 class="mb-1">Welcome, {{ authService.authState().name }}!</h4>
                         <p class="mb-0 opacity-75">Track your orders and manage your profile</p>
                     </div>
-
+                    <div class="col-auto text-end">
+                        <button class="btn btn-light rounded-pill px-4 shadow-sm" (click)="onLogout()">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Log Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

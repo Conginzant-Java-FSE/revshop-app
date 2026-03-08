@@ -21,6 +21,8 @@ export class ProductListComponent implements OnInit {
     minPrice = signal<number | undefined>(undefined);
     maxPrice = signal<number | undefined>(undefined);
     categoryId = signal<number | undefined>(undefined);
+    minRating = signal<number | undefined>(undefined);
+    minDiscount = signal<number | undefined>(undefined);
     categories = signal<CategoryDTO[]>([]);
     loading = signal<boolean>(false);
 
@@ -85,15 +87,19 @@ export class ProductListComponent implements OnInit {
         const kw = this.keyword().trim();
         const hasFilters = this.categoryId() !== undefined ||
             this.minPrice() !== undefined ||
-            this.maxPrice() !== undefined;
+            this.maxPrice() !== undefined ||
+            this.minRating() !== undefined ||
+            this.minDiscount() !== undefined;
 
         if (hasFilters) {
-            // Use filterProducts — supports category, price, keyword (via backend search+filter)
+            // Use filterProducts — supports category, price, rating, discount, keyword (via backend search+filter)
             this.productService.filterProducts(
                 {
                     minPrice: this.minPrice(),
                     maxPrice: this.maxPrice(),
                     categoryId: this.categoryId(),
+                    minRating: this.minRating(),
+                    minDiscount: this.minDiscount(),
                     // pass keyword too if present
                     ...(kw ? { keyword: kw } : {})
                 },
@@ -182,6 +188,8 @@ export class ProductListComponent implements OnInit {
         this.minPrice.set(undefined);
         this.maxPrice.set(undefined);
         this.categoryId.set(undefined);
+        this.minRating.set(undefined);
+        this.minDiscount.set(undefined);
         this.currentPage.set(0);
         this.fetchProducts();
     }

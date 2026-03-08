@@ -11,9 +11,36 @@
         <div class="row g-5">
             <!-- Product Images -->
             <div class="col-lg-6">
-                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
-                    <img [src]="product()?.imageUrl || 'https://placehold.co/600x400?text=No+Image'" class="img-fluid"
-                        [alt]="product()?.name" style="max-height: 500px; object-fit: contain;">
+                <!-- Main Image -->
+                <div
+                    class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white position-relative overflow-hidden">
+                    <img [src]="allImages().length > 0 ? allImages()[currentImageIndex()] : 'https://placehold.co/600x400?text=No+Image'"
+                        class="img-fluid" [alt]="product()?.name"
+                        style="max-height: 500px; object-fit: contain; width: 100%; transition: opacity 0.3s ease;">
+
+                    <!-- Carousel Controls -->
+                    <button *ngIf="allImages().length > 1"
+                        class="btn btn-light shadow-sm rounded-circle position-absolute top-50 start-0 translate-middle-y ms-3"
+                        (click)="prevImage()" style="width: 45px; height: 45px; z-index: 10;">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button *ngIf="allImages().length > 1"
+                        class="btn btn-light shadow-sm rounded-circle position-absolute top-50 end-0 translate-middle-y me-3"
+                        (click)="nextImage()" style="width: 45px; height: 45px; z-index: 10;">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Thumbnails Gallery -->
+                <div class="d-flex gap-3 mt-4 overflow-auto px-1 py-1 custom-scrollbar" *ngIf="allImages().length > 1">
+                    <div *ngFor="let img of allImages(); let i = index"
+                        class="cursor-pointer border rounded-3 bg-white shadow-sm overflow-hidden flex-shrink-0 transition-all opacity-75 hover-opacity-100"
+                        [class.border-primary]="i === currentImageIndex()" [class.border-2]="i === currentImageIndex()"
+                        [class.opacity-100]="i === currentImageIndex()" style="width: 80px; height: 80px;"
+                        (click)="setCurrentImage(i)">
+                        <img [src]="img" class="w-100 h-100 p-1" style="object-fit: contain;"
+                            [alt]="product()?.name + ' thumbnail ' + i">
+                    </div>
                 </div>
             </div>
 
@@ -69,9 +96,14 @@
                             </button>
                         </div>
 
-                        <button class="btn btn-primary btn-lg px-5 rounded-pill flex-grow-1 shadow-sm fw-bold"
+                        <button class="btn btn-primary btn-lg px-4 rounded-pill flex-grow-1 shadow-sm fw-bold"
                             (click)="addToCart()">
                             <i class="fa-solid fa-cart-shopping me-2"></i> Add to Cart
+                        </button>
+
+                        <button class="btn btn-warning btn-lg px-4 rounded-pill flex-grow-1 shadow-sm fw-bold"
+                            (click)="buyNow()">
+                            <i class="fa-solid fa-bolt me-2"></i> Buy Now
                         </button>
 
                         <button class="btn btn-outline-danger btn-lg rounded-circle p-3" (click)="toggleFavorite()"

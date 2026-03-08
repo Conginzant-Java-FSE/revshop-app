@@ -22,6 +22,7 @@ import { ShipperDashboardComponent } from './components/shipper-dashboard/shippe
 import { ShipperRegisterComponent } from './components/shipper-register/shipper-register';
 import { WalletComponent } from './components/user/wallet/wallet';
 import { ResetPasswordComponent } from './components/reset-password/reset-password';
+import { WalletComponent } from './components/user/wallet/wallet';
 
 export const routes: Routes = [
   { path: '', component: LandingPageComponent },

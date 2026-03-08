@@ -2,14 +2,17 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ShipperDashboardComponent } from './shipper-dashboard';
 import { ShipperService } from '../../services/shipper.service';
 import { ToastService } from '../../services/toast';
+import { ThemeService } from '../../services/theme.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { signal } from '@angular/core';
 
 describe('ShipperDashboardComponent', () => {
     let component: ShipperDashboardComponent;
     let fixture: ComponentFixture<ShipperDashboardComponent>;
     let mockShipperService: jasmine.SpyObj<ShipperService>;
     let mockToastService: jasmine.SpyObj<ToastService>;
+    let mockThemeService: any;
     let mockRouter: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
@@ -17,6 +20,10 @@ describe('ShipperDashboardComponent', () => {
             'getOrdersByShipper', 'updateOrderStatus', 'updateAvailability'
         ]);
         mockToastService = jasmine.createSpyObj('ToastService', ['success', 'error']);
+        mockThemeService = {
+            currentTheme: signal('system'),
+            setTheme: jasmine.createSpy('setTheme')
+        };
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
         mockShipperService.getOrdersByShipper.and.returnValue(of({ message: 'OK', data: [] }));
@@ -35,6 +42,7 @@ describe('ShipperDashboardComponent', () => {
             providers: [
                 { provide: ShipperService, useValue: mockShipperService },
                 { provide: ToastService, useValue: mockToastService },
+                { provide: ThemeService, useValue: mockThemeService },
                 { provide: Router, useValue: mockRouter }
             ]
         }).compileComponents();

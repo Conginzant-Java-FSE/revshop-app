@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-:root {
+/* Theme Variables */
+[data-bs-theme="dark"] {
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --bg-color: #0F172A;
@@ -8,6 +9,18 @@
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
   --border-color: rgba(255, 255, 255, 0.1);
+  --error: #EF4444;
+  --success: #10B981;
+}
+
+[data-bs-theme="light"] {
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --bg-color: #F8FAFC;
+  --surface: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-color: rgba(0, 0, 0, 0.1);
   --error: #EF4444;
   --success: #10B981;
 }

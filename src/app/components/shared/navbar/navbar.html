@@ -16,6 +16,12 @@
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
             </ul>
+            <!-- Deliver-to chip -->
+            <div *ngIf="isAnyUserLoggedIn" class="deliver-to-chip" (click)="openLocationPopup()"
+                title="Change delivery location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>{{ deliveryCity ? 'Deliver to: ' + deliveryCity : 'Set location' }}</span>
+            </div>
             <app-search-bar class="mx-auto"></app-search-bar>
             <ul
                 class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-start align-items-lg-center d-flex flex-column flex-lg-row gap-3 gap-lg-0">

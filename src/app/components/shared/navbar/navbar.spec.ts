@@ -4,18 +4,21 @@ import { provideHttpClient } from '@angular/common/http';
 import { Navbar } from './navbar';
 import { AuthService } from '../../../services/auth';
 import { NotificationService } from '../../../services/notification.service';
+import { LocationService } from '../../../services/location.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { signal } from '@angular/core';
 
 describe('Navbar', () => {
     let component: Navbar;
     let fixture: ComponentFixture<Navbar>;
     let mockAuthService: any;
     let mockNotificationService: jasmine.SpyObj<NotificationService>;
+    let mockLocationService: jasmine.SpyObj<any>;
 
     beforeEach(async () => {
         mockAuthService = {
-            authState: () => ({ token: 'test-token', role: 'BUYER', userId: '1', name: 'Test' }),
+            authState: signal({ token: 'test-token', role: 'BUYER', userId: '1', name: 'Test' }),
             isLoggedIn: () => true,
             userRole: () => 'BUYER',
             logout: jasmine.createSpy('logout')
@@ -27,6 +30,9 @@ describe('Navbar', () => {
         mockNotificationService.getNotifications.and.returnValue(of({ message: 'OK', data: [] }));
         mockNotificationService.markAsRead.and.returnValue(of({ message: 'OK', data: undefined }));
 
+        mockLocationService = jasmine.createSpyObj('LocationService', ['selectedLocation', 'clearLocation']);
+        mockLocationService.selectedLocation.and.returnValue(null);
+
         spyOn(localStorage, 'getItem').and.returnValue(null);
 
         await TestBed.configureTestingModule({
@@ -35,7 +41,8 @@ describe('Navbar', () => {
                 provideRouter([]),
                 provideHttpClient(),
                 { provide: AuthService, useValue: mockAuthService },
-                { provide: NotificationService, useValue: mockNotificationService }
+                { provide: NotificationService, useValue: mockNotificationService },
+                { provide: LocationService, useValue: mockLocationService }
             ]
         }).compileComponents();
 
@@ -84,6 +91,31 @@ describe('Navbar', () => {
 
     it('should return false for isShipper when not shipper', () => {
         expect(component.isShipper).toBeFalse();
+    });
+
+    it('should return true for isAnyUserLoggedIn when buyer/seller is logged in', () => {
+        // mockAuthService.authState().token is 'test-token'
+        expect(component.isAnyUserLoggedIn).toBeTrue();
+    });
+
+    it('should return false for isAnyUserLoggedIn when completely logged out', () => {
+        mockAuthService.authState.set({ token: null, role: null, userId: null, name: null });
+        expect(component.isAnyUserLoggedIn).toBeFalse();
+    });
+
+    it('should clear location when openLocationPopup is called', () => {
+        component.openLocationPopup();
+        expect(mockLocationService.clearLocation).toHaveBeenCalled();
+    });
+
+    it('should format deliveryCity properly', () => {
+        mockLocationService.selectedLocation.and.returnValue({ city: 'Test City' });
+        expect(component.deliveryCity).toBe('Test City');
+    });
+
+    it('should return null for deliveryCity when not set', () => {
+        mockLocationService.selectedLocation.and.returnValue(null);
+        expect(component.deliveryCity).toBeNull();
     });
 
     it('should call authService logout for non-shipper', () => {

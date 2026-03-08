@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService } from '../../services/shipper.service';
 import { ApiResponse } from '../../models/api-response.model';
+import { LocationService } from '../../services/location.service';
 
 
 @Component({
@@ -23,7 +24,8 @@ export class ShipperLoginComponent {
     constructor(
         private fb: FormBuilder,
         private shipperService: ShipperService,
-        private router: Router
+        private router: Router,
+        private locationService: LocationService
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
@@ -53,6 +55,7 @@ export class ShipperLoginComponent {
                 localStorage.setItem('shipperEmail', data.email || '');
                 localStorage.setItem('shipperVehicle', data.vehicleNumber || '');
                 localStorage.setItem('role', 'SHIPPER');
+                this.locationService.clearLocation();
                 this.loading = false;
                 this.router.navigate(['/shipper-dashboard']);
             },

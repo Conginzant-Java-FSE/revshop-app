@@ -11,6 +11,7 @@ import { PaymentService } from '../../services/payment.service';
 import { NotificationService } from '../../services/notification.service';
 import { WalletService } from '../../services/wallet.service';
 import { ApiResponse } from '../../models/api-response.model';
+import { LocationService } from '../../services/location.service';
 
 
 @Component({
@@ -70,6 +71,7 @@ export class CheckoutComponent implements OnInit {
         private paymentService: PaymentService,
         private notificationService: NotificationService,
         private walletService: WalletService,
+        private locationService: LocationService,
         private router: Router,
         private route: ActivatedRoute
     ) { }
@@ -85,6 +87,21 @@ export class CheckoutComponent implements OnInit {
             next: (res: any) => {
                 // Backend returns bare List<AddressDTO> not wrapped in ApiResponse
                 const addrs: AddressDTO[] = Array.isArray(res) ? res : (res.data ?? []);
+                
+                // Add GPS Location if available
+                const loc = this.locationService.selectedLocation();
+                if (loc) {
+                    addrs.unshift({
+                        addressId: -1,
+                        addressLine: 'Current Location',
+                        city: loc.city || '',
+                        state: loc.state || '',
+                        zipCode: '',
+                        country: loc.country || 'India',
+                        isDefault: false
+                    });
+                }
+
                 this.addresses.set(addrs);
                 // Auto-select default address or first address
                 const def = addrs.find((a: any) => a.isDefault) ?? addrs[0];
@@ -215,6 +232,14 @@ export class CheckoutComponent implements OnInit {
 
         if (addrId === null || addrId === undefined) {
             this.toastService.error('Please select a shipping address.');
+            return;
+        }
+        if (addrId === -1) {
+            this.toastService.error('Please edit and save your Current Location to provide complete details.');
+            const gpsAddr = this.addresses().find(a => a.addressId === -1);
+            if (gpsAddr) {
+                this.editAddress(gpsAddr);
+            }
             return;
         }
         if (!cart || !cart.items || cart.items.length === 0) { this.toastService.error('Your cart is empty.'); return; }
@@ -353,6 +378,14 @@ export class CheckoutComponent implements OnInit {
         this.showAddressModal.set(true);
     }
 
+    editAddress(addr: AddressDTO, event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+        }
+        this.addressForm = { ...addr };
+        this.showAddressModal.set(true);
+    }
+
     closeAddressModal(): void {
         this.showAddressModal.set(false);
     }
@@ -368,21 +401,47 @@ export class CheckoutComponent implements OnInit {
 
         this.submittingAddress.set(true);
         this.addressForm.userId = userId; // Ensure userId is set
-        this.addressService.addAddress(this.addressForm).subscribe({
-            next: (res: ApiResponse<AddressDTO>) => {
-                // Backend returns bare AddressDTO (not wrapped in ApiResponse)
-                const newAddress: AddressDTO = res.data ?? res;
-                this.addresses.update(prev => [...prev, newAddress]);
-                this.selectedAddressId = newAddress.addressId ?? null;
-                this.toastService.success('Address added successfully');
-                this.submittingAddress.set(false);
-                this.closeAddressModal();
-            },
-            error: () => {
-                this.toastService.error('Failed to add address');
-                this.submittingAddress.set(false);
+
+        if (this.addressForm.addressId && this.addressForm.addressId !== -1) {
+            this.addressService.updateAddress(this.addressForm.addressId, this.addressForm).subscribe({
+                next: (res: ApiResponse<AddressDTO>) => {
+                    const updatedAddress: AddressDTO = res.data ?? res;
+                    this.addresses.update(prev => prev.map(a => a.addressId === updatedAddress.addressId ? updatedAddress : a));
+                    this.selectedAddressId = updatedAddress.addressId ?? null;
+                    this.toastService.success('Address updated successfully');
+                    this.submittingAddress.set(false);
+                    this.closeAddressModal();
+                },
+                error: () => {
+                    this.toastService.error('Failed to update address');
+                    this.submittingAddress.set(false);
+                }
+            });
+        } else {
+            // Remove mock ID if it was -1 before submitting
+            if (this.addressForm.addressId === -1) {
+                delete this.addressForm.addressId;
             }
-        });
+            this.addressService.addAddress(this.addressForm).subscribe({
+                next: (res: ApiResponse<AddressDTO>) => {
+                    // Backend returns bare AddressDTO (not wrapped in ApiResponse)
+                    const newAddress: AddressDTO = res.data ?? res;
+                    // Replace the GPS address in the list or just append
+                    this.addresses.update(prev => {
+                        const filtered = prev.filter(a => a.addressId !== -1);
+                        return [newAddress, ...filtered];
+                    });
+                    this.selectedAddressId = newAddress.addressId ?? null;
+                    this.toastService.success('Address added successfully');
+                    this.submittingAddress.set(false);
+                    this.closeAddressModal();
+                },
+                error: () => {
+                    this.toastService.error('Failed to add address');
+                    this.submittingAddress.set(false);
+                }
+            });
+        }
     }
 
     onSavedAddressSelect(event: Event): void {

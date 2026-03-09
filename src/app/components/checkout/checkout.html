@@ -39,15 +39,19 @@
                     </div>
 
                     <div class="address-list" *ngIf="addresses().length > 0">
-                        <div class="form-check address-card p-3 border rounded-3 mb-2" *ngFor="let addr of addresses()"
+                        <div class="address-card p-3 border rounded-3 mb-2 d-flex justify-content-between align-items-center" *ngFor="let addr of addresses()"
                             [class.border-primary]="selectedAddressId === addr.addressId">
-                            <input class="form-check-input" type="radio" [id]="'addr' + addr.addressId"
-                                [value]="addr.addressId" [(ngModel)]="selectedAddressId" name="addressRadio">
-                            <label class="form-check-label w-100 ms-2" [for]="'addr' + addr.addressId">
-                                <span class="fw-bold d-block">{{ addr.addressLine }}</span>
-                                <span class="small text-muted">{{ addr.city }}, {{ addr.state }} - {{ addr.zipCode
-                                    }}</span>
-                            </label>
+                            <div class="form-check mb-0 flex-grow-1">
+                                <input class="form-check-input mt-2" type="radio" [id]="'addr' + addr.addressId"
+                                    [value]="addr.addressId" [(ngModel)]="selectedAddressId" name="addressRadio">
+                                <label class="form-check-label w-100 ms-2 cursor-pointer" [for]="'addr' + addr.addressId">
+                                    <span class="fw-bold d-block">{{ addr.addressLine }}</span>
+                                    <span class="small text-muted">{{ addr.city }}{{ addr.state ? ', ' + addr.state : '' }}{{ addr.zipCode ? ' - ' + addr.zipCode : '' }}</span>
+                                </label>
+                            </div>
+                            <button class="btn btn-sm btn-light rounded-circle" (click)="editAddress(addr, $event)" title="Edit Address">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -219,7 +223,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header bg-light border-0 py-3">
-                    <h5 class="modal-title fw-bold">Add New Shipping Address</h5>
+                    <h5 class="modal-title fw-bold">{{ addressForm.addressId && addressForm.addressId > 0 ? 'Edit ' : 'Add New ' }}Shipping Address</h5>
                     <button type="button" class="btn-close" (click)="closeAddressModal()"></button>
                 </div>
                 <div class="modal-body p-4">

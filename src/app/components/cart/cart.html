@@ -9,7 +9,7 @@
         </div>
 
         <div *ngIf="!loading() && (!cart() || cart()?.items?.length === 0)"
-            class="text-center py-5 bg-white rounded-4 shadow-sm">
+            class="text-center py-5 bg-body rounded-4 shadow-sm">
             <div class="mb-4">
                 <i class="fa-solid fa-cart-arrow-down fs-1 text-muted"></i>
             </div>
@@ -38,7 +38,7 @@
                                 <div class="input-group input-group-sm" style="width: 100px;">
                                     <button class="btn btn-outline-secondary"
                                         (click)="updateQuantity(item.cartItemId!, item.quantity - 1)">-</button>
-                                    <input type="text" class="form-control text-center bg-white" [value]="item.quantity"
+                                    <input type="text" class="form-control text-center bg-body text-body" [value]="item.quantity"
                                         readonly>
                                     <button class="btn btn-outline-secondary"
                                         (click)="updateQuantity(item.cartItemId!, item.quantity + 1)">+</button>

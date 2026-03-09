@@ -104,7 +104,7 @@
                     <div *ngIf="stats().topProducts && stats().topProducts.length > 0; else noTopProducts">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>Product Name</th>
@@ -115,7 +115,7 @@
                                     <tr *ngFor="let p of stats().topProducts; let i = index">
                                         <td>
                                             <span class="badge rounded-pill"
-                                                [ngClass]="i === 0 ? 'bg-warning text-dark' : i === 1 ? 'bg-secondary' : 'bg-light text-dark'">
+                                                [ngClass]="i === 0 ? 'bg-warning text-dark' : i === 1 ? 'bg-secondary' : 'bg-body-tertiary text-body'">
                                                 {{ i + 1 }}
                                             </span>
                                         </td>
@@ -137,7 +137,7 @@
     <!-- ===== MY PRODUCTS SECTION ===== -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="fw-bold mb-0">
                         <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>
@@ -157,7 +157,7 @@
 
                     <!-- Products table -->
                     <table class="table table-hover align-middle" *ngIf="myProducts().length > 0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>Thumbnail</th>
                                 <th>Name</th>
@@ -171,7 +171,7 @@
                             <tr *ngFor="let product of myProducts()">
                                 <!-- Thumbnail -->
                                 <td>
-                                    <div class="rounded-3 overflow-hidden bg-light d-flex align-items-center justify-content-center"
+                                    <div class="rounded-3 overflow-hidden bg-body-tertiary d-flex align-items-center justify-content-center"
                                         style="width: 52px; height: 52px;">
                                         <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name"
                                             style="width:52px;height:52px;object-fit:cover;"
@@ -254,7 +254,7 @@
     <!-- ===== ORDERS SECTION ===== -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-body">
                 <h5 class="fw-bold mb-4">
                     <i class="fa-solid fa-clipboard-list me-2 text-primary"></i>
                     Orders ({{ sellerOrders().length }})
@@ -266,7 +266,7 @@
 
                 <div class="table-responsive" *ngIf="!loadingOrders()">
                     <table class="table table-hover align-middle" *ngIf="sellerOrders().length > 0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>Order #</th>
                                 <th>Buyer</th>
@@ -296,7 +296,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span *ngIf="order.shipperName" class="badge bg-light text-dark rounded-pill px-2">
+                                    <span *ngIf="order.shipperName" class="badge bg-body-tertiary text-body rounded-pill px-2">
                                         <i class="fa-solid fa-truck-fast me-1 text-primary"></i>{{ order.shipperName }}
                                     </span>
                                     <span *ngIf="!order.shipperName" class="text-muted small">—</span>

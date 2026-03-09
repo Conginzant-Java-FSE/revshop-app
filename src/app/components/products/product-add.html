@@ -11,10 +11,10 @@
                 </ol>
             </nav>
 
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-body">
                 <div class="card-header bg-primary text-white p-4 border-0">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-white bg-opacity-25 p-3">
+                        <div class="rounded-circle bg-body bg-opacity-25 p-3">
                             <i class="fa-solid fa-plus fs-3"></i>
                         </div>
                         <div>
@@ -48,7 +48,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">MRP (Maximum Retail Price)*</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">₹</span>
+                                <span class="input-group-text bg-body-tertiary border-end-0">₹</span>
                                 <input type="number" formControlName="mrp" class="form-control rounded-end-3"
                                     [ngClass]="{'is-invalid': submitted && productForm.get('mrp')?.errors}">
                                 <div class="invalid-feedback">MRP must be greater than 0.</div>
@@ -58,7 +58,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Selling Price*</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">₹</span>
+                                <span class="input-group-text bg-body-tertiary border-end-0">₹</span>
                                 <input type="number" formControlName="sellingPrice" class="form-control rounded-end-3"
                                     [ngClass]="{'is-invalid': submitted && productForm.get('sellingPrice')?.errors}">
                                 <div class="invalid-feedback">Selling Price must be greater than 0.</div>

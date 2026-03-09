@@ -1,4 +1,6 @@
-<app-navbar></app-navbar>
-<app-location-popup *ngIf="showLocationPopup()"></app-location-popup>
-<router-outlet></router-outlet>
-<app-toast></app-toast>
+<div class="min-vh-100 d-flex flex-column" style="background-color: var(--bg-color);">
+  <app-navbar></app-navbar>
+  <app-location-popup *ngIf="showLocationPopup()"></app-location-popup>
+  <router-outlet></router-outlet>
+  <app-toast></app-toast>
+</div>

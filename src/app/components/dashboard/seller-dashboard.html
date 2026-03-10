@@ -33,7 +33,7 @@
     <!-- ===== ANALYTICS SECTION ===== -->
     <div class="row mb-4">
         <div class="col-12">
-            <h5 class="fw-bold mb-3 text-secondary">
+            <h5 class="fw-bold mb-3 text-body-secondary">
                 <i class="fa-solid fa-chart-line me-2"></i>Analytics Overview
             </h5>
         </div>
@@ -50,12 +50,12 @@
 
             <!-- Total Revenue -->
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-body">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="rounded-circle bg-success bg-opacity-10 p-3">
                             <i class="fa-solid fa-indian-rupee-sign text-success fs-4"></i>
                         </div>
-                        <span class="text-muted fw-semibold">Total Revenue</span>
+                        <span class="text-body-secondary fw-semibold">Total Revenue</span>
                     </div>
                     <h3 class="fw-bold text-success mb-0">
                         ₹{{ stats().totalRevenue | number:'1.0-0' }}
@@ -65,12 +65,12 @@
 
             <!-- Total Orders -->
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-body">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3">
                             <i class="fa-solid fa-box-open text-primary fs-4"></i>
                         </div>
-                        <span class="text-muted fw-semibold">Total Orders</span>
+                        <span class="text-body-secondary fw-semibold">Total Orders</span>
                     </div>
                     <h3 class="fw-bold text-primary mb-0">{{ stats().totalOrders }}</h3>
                 </div>
@@ -78,18 +78,18 @@
 
             <!-- By Status -->
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-body">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <div class="rounded-circle bg-warning bg-opacity-10 p-3">
                             <i class="fa-solid fa-circle-half-stroke text-warning fs-4"></i>
                         </div>
-                        <span class="text-muted fw-semibold">By Status</span>
+                        <span class="text-body-secondary fw-semibold">By Status</span>
                     </div>
                     <div *ngFor="let entry of statusEntries()" class="d-flex justify-content-between mb-1">
-                        <span class="text-muted small">{{ entry.key }}</span>
+                        <span class="text-body-secondary small">{{ entry.key }}</span>
                         <span class="badge bg-secondary rounded-pill">{{ entry.value }}</span>
                     </div>
-                    <p *ngIf="statusEntries().length === 0" class="text-muted small mb-0">No orders yet</p>
+                    <p *ngIf="statusEntries().length === 0" class="text-body-secondary small mb-0">No orders yet</p>
                 </div>
             </div>
         </div>
@@ -97,14 +97,14 @@
         <!-- Top 5 Products Table -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-body">
                     <h6 class="fw-bold mb-3">
                         <i class="fa-solid fa-trophy text-warning me-2"></i>Top 5 Products by Units Sold
                     </h6>
                     <div *ngIf="stats().topProducts && stats().topProducts.length > 0; else noTopProducts">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>Product Name</th>
@@ -115,7 +115,7 @@
                                     <tr *ngFor="let p of stats().topProducts; let i = index">
                                         <td>
                                             <span class="badge rounded-pill"
-                                                [ngClass]="i === 0 ? 'bg-warning text-dark' : i === 1 ? 'bg-secondary' : 'bg-light text-dark'">
+                                                [ngClass]="i === 0 ? 'bg-warning text-dark' : i === 1 ? 'bg-secondary' : 'bg-body-tertiary text-body'">
                                                 {{ i + 1 }}
                                             </span>
                                         </td>
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                     <ng-template #noTopProducts>
-                        <p class="text-muted mb-0">No sales data yet.</p>
+                        <p class="text-body-secondary mb-0">No sales data yet.</p>
                     </ng-template>
                 </div>
             </div>
@@ -137,7 +137,7 @@
     <!-- ===== MY PRODUCTS SECTION ===== -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="fw-bold mb-0">
                         <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>
@@ -157,7 +157,7 @@
 
                     <!-- Products table -->
                     <table class="table table-hover align-middle" *ngIf="myProducts().length > 0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>Thumbnail</th>
                                 <th>Name</th>
@@ -171,12 +171,12 @@
                             <tr *ngFor="let product of myProducts()">
                                 <!-- Thumbnail -->
                                 <td>
-                                    <div class="rounded-3 overflow-hidden bg-light d-flex align-items-center justify-content-center"
+                                    <div class="rounded-3 overflow-hidden bg-body-tertiary d-flex align-items-center justify-content-center"
                                         style="width: 52px; height: 52px;">
                                         <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name"
                                             style="width:52px;height:52px;object-fit:cover;"
                                             (error)="$any($event.target).style.display='none'">
-                                        <i *ngIf="!product.imageUrl" class="fa-solid fa-image text-muted"></i>
+                                        <i *ngIf="!product.imageUrl" class="fa-solid fa-image text-body-secondary"></i>
                                     </div>
                                 </td>
 
@@ -189,7 +189,7 @@
                                 <!-- Stock -->
                                 <td>
                                     <span
-                                        [ngClass]="product.stockQuantity < product.thresholdQuantity ? 'text-danger fw-bold' : 'text-muted'">
+                                        [ngClass]="product.stockQuantity < product.thresholdQuantity ? 'text-danger fw-bold' : 'text-body-secondary'">
                                         {{ product.stockQuantity }}
                                         <i *ngIf="product.stockQuantity < product.thresholdQuantity"
                                             class="fa-solid fa-triangle-exclamation ms-1 text-danger"
@@ -238,10 +238,10 @@
                     <!-- Empty state -->
                     <div *ngIf="myProducts().length === 0" class="text-center py-5">
                         <div class="mb-3">
-                            <i class="fa-solid fa-box-open text-muted" style="font-size: 3rem;"></i>
+                            <i class="fa-solid fa-box-open text-body-secondary" style="font-size: 3rem;"></i>
                         </div>
-                        <h6 class="text-muted mb-1">No products yet</h6>
-                        <p class="text-muted small mb-3">You haven't listed any products yet.</p>
+                        <h6 class="text-body-secondary mb-1">No products yet</h6>
+                        <p class="text-body-secondary small mb-3">You haven't listed any products yet.</p>
                         <a routerLink="/products/new" class="btn btn-primary rounded-pill px-4">
                             <i class="fa-solid fa-plus me-2"></i>Add your first product
                         </a>
@@ -254,7 +254,7 @@
     <!-- ===== ORDERS SECTION ===== -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-body">
                 <h5 class="fw-bold mb-4">
                     <i class="fa-solid fa-clipboard-list me-2 text-primary"></i>
                     Orders ({{ sellerOrders().length }})
@@ -266,7 +266,7 @@
 
                 <div class="table-responsive" *ngIf="!loadingOrders()">
                     <table class="table table-hover align-middle" *ngIf="sellerOrders().length > 0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>Order #</th>
                                 <th>Buyer</th>
@@ -296,10 +296,10 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span *ngIf="order.shipperName" class="badge bg-light text-dark rounded-pill px-2">
+                                    <span *ngIf="order.shipperName" class="badge bg-body-tertiary text-body rounded-pill px-2">
                                         <i class="fa-solid fa-truck-fast me-1 text-primary"></i>{{ order.shipperName }}
                                     </span>
-                                    <span *ngIf="!order.shipperName" class="text-muted small">—</span>
+                                    <span *ngIf="!order.shipperName" class="text-body-secondary small">—</span>
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex gap-2 justify-content-end">
@@ -322,7 +322,7 @@
                                         </button>
 
                                         <!-- No action indicator for terminal/in-transit states -->
-                                        <span class="text-muted small"
+                                        <span class="text-body-secondary small"
                                             *ngIf="order.status !== 'PENDING' && order.status !== 'PROCESSING' && order.status !== 'RETURN_REQUESTED'">
                                             —
                                         </span>
@@ -334,8 +334,8 @@
                         </tbody>
                     </table>
                     <div *ngIf="sellerOrders().length === 0" class="text-center py-4">
-                        <i class="fa-solid fa-clipboard text-muted" style="font-size: 2rem;"></i>
-                        <p class="text-muted small mt-2 mb-0">No orders yet.</p>
+                        <i class="fa-solid fa-clipboard text-body-secondary" style="font-size: 2rem;"></i>
+                        <p class="text-body-secondary small mt-2 mb-0">No orders yet.</p>
                     </div>
                 </div>
             </div>
@@ -357,11 +357,11 @@
             </div>
             <div class="modal-body p-4">
                 <div *ngIf="availableShippers().length === 0" class="text-center py-3">
-                    <i class="fa-solid fa-user-slash text-muted fs-3 mb-2 d-block"></i>
-                    <p class="text-muted small mb-0">No available shippers at the moment.</p>
+                    <i class="fa-solid fa-user-slash text-body-secondary fs-3 mb-2 d-block"></i>
+                    <p class="text-body-secondary small mb-0">No available shippers at the moment.</p>
                 </div>
                 <div *ngIf="availableShippers().length > 0">
-                    <label class="form-label small fw-bold text-muted">SELECT SHIPPER</label>
+                    <label class="form-label small fw-bold text-body-secondary">SELECT SHIPPER</label>
                     <select class="form-select rounded-3" [(ngModel)]="selectedShipperId">
                         <option [ngValue]="null" disabled>-- Choose a shipper --</option>
                         <option *ngFor="let shipper of availableShippers()" [ngValue]="shipper.shipperId">

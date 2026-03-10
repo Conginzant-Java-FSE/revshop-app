@@ -77,7 +77,7 @@ import { ToastService } from '../../services/toast';
                 <div class="mt-5 pt-4 border-top">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
-                      <h5 class="fw-bold mb-1 text-dark">Account Security</h5>
+                      <h5 class="fw-bold mb-1 text-body">Account Security</h5>
                       <p class="text-muted small mb-0">Update your password to keep your account safe</p>
                     </div>
                     <button class="btn btn-outline-primary rounded-pill px-4" (click)="openPasswordModal()">Change Password</button>
@@ -91,7 +91,7 @@ import { ToastService } from '../../services/toast';
           <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0 text-dark">My Addresses</h5>
+                <h5 class="fw-bold mb-0 text-body">My Addresses</h5>
                 <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="openAddressModal()">
                   <i class="fa-solid fa-plus me-2"></i>Add Address
                 </button>
@@ -101,7 +101,7 @@ import { ToastService } from '../../services/toast';
                 <div class="spinner-border spinner-border-sm text-primary"></div>
               </div>
 
-              <div *ngIf="!loadingAddresses() && addresses().length === 0" class="text-center py-4 bg-light rounded-3">
+              <div *ngIf="!loadingAddresses() && addresses().length === 0" class="text-center py-4 bg-body-tertiary rounded-3">
                 <i class="fa-solid fa-map-location-dot fs-2 text-muted mb-2"></i>
                 <p class="text-muted mb-0">No addresses saved yet.</p>
               </div>
@@ -120,7 +120,7 @@ import { ToastService } from '../../services/toast';
                         </button>
                       </div>
                     </div>
-                    <p class="mb-1 fw-medium text-dark">{{ addr.addressLine }}</p>
+                    <p class="mb-1 fw-medium text-body">{{ addr.addressLine }}</p>
                     <p class="mb-0 text-muted small">{{ addr.city }}, {{ addr.state }} {{ addr.zipCode }}</p>
                     <p class="mb-0 text-muted small">{{ addr.country }}</p>
                   </div>
@@ -298,7 +298,7 @@ import { ToastService } from '../../services/toast';
   styles: [`
     .container { max-width: 1000px; }
     .profile-avatar { border: 4px solid rgba(255,255,255,0.2); }
-    .address-card:hover { border-color: var(--bs-primary) !important; background: var(--bs-light); }
+    .address-card:hover { border-color: var(--bs-primary) !important; background: var(--surface); }
     .x-small { font-size: 0.65rem; }
     .transition-all { transition: all 0.2s ease; }
     .modal { background: rgba(0,0,0,0.5); }

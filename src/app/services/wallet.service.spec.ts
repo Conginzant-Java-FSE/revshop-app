@@ -40,7 +40,7 @@ describe('WalletService', () => {
             expect(res.data.kycVerified).toBeTrue();
         });
 
-        const req = httpMock.expectOne('http://localhost:8080/api/wallets/balance');
+        const req = httpMock.expectOne('/api/wallets/balance');
         expect(req.request.method).toBe('GET');
         req.flush(mockResponse);
     });
@@ -52,7 +52,7 @@ describe('WalletService', () => {
             expect(res.message).toBe('OTP Sent');
         });
 
-        const req = httpMock.expectOne('http://localhost:8080/api/wallets/kyc/send-sms');
+        const req = httpMock.expectOne('/api/wallets/kyc/send-sms');
         expect(req.request.method).toBe('POST');
         expect(req.request.body.mobileNumber).toBe('1234567890');
         req.flush(mockResponse);
@@ -66,7 +66,7 @@ describe('WalletService', () => {
             expect(res.data.kycVerified).toBeTrue();
         });
 
-        const req = httpMock.expectOne('http://localhost:8080/api/wallets/kyc/verify');
+        const req = httpMock.expectOne('/api/wallets/kyc/verify');
         expect(req.request.method).toBe('POST');
         expect(req.request.body.otp).toBe('123456');
         req.flush(mockResponse);
@@ -83,7 +83,7 @@ describe('WalletService', () => {
             expect(res.data[0].amount).toBe(50);
         });
 
-        const req = httpMock.expectOne('http://localhost:8080/api/wallets/transactions');
+        const req = httpMock.expectOne('/api/wallets/transactions');
         expect(req.request.method).toBe('GET');
         req.flush(mockResponse);
     });

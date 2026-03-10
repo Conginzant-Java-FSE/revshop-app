@@ -52,13 +52,13 @@
             <div class="stepper">
                 <ng-container
                     *ngFor="let step of ['Ordered','Processing','Shipped','Out for Delivery','Delivered']; let i = index">
-                    <div class="step-item" [class.step-done]="!isCancelled() && getStatusIndex(order().status) > i"
+                    <div class="step-item" [class.step-done]="!isCancelled() && getStatusIndex(order().status) >= i"
                         [class.step-active]="!isCancelled() && getStatusIndex(order().status) === i"
                         [class.step-cancelled]="isCancelled()">
                         <div class="step-circle">
-                            <span *ngIf="!isCancelled() && getStatusIndex(order().status) > i">✓</span>
+                            <span *ngIf="!isCancelled() && getStatusIndex(order().status) >= i">✓</span>
                             <span *ngIf="isCancelled()">✕</span>
-                            <span *ngIf="!isCancelled() && getStatusIndex(order().status) <= i">{{ i + 1 }}</span>
+                            <span *ngIf="!isCancelled() && getStatusIndex(order().status) < i">{{ i + 1 }}</span>
                         </div>
                         <p class="step-label">{{ step }}</p>
                     </div>

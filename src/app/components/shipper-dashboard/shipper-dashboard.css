@@ -9,7 +9,7 @@
     --sd-border: var(--border-color, rgba(255, 255, 255, 0.1));
     --sd-text-primary: var(--text-primary, #f8fafc);
     --sd-text-secondary: var(--text-secondary, #94a3b8);
-    --sd-text-muted: #64748b;
+    --sd-text-muted: var(--text-secondary, #94a3b8);
 }
 
 * {

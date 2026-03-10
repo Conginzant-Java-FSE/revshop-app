@@ -5,7 +5,7 @@
 }
 
 .address-card:hover {
-    background-color: var(--bs-light);
+    background-color: var(--surface);
 }
 
 .payment-method-card:hover {
@@ -15,9 +15,10 @@
 
 .coupon-badge {
     cursor: pointer;
-    background-color: #f8f9fa;
+    background-color: var(--surface);
+    color: var(--text-primary);
     transition: all 0.2s ease;
-    border-style: dashed !important;
+    border: 1px dashed var(--border-color) !important;
 }
 
 .coupon-badge:hover {

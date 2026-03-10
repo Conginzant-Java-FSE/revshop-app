@@ -9,6 +9,7 @@ import { LocationService } from './services/location.service';
 import { AuthService } from './services/auth';
 
 import { LocationPopupComponent } from './components/shared/location-popup/location-popup';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,7 @@ export class App {
 
   constructor(
     public locationService: LocationService,
-    public authService: AuthService
+    public authService: AuthService,
+    private themeService: ThemeService
   ) { }
 }

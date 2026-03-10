@@ -1,6 +1,6 @@
 .register-page {
-    background-color: #f8f9fa;
-    background-image: radial-gradient(#e9ecef 1px, transparent 1px);
+    background-color: var(--bg-color);
+    background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
     background-size: 20px 20px;
 }
 

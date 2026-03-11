@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { UserService, UserDTO, PasswordUpdateRequest } from '../../services/user';
 import { AddressService, AddressDTO } from '../../services/address';
 import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
 import { ThemeService, Theme } from '../../services/theme.service';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
@@ -81,6 +82,27 @@ import { ToastService } from '../../services/toast';
                       <p class="text-muted small mb-0">Update your password to keep your account safe</p>
                     </div>
                     <button class="btn btn-outline-primary rounded-pill px-4" (click)="openPasswordModal()">Change Password</button>
+                  </div>
+                  
+                  <!-- Account Deactivation/Deletion -->
+                  <div class="mt-4 border-top pt-4">
+                    <h5 class="fw-bold mb-3 text-danger">Danger Zone</h5>
+                    <div class="d-flex flex-column gap-3">
+                      <div class="d-flex justify-content-between align-items-center border p-3 rounded-3 bg-danger-subtle bg-opacity-10 border-danger border-opacity-25">
+                        <div>
+                          <h6 class="fw-bold mb-1 text-danger">Deactivate Account</h6>
+                          <p class="text-muted small mb-0">Temporarily disable your account</p>
+                        </div>
+                        <button class="btn btn-outline-warning rounded-pill px-4" (click)="deactivateAccount()">Deactivate</button>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center border p-3 rounded-3 bg-danger-subtle bg-opacity-25 border-danger border-opacity-50">
+                        <div>
+                          <h6 class="fw-bold mb-1 text-danger">Delete Account</h6>
+                          <p class="text-muted small mb-0">Permanently delete your account and data</p>
+                        </div>
+                        <button class="btn btn-danger rounded-pill px-4" (click)="deleteAccount()">Delete Account</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -335,7 +357,9 @@ export class ProfileComponent implements OnInit {
     private userService: UserService,
     private addressService: AddressService,
     private toastService: ToastService,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -519,4 +543,41 @@ export class ProfileComponent implements OnInit {
       error: (err: any) => this.toastService.error(err?.error?.message ?? 'Failed to delete address')
     });
   }
+
+  deactivateAccount(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    if (confirm('Are you sure you want to deactivate your account? You will be logged out.')) {
+      this.userService.deactivateAccount(Number(userId)).subscribe({
+        next: () => {
+          this.toastService.success('Account deactivated successfully');
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        },
+        error: (err: any) => {
+          this.toastService.error(err.error?.message || 'Failed to deactivate account');
+        }
+      });
+    }
+  }
+
+  deleteAccount(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    if (confirm('WARNING: Are you sure you want to PERMANENTLY delete your account? This action cannot be undone.')) {
+      this.userService.deleteAccount(Number(userId)).subscribe({
+        next: () => {
+          this.toastService.success('Account deleted successfully');
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        },
+        error: (err: any) => {
+          this.toastService.error(err.error?.message || 'Failed to delete account');
+        }
+      });
+    }
+  }
 }
+

@@ -57,9 +57,7 @@ export class LoginComponent implements OnInit {
           this.locationService.clearLocation();
           this.router.navigate(['/']);
         },
-        error: (err) => {
-          this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';
-        }
+        error: (err) => this.handleLoginError(err, credentials, role)
       });
     } else {
       this.authService.loginBuyer(credentials).subscribe({
@@ -69,10 +67,29 @@ export class LoginComponent implements OnInit {
           this.locationService.clearLocation();
           this.router.navigate(['/dashboard']);
         },
-        error: (err) => {
-          this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';
-        }
+        error: (err) => this.handleLoginError(err, credentials, role)
       });
+    }
+  }
+
+  handleLoginError(err: any, credentials: any, role: string) {
+    const msg = err.error?.message || err.error || '';
+    if (typeof msg === 'string' && msg.toLowerCase().includes('inactive')) {
+      if (confirm("Your account is deactivated. Would you like to reactivate and log in?")) {
+        this.authService.reactivate(credentials).subscribe({
+          next: (res) => {
+            const data = res.data || res;
+            this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
+            this.locationService.clearLocation();
+            this.router.navigate(role === 'SELLER' ? ['/'] : ['/dashboard']);
+          },
+          error: (rErr) => {
+            this.errorMessage = rErr.error?.message || rErr.error || 'Reactivation failed.';
+          }
+        });
+      }
+    } else {
+      this.errorMessage = msg || 'Login failed Check your credentials.';
     }
   }
 }

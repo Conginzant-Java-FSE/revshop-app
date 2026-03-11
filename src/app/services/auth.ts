@@ -46,6 +46,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login/seller`, credentials);
   }
 
+  reactivate(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reactivate`, credentials);
+  }
+
   // ==== Authentication Helper Methods ====
 
   /**

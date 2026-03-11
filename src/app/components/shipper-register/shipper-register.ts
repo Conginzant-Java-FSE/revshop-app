@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService } from '../../services/shipper.service';
 import { ApiResponse } from '../../models/api-response.model';
+import { ToastService } from '../../services/toast';
 
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -34,7 +35,8 @@ export class ShipperRegisterComponent {
     constructor(
         private fb: FormBuilder,
         private shipperService: ShipperService,
-        private router: Router
+        private router: Router,
+        private toastService: ToastService
     ) {
         this.form = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(3)]],
@@ -68,10 +70,12 @@ export class ShipperRegisterComponent {
                 localStorage.setItem('shipperToken', data.token || '');
                 localStorage.setItem('role', 'SHIPPER');
                 this.loading = false;
+                this.toastService.success('Shipper registered successfully! Logging you in...');
                 this.router.navigate(['/shipper-dashboard']);
             },
             error: (err) => {
                 this.errorMessage = err.error?.message || 'Registration failed. Please try again.';
+                this.toastService.error(this.errorMessage);
                 this.loading = false;
             }
         });

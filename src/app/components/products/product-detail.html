@@ -11,12 +11,13 @@
         <div class="row g-5">
             <!-- Product Images -->
             <div class="col-lg-6">
-                <!-- Main Image -->
-                <div
-                    class="card border-0 shadow-sm rounded-4 p-5 text-center bg-body position-relative overflow-hidden">
+                <!-- Main Image with Zoom -->
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-body position-relative overflow-hidden zoom-container"
+                    (mousemove)="onMouseMove($event)" (mouseenter)="toggleZoom(true)" (mouseleave)="toggleZoom(false)">
                     <img [src]="allImages().length > 0 ? allImages()[currentImageIndex()] : 'https://placehold.co/600x400?text=No+Image'"
-                        class="img-fluid" [alt]="product()?.name"
-                        style="max-height: 500px; object-fit: contain; width: 100%; transition: opacity 0.3s ease;">
+                        class="img-fluid main-product-image" [alt]="product()?.name"
+                        [style.transform-origin]="zoomPosition().x + '% ' + zoomPosition().y + '%'"
+                        [class.zoomed]="isZoomed()">
 
                     <!-- Carousel Controls -->
                     <button *ngIf="allImages().length > 1"
@@ -130,6 +131,127 @@
                                     <div class="text-muted">Hassle free returns</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- More Details Section -->
+                    <div class="mt-4">
+                        <ul class="nav nav-tabs border-bottom-0 gap-2 mb-3" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link rounded-pill px-4 fw-bold" [class.active]="activeTab() === 'description'"
+                                    (click)="setActiveTab('description')" type="button">Description</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link rounded-pill px-4 fw-bold" [class.active]="activeTab() === 'specifications'"
+                                    (click)="setActiveTab('specifications')" type="button">Specifications</button>
+                            </li>
+                            <li class="nav-item" role="presentation" *ngIf="productVideos().length > 0">
+                                <button class="nav-link rounded-pill px-4 fw-bold" [class.active]="activeTab() === 'video'"
+                                    (click)="setActiveTab('video')" type="button">Demo Video</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-3 border rounded-4 bg-body-tertiary">
+                            <div class="tab-pane fade show active" *ngIf="activeTab() === 'description'">
+                                <p class="mb-0 text-body-secondary lh-lg">{{ product()?.description }}</p>
+                            </div>
+                            <div class="tab-pane fade show active" *ngIf="activeTab() === 'specifications'">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tbody>
+                                            <tr *ngFor="let attr of getAttributesList(product()?.attributes)">
+                                                <th class="text-body-secondary fw-bold py-2" style="width: 40%">{{ attr.key }}</th>
+                                                <td class="text-body py-2">{{ attr.value }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-body-secondary fw-bold py-2">Category</th>
+                                                <td class="text-body py-2">{{ product()?.categoryName }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-body-secondary fw-bold py-2">Brand</th>
+                                                <td class="text-body py-2">{{ product()?.sellerName }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade show active" *ngIf="activeTab() === 'video'">
+                                <div *ngFor="let video of productVideos()" class="ratio ratio-16x9 rounded-4 overflow-hidden mb-3">
+                                    <iframe [src]="getSafeUrl(video.videoUrl)" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Comparison -->
+        <div class="mt-5 pt-5 border-top" *ngIf="comparisonProducts().length > 1">
+            <h3 class="fw-bold mb-4">Compare with similar items</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle comparison-table" style="min-width: 800px;">
+                    <thead class="bg-body-tertiary">
+                        <tr>
+                            <th style="width: 20%;" class="text-start">Feature</th>
+                            <th *ngFor="let p of comparisonProducts()" style="width: 25%;">
+                                <img [src]="p.imageUrl" class="img-fluid mb-2 rounded-3" style="height: 100px; object-fit: contain;">
+                                <div class="fw-bold small text-truncate">{{ p.name }}</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="text-start bg-body-tertiary">Price</th>
+                            <td *ngFor="let p of comparisonProducts()">
+                                <span class="fw-bold text-primary">₹{{ p.sellingPrice }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-start bg-body-tertiary">Brand</th>
+                            <td *ngFor="let p of comparisonProducts()">{{ p.sellerName }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-start bg-body-tertiary">Category</th>
+                            <td *ngFor="let p of comparisonProducts()">{{ p.categoryName }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-start bg-body-tertiary">Availability</th>
+                            <td *ngFor="let p of comparisonProducts()">
+                                <span class="badge" [ngClass]="p.stockQuantity > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'">
+                                    {{ p.stockQuantity > 0 ? 'In Stock' : 'Out of Stock' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- Dynamic Attributes Comparison -->
+                        <tr *ngFor="let attr of getAttributesList(product()?.attributes)">
+                            <th class="text-start bg-body-tertiary">{{ attr.key }}</th>
+                            <td *ngFor="let p of comparisonProducts()">
+                                {{ p.attributes ? p.attributes[attr.key] : '-' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-start bg-body-tertiary">Action</th>
+                            <td *ngFor="let p of comparisonProducts()">
+                                <a [routerLink]="['/product', p.productId]" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Similar Products -->
+        <div class="mt-5 pt-5 border-top" *ngIf="similarProducts().length > 0">
+            <h3 class="fw-bold mb-4">Customers also viewed</h3>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+                <div class="col" *ngFor="let p of similarProducts()">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 product-card hover-lift cursor-pointer" [routerLink]="['/product', p.productId]">
+                        <div class="p-3 text-center bg-body-tertiary rounded-top-4">
+                            <img [src]="p.imageUrl" class="img-fluid" [alt]="p.name" style="height: 150px; object-fit: contain;">
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate mb-1 fw-bold">{{ p.name }}</h6>
+                            <div class="text-primary fw-bold">₹{{ p.sellingPrice }}</div>
                         </div>
                     </div>
                 </div>

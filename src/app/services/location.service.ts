@@ -18,6 +18,7 @@ const STORAGE_KEY = 'deliveryLocation';
 })
 export class LocationService {
   selectedLocation = signal<LocationData | null>(null);
+  isPopupDismissed = signal<boolean>(false);
 
   constructor(private http: HttpClient) {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -32,7 +33,12 @@ export class LocationService {
 
   setLocation(data: LocationData): void {
     this.selectedLocation.set(data);
+    this.isPopupDismissed.set(false);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  dismissPopup(): void {
+    this.isPopupDismissed.set(true);
   }
 
   clearLocation(): void {

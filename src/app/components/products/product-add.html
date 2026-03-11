@@ -176,6 +176,47 @@
                             <div class="invalid-feedback">Please select a category.</div>
                         </div>
 
+                        <!-- Product Demo Video -->
+                        <div class="col-12 mt-4">
+                            <div class="p-4 bg-light rounded-4 border">
+                                <h5 class="fw-bold mb-3 border-bottom pb-2">
+                                    <i class="fa-solid fa-video me-2 text-primary"></i>
+                                    Product Demo Video
+                                </h5>
+                                <p class="text-muted small mb-3">Add a video to help buyers understand your product better.</p>
+                                
+                                <div class="mb-3">
+                                    <div class="btn-group btn-group-sm mb-3 d-block">
+                                        <button type="button" class="btn btn-outline-primary"
+                                            [class.active]="productForm.get('videoType')?.value === 'YOUTUBE'" 
+                                            (click)="productForm.get('videoType')?.setValue('YOUTUBE')">
+                                            <i class="fa-brands fa-youtube me-1"></i> YouTube Link
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary"
+                                            [class.active]="productForm.get('videoType')?.value === 'UPLOADED'" 
+                                            (click)="productForm.get('videoType')?.setValue('UPLOADED')">
+                                            <i class="fa-solid fa-upload me-1"></i> Upload Video
+                                        </button>
+                                    </div>
+
+                                    <div *ngIf="productForm.get('videoType')?.value === 'YOUTUBE'">
+                                        <input type="text" formControlName="videoUrl" class="form-control rounded-3"
+                                            placeholder="https://www.youtube.com/watch?v=...">
+                                        <small class="text-muted">Paste the YouTube video link</small>
+                                    </div>
+
+                                    <div *ngIf="productForm.get('videoType')?.value === 'UPLOADED'">
+                                        <input type="file" class="form-control rounded-3"
+                                            accept="video/mp4, video/webm, video/ogg" (change)="onVideoFileSelected($event)">
+                                        <small class="text-muted">Select a video file (MP4, WEBM, OGG)</small>
+                                        <div class="mt-2" *ngIf="productForm.get('videoUrl')?.value && productForm.get('videoType')?.value === 'UPLOADED'">
+                                            <p class="small text-success"><i class="fa-solid fa-check-circle me-1"></i> Video uploaded</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Dynamic Attributes (Filters) -->
                         <div class="col-12 mt-4" *ngIf="dynamicAttributes().length > 0" formGroupName="attributes">
                             <div class="p-4 bg-light rounded-4 border">

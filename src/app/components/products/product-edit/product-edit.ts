@@ -50,7 +50,9 @@ export class ProductEditComponent implements OnInit {
             additionalImages: this.fb.array([]),
             categoryId: ['', [Validators.required]],
             sellerId: [null],
-            isActive: [true]
+            isActive: [true],
+            videoType: ['YOUTUBE'],
+            videoUrl: ['']
         });
     }
 
@@ -69,24 +71,47 @@ export class ProductEditComponent implements OnInit {
     onFileSelected(event: Event, isMain: boolean, index?: number): void {
         const file = (event.target as HTMLInputElement).files?.[0];
         if (file) {
+            this.uploadFile(file, isMain, index);
+        }
+    }
+
+    onVideoFileSelected(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (file) {
             this.loading.set(true);
             this.productService.uploadImage(file).subscribe({
                 next: (res: any) => {
                     const url = res.url || res.data?.url;
-                    if (isMain) {
-                        this.productForm.get('imageUrl')?.setValue(url);
-                    } else if (index !== undefined) {
-                        this.additionalImages.at(index).setValue(url);
-                    }
-                    this.toastService.success('Image uploaded successfully');
+                    this.productForm.get('videoUrl')?.setValue(url);
+                    this.toastService.success('Video uploaded successfully');
                     this.loading.set(false);
                 },
                 error: (err) => {
-                    this.toastService.error('Failed to upload image');
+                    this.toastService.error('Failed to upload video');
                     this.loading.set(false);
                 }
             });
         }
+    }
+
+    private uploadFile(file: File, isMain: boolean, index?: number): void {
+        this.loading.set(true);
+        this.productService.uploadImage(file).subscribe({
+            next: (res: any) => {
+                const url = res.url || res.data?.url;
+                if (isMain) {
+                    this.productForm.get('imageUrl')?.setValue(url);
+                } else if (index !== undefined) {
+                    this.additionalImages.at(index).setValue(url);
+                }
+                this.toastService.success('Image uploaded successfully');
+                this.loading.set(false);
+            },
+            error: (err) => {
+                this.toastService.error('Failed to upload image');
+                this.loading.set(false);
+            }
+        });
     }
 
     loadProduct(): void {
@@ -109,6 +134,17 @@ export class ProductEditComponent implements OnInit {
                 if (p.additionalImages && p.additionalImages.length > 0) {
                     p.additionalImages.forEach((img: string) => this.addAdditionalImage(img));
                 }
+                this.productService.getProductVideos(this.productId).subscribe({
+                    next: (vRes) => {
+                        if (vRes.data && vRes.data.length > 0) {
+                            const video = vRes.data[0];
+                            this.productForm.patchValue({
+                                videoType: video.videoType,
+                                videoUrl: video.videoUrl
+                            });
+                        }
+                    }
+                });
                 this.fetching.set(false);
             },
             error: () => {
@@ -133,10 +169,30 @@ export class ProductEditComponent implements OnInit {
         }
 
         this.loading.set(true);
-        this.productService.updateProduct(this.productId, this.productForm.value).subscribe({
+        const formValue = { ...this.productForm.value };
+        const videoUrl = formValue.videoUrl;
+        const videoType = formValue.videoType;
+
+        delete formValue.videoUrl;
+        delete formValue.videoType;
+
+        this.productService.updateProduct(this.productId, formValue).subscribe({
             next: () => {
-                this.toastService.success('Product updated successfully!');
-                this.router.navigate(['/seller-dashboard']);
+                if (videoUrl) {
+                    this.productService.addProductVideo(this.productId, videoUrl, videoType).subscribe({
+                        next: () => {
+                            this.toastService.success('Product updated successfully!');
+                            this.router.navigate(['/seller-dashboard']);
+                        },
+                        error: () => {
+                            this.toastService.warning('Product updated, but video failed to save');
+                            this.router.navigate(['/seller-dashboard']);
+                        }
+                    });
+                } else {
+                    this.toastService.success('Product updated successfully!');
+                    this.router.navigate(['/seller-dashboard']);
+                }
             },
             error: (err) => {
                 this.loading.set(false);

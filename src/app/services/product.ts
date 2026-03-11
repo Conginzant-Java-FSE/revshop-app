@@ -21,6 +21,13 @@ export interface ProductDTO {
     attributes?: Record<string, string>;
 }
 
+export interface ProductVideo {
+    videoId?: number;
+    productId: number;
+    videoUrl: string;
+    videoType: 'YOUTUBE' | 'UPLOADED';
+}
+
 import { ApiResponse } from '../models/api-response.model';
 
 export interface Page<T> {
@@ -117,5 +124,25 @@ export class ProductService {
 
     toggleActive(productId: number): Observable<ApiResponse<ProductDTO>> {
         return this.http.patch<ApiResponse<ProductDTO>>(`${this.apiUrl}/${productId}/toggle-active`, {});
+    }
+
+    getSimilarProducts(productId: number): Observable<ApiResponse<ProductDTO[]>> {
+        return this.http.get<ApiResponse<ProductDTO[]>>(`${this.apiUrl}/${productId}/similar`);
+    }
+
+    compareProducts(ids: number[]): Observable<ApiResponse<ProductDTO[]>> {
+        let params = new HttpParams();
+        ids.forEach(id => {
+            params = params.append('ids', id.toString());
+        });
+        return this.http.get<ApiResponse<ProductDTO[]>>(`${this.apiUrl}/compare`, { params });
+    }
+
+    getProductVideos(productId: number): Observable<ApiResponse<ProductVideo[]>> {
+        return this.http.get<ApiResponse<ProductVideo[]>>(`${this.apiUrl}/${productId}/videos`);
+    }
+
+    addProductVideo(productId: number, videoUrl: string, videoType: string): Observable<ApiResponse<ProductVideo>> {
+        return this.http.post<ApiResponse<ProductVideo>>(`${this.apiUrl}/${productId}/videos`, { videoUrl, videoType });
     }
 }

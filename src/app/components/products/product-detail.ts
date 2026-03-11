@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
-import { ProductService, ProductDTO } from '../../services/product';
+import { ProductService, ProductDTO, ProductVideo } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { ReviewService } from '../../services/review';
 import { FavoriteService } from '../../services/favorite';
@@ -9,6 +9,7 @@ import { Review } from '../../models/review.model';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
 import { Location } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -33,6 +34,14 @@ export class ProductDetailComponent implements OnInit {
     canReview = signal<boolean>(false);
     stars = [1, 2, 3, 4, 5];
 
+    // New features signals
+    similarProducts = signal<ProductDTO[]>([]);
+    productVideos = signal<ProductVideo[]>([]);
+    comparisonProducts = signal<ProductDTO[]>([]);
+    isZoomed = signal<boolean>(false);
+    zoomPosition = signal<{ x: number, y: number }>({ x: 0, y: 0 });
+    activeTab = signal<string>('description');
+
     newReview = {
         rating: 5,
         reviewText: ''
@@ -46,7 +55,8 @@ export class ProductDetailComponent implements OnInit {
         private favoriteService: FavoriteService,
         private toastService: ToastService,
         private location: Location,
-        private router: Router
+        private router: Router,
+        private sanitizer: DomSanitizer
     ) { }
 
     goBack(): void {
@@ -54,18 +64,27 @@ export class ProductDetailComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const id = this.route.snapshot.paramMap.get('id');
-        if (id) {
-            const productId = Number(id);
-            const userId = localStorage.getItem('userId');
-            this.loadProduct(productId);
-            this.loadReviews(productId);
-            this.loadAverageRating(productId);
-            if (userId) {
-                this.checkIfFavorite(productId);
-                this.checkReviewEligibility(productId, Number(userId));
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id');
+            if (id) {
+                const productId = Number(id);
+                const userId = localStorage.getItem('userId');
+                
+                // Reset loading state and scroll to top
+                this.loading.set(true);
+                window.scrollTo(0, 0);
+
+                this.loadProduct(productId);
+                this.loadReviews(productId);
+                this.loadAverageRating(productId);
+                if (userId) {
+                    this.checkIfFavorite(productId);
+                    this.checkReviewEligibility(productId, Number(userId));
+                }
+                this.loadSimilarProducts(productId);
+                this.loadVideos(productId);
             }
-        }
+        });
     }
 
     loadProduct(id: number): void {
@@ -258,5 +277,65 @@ export class ProductDetailComponent implements OnInit {
 
     setCurrentImage(index: number): void {
         this.currentImageIndex.set(index);
+    }
+
+    loadSimilarProducts(productId: number): void {
+        this.productService.getSimilarProducts(productId).subscribe({
+            next: (res) => {
+                this.similarProducts.set(res.data);
+                if (res.data.length > 0) {
+                    // Automatically load comparison data for top 2 similar products
+                    const compareIds = [productId, ...res.data.slice(0, 2).map(p => p.productId!)];
+                    this.loadComparison(compareIds);
+                }
+            }
+        });
+    }
+
+    loadVideos(productId: number): void {
+        this.productService.getProductVideos(productId).subscribe({
+            next: (res) => this.productVideos.set(res.data)
+        });
+    }
+
+    loadComparison(ids: number[]): void {
+        this.productService.compareProducts(ids).subscribe({
+            next: (res) => this.comparisonProducts.set(res.data)
+        });
+    }
+
+    getSafeUrl(url: string): SafeResourceUrl {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const videoId = this.extractYoutubeId(url);
+            return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
+        }
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+
+    private extractYoutubeId(url: string): string {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : '';
+    }
+
+    onMouseMove(event: MouseEvent): void {
+        const target = event.target as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = ((event.clientY - rect.top) / rect.height) * 100;
+        this.zoomPosition.set({ x, y });
+    }
+
+    toggleZoom(state: boolean): void {
+        this.isZoomed.set(state);
+    }
+
+    setActiveTab(tab: string): void {
+        this.activeTab.set(tab);
+    }
+
+    getAttributesList(attributes: any): { key: string, value: string }[] {
+        if (!attributes) return [];
+        return Object.keys(attributes).map(key => ({ key, value: attributes[key] }));
     }
 }

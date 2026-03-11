@@ -14,7 +14,7 @@
                         [routerLinkActiveOptions]="{exact: true}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/about" routerLinkActive="active">About Us</a></li>
             </ul>
             <!-- Deliver-to chip -->
             <div *ngIf="isAnyUserLoggedIn" class="deliver-to-chip" (click)="openLocationPopup()"
@@ -144,7 +144,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item" *ngIf="!isShipper">
+                <li class="nav-item" *ngIf="!isShipper && authService.userRole() !== 'SELLER'">
                     <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative text-warning"
                         routerLink="/cart">
                         <i class="fa-solid fa-cart-shopping fs-5 mb-0 mb-lg-1"></i>

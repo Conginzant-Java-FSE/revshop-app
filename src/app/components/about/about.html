@@ -1,0 +1,111 @@
+<div class="about-page">
+    <!-- Hero Section -->
+    <section class="hero-section text-center py-5 d-flex align-items-center justify-content-center text-white">
+        <div class="container hero-content animate-fade-in">
+            <h1 class="display-3 fw-bold mb-3 text-white">Redefining <span class="text-warning">Shopping</span></h1>
+            <p class="lead mb-4 opacity-75 text-white">RevShop is more than just a marketplace. It's a premium experience designed for those who value quality, variety, and efficiency.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a routerLink="/products" class="btn btn-warning btn-lg px-4 rounded-pill fw-bold">Explore Products</a>
+                <a [routerLink]="['/about']" fragment="story" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-bold">Our Story</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section py-5">
+        <div class="container">
+            <div class="row g-4 text-center">
+                <div class="col-md-3">
+                    <div class="stat-card p-4 rounded-4">
+                        <i class="fa-solid fa-users fs-2 text-warning mb-3"></i>
+                        <h2 class="fw-bold">50K+</h2>
+                        <p class="text-muted mb-0">Active Users</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card p-4 rounded-4">
+                        <i class="fa-solid fa-bag-shopping fs-2 text-warning mb-3"></i>
+                        <h2 class="fw-bold">100K+</h2>
+                        <p class="text-muted mb-0">Products Sold</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card p-4 rounded-4">
+                        <i class="fa-solid fa-star fs-2 text-warning mb-3"></i>
+                        <h2 class="fw-bold">4.8</h2>
+                        <p class="text-muted mb-0">Average Rating</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card p-4 rounded-4">
+                        <i class="fa-solid fa-earth-americas fs-2 text-warning mb-3"></i>
+                        <h2 class="fw-bold">10+</h2>
+                        <p class="text-muted mb-0">Countries Served</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Section -->
+    <section id="story" class="content-section py-5">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 mb-4 mb-lg-0 animate-slide-left">
+                    <div class="image-wrapper rounded-5 overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=1000" alt="RevShop Team" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-6 ps-lg-5 animate-slide-right">
+                    <h2 class="display-5 fw-bold mb-4">Our <span class="text-warning">Vision</span></h2>
+                    <p class="mb-4 lead opacity-75">At RevShop, we believe that high-end shopping should be accessible, secure, and intuitive. Our platform bridges the gap between premium sellers and discerning buyers across the globe.</p>
+                    <p class="opacity-75">We founded RevShop with a simple goal: to create a marketplace where every transaction is backed by trust and every product meets the highest standards of quality. Our team of dedicated professionals works tirelessly to ensure that your shopping journey is seamless from discovery to delivery.</p>
+                </div>
+            </div>
+
+            <div class="row align-items-center flex-row-reverse">
+                <div class="col-lg-6 mb-4 mb-lg-0 animate-slide-right">
+                    <div class="image-wrapper rounded-5 overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1000" alt="Innovation" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-6 pe-lg-5 animate-slide-left">
+                    <h2 class="display-5 fw-bold mb-4">Innovation at <span class="text-warning">Core</span></h2>
+                    <p class="mb-4 lead opacity-75">Technology is the engine that drives us forward. From real-time inventory tracking to AI-driven personalized recommendations, we leverage the latest innovations to serve you better.</p>
+                    <div class="features-list mt-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon-sm bg-warning-subtle rounded-circle p-2 me-3">
+                                <i class="fa-solid fa-shield-halved text-warning"></i>
+                            </div>
+                            <span class="fw-semibold">Secure Payment Gateway</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon-sm bg-warning-subtle rounded-circle p-2 me-3">
+                                <i class="fa-solid fa-bolt text-warning"></i>
+                            </div>
+                            <span class="fw-semibold">Ultra-Fast Shipping</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="feature-icon-sm bg-warning-subtle rounded-circle p-2 me-3">
+                                <i class="fa-solid fa-headset text-warning"></i>
+                            </div>
+                            <span class="fw-semibold">24/7 Dedicated Support</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section py-5 text-center">
+        <div class="container py-4 rounded-5 bg-gradient-warning-red shadow-lg animate-pulse-slow">
+            <h2 class="display-6 fw-bold text-white mb-3">Ready to Join the Revolution?</h2>
+            <p class="text-white-50 mb-4">Sign up today and experience the future of digital commerce.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a routerLink="/register" class="btn btn-light btn-lg px-4 rounded-pill fw-bold text-warning">Create Account</a>
+                <a routerLink="/login" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-bold">Sign In</a>
+            </div>
+        </div>
+    </section>
+</div>

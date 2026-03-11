@@ -136,12 +136,12 @@ describe('ShipperDashboardComponent', () => {
     });
 
     it('should return correct status icon', () => {
-        expect(component.getStatusIcon('PROCESSING')).toBe('📦');
-        expect(component.getStatusIcon('SHIPPED')).toBe('🚚');
-        expect(component.getStatusIcon('OUT_FOR_DELIVERY')).toBe('🛵');
-        expect(component.getStatusIcon('DELIVERED')).toBe('✅');
-        expect(component.getStatusIcon('CANCELLED')).toBe('❌');
-        expect(component.getStatusIcon('UNKNOWN')).toBe('⏳');
+        expect(component.getStatusIcon('PROCESSING')).toBe('fa-solid fa-box');
+        expect(component.getStatusIcon('SHIPPED')).toBe('fa-solid fa-truck');
+        expect(component.getStatusIcon('OUT_FOR_DELIVERY')).toBe('fa-solid fa-motorcycle');
+        expect(component.getStatusIcon('DELIVERED')).toBe('fa-solid fa-circle-check');
+        expect(component.getStatusIcon('CANCELLED')).toBe('fa-solid fa-circle-xmark');
+        expect(component.getStatusIcon('UNKNOWN')).toBe('fa-solid fa-clock');
     });
 
     it('should return correct tracking step', () => {

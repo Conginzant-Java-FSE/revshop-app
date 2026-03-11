@@ -119,12 +119,12 @@ export class ShipperDashboardComponent implements OnInit {
 
     getStatusIcon(status: string): string {
         switch (status) {
-            case 'PROCESSING': return '📦';
-            case 'SHIPPED': return '🚚';
-            case 'OUT_FOR_DELIVERY': return '🛵';
-            case 'DELIVERED': return '✅';
-            case 'CANCELLED': return '❌';
-            default: return '⏳';
+            case 'PROCESSING': return 'fa-solid fa-box';
+            case 'SHIPPED': return 'fa-solid fa-truck';
+            case 'OUT_FOR_DELIVERY': return 'fa-solid fa-motorcycle';
+            case 'DELIVERED': return 'fa-solid fa-circle-check';
+            case 'CANCELLED': return 'fa-solid fa-circle-xmark';
+            default: return 'fa-solid fa-clock';
         }
     }
 

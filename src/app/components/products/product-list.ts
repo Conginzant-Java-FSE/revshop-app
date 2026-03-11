@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService, ProductDTO } from '../../services/product';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { CartService } from '../../services/cart';
@@ -42,6 +43,7 @@ export class ProductListComponent implements OnInit {
 
     constructor(
         private productService: ProductService,
+        public authService: AuthService,
         private cartService: CartService,
         private categoryService: CategoryService,
         private toastService: ToastService,
@@ -59,8 +61,31 @@ export class ProductListComponent implements OnInit {
             if (params['search']) {
                 this.keyword.set(params['search']);
             }
-            this.currentPage.set(0);
-            this.fetchProducts();
+            
+            const categoryName = params['category'];
+            if (categoryName) {
+                // We need to wait for categories to be loaded if they aren't already
+                this.categoryService.getAllCategories().subscribe({
+                    next: (res) => {
+                        this.categories.set(res.data);
+                        const cat = res.data.find(c => c.name.toLowerCase() === categoryName.toLowerCase());
+                        if (cat) {
+                            this.categoryId.set(cat.categoryId);
+                            this.onCategoryChange();
+                        } else {
+                            this.currentPage.set(0);
+                            this.fetchProducts();
+                        }
+                    },
+                    error: () => {
+                        this.currentPage.set(0);
+                        this.fetchProducts();
+                    }
+                });
+            } else {
+                this.currentPage.set(0);
+                this.fetchProducts();
+            }
         });
     }
 

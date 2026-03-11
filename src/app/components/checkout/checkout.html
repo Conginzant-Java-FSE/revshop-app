@@ -33,7 +33,7 @@
                         <select class="form-select rounded-3" [(ngModel)]="selectedAddressId" name="addressSelect">
                             <option [ngValue]="null">-- Choose a saved address --</option>
                             <option *ngFor="let addr of addresses()" [ngValue]="addr.addressId">
-                                {{ addr.addressLine }}, {{ addr.city }}
+                                {{ addr.addressType ? '[' + addr.addressType + '] ' : '' }}{{ addr.addressLine }}, {{ addr.city }}
                             </option>
                         </select>
                     </div>
@@ -44,8 +44,11 @@
                             <div class="form-check mb-0 flex-grow-1">
                                 <input class="form-check-input mt-2" type="radio" [id]="'addr' + addr.addressId"
                                     [value]="addr.addressId" [(ngModel)]="selectedAddressId" name="addressRadio">
-                                <label class="form-check-label w-100 ms-2 cursor-pointer" [for]="'addr' + addr.addressId">
-                                    <span class="fw-bold d-block">{{ addr.addressLine }}</span>
+                                 <label class="form-check-label w-100 ms-2 cursor-pointer" [for]="'addr' + addr.addressId">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <span class="fw-bold">{{ addr.addressLine }}</span>
+                                        <span *ngIf="addr.addressType" class="badge bg-primary-subtle text-primary rounded-pill x-small">{{ addr.addressType }}</span>
+                                    </span>
                                     <span class="small text-muted">{{ addr.city }}{{ addr.state ? ', ' + addr.state : '' }}{{ addr.zipCode ? ' - ' + addr.zipCode : '' }}</span>
                                 </label>
                             </div>
@@ -228,6 +231,23 @@
                 </div>
                 <div class="modal-body p-4">
                     <form (ngSubmit)="onAddressSubmit()">
+                        <div class="d-grid mb-4">
+                            <button type="button" class="btn btn-outline-primary rounded-pill" (click)="detectLocation()"
+                                [disabled]="isDetectingLocation()">
+                                <i class="fa-solid fa-location-arrow me-2" [class.fa-spin]="isDetectingLocation()"></i>
+                                {{ isDetectingLocation() ? 'Detecting Location...' : 'Detect My Location' }}
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Address Label</label>
+                            <select class="form-select rounded-3" [(ngModel)]="addressForm.addressType" name="type">
+                                <option value="">Select Label</option>
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                                <option value="Hostel">Hostel</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold small">Address Line</label>
                             <input type="text" class="form-control rounded-3" [(ngModel)]="addressForm.addressLine"

@@ -6,6 +6,10 @@ export interface LocationData {
   city: string;
   state?: string;
   country?: string;
+  area?: string;
+  zipCode?: string;
+  addressLine?: string;
+  street?: string;
   lat?: number;
   lng?: number;
   source: 'gps' | 'manual';
@@ -41,6 +45,10 @@ export class LocationService {
     this.isPopupDismissed.set(true);
   }
 
+  showPopup(): void {
+    this.isPopupDismissed.set(false);
+  }
+
   clearLocation(): void {
     this.selectedLocation.set(null);
     localStorage.removeItem(STORAGE_KEY);
@@ -60,7 +68,7 @@ export class LocationService {
 
           // Reverse geocode using Nominatim (free, no API key)
           const nominatimUrl =
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en`;
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en&addressdetails=1`;
 
           this.http.get<any>(nominatimUrl).pipe(
             catchError(() => of(null))
@@ -68,13 +76,15 @@ export class LocationService {
             const addr = geoRes?.address;
 
             // Most specific locality (nagar / area / neighbourhood)
-            const area =
+            const houseNumber = addr?.house_number || '';
+            const road = addr?.road || '';
+            const neighbourhood =
               addr?.neighbourhood ||
               addr?.suburb ||
               addr?.village ||
               addr?.hamlet ||
               addr?.residential ||
-              null;
+              '';
 
             // City / Town / District
             const cityName =
@@ -84,19 +94,43 @@ export class LocationService {
               addr?.county ||
               null;
 
-            const pincode = addr?.postcode || null;
+            const zipCode = addr?.postcode || null;
             const state = addr?.state || undefined;
             const country = addr?.country || undefined;
 
-            // Compose: "Madhapur, Hyderabad - 500081"
-            const parts: string[] = [];
-            if (area) parts.push(area);
-            if (cityName) parts.push(cityName);
-            const city = parts.length
-              ? parts.join(', ') + (pincode ? ' - ' + pincode : '')
-              : (pincode || 'My Location');
+            // Compose detailed address line: "123, Ward 28"
+            const lineParts: string[] = [];
+            if (houseNumber) lineParts.push(houseNumber);
+            if (neighbourhood) lineParts.push(neighbourhood);
+            const addressLine = lineParts.join(', ');
 
-            const data: LocationData = { city, state, country, lat, lng, source: 'gps' };
+            // Street / Landmark: "Main Rd"
+            const street = road || '';
+
+            // Fallback for city
+            const city = cityName || neighbourhood || 'Unknown City';
+
+            const data: LocationData = { 
+              city: city, 
+              state, 
+              country, 
+              area: neighbourhood || undefined,
+              zipCode: zipCode || undefined,
+              addressLine,
+              street,
+              lat, 
+              lng, 
+              source: 'gps' 
+            };
+
+            // Update display city for the header preview
+            const cityDisplayParts: string[] = [];
+            if (city !== 'Unknown City') cityDisplayParts.push(city);
+            if (zipCode) cityDisplayParts.push(zipCode);
+            
+            // Note: We don't overwrite the full data.city because it's used in form fields
+            // but we can add a helper or just return the granular data
+            
             observer.next(data);
             observer.complete();
           });
@@ -112,7 +146,7 @@ export class LocationService {
           }
           observer.error(new Error(message));
         },
-        { timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     });
   }

@@ -95,7 +95,7 @@ describe('LocationService', () => {
             service.detectGPS().subscribe({
                 next: (data) => {
                     expect(data.source).toBe('gps');
-                    expect(data.city).toBe('Madhapur, Hyderabad - 500081');
+                    expect(data.city).toBe('Hyderabad');
                     expect(data.lat).toBe(17.385);
                     expect(data.lng).toBe(78.4867);
                     done();

@@ -5,6 +5,7 @@ import { AddressService, AddressDTO } from '../../services/address';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
 import { ThemeService, Theme } from '../../services/theme.service';
+import { LocationService, LocationData } from '../../services/location.service';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
@@ -132,6 +133,7 @@ import { ToastService } from '../../services/toast';
                 <div class="col-md-6" *ngFor="let addr of addresses()">
                   <div class="address-card p-3 border rounded-3 position-relative transition-all h-100">
                     <div class="d-flex justify-content-between mb-2">
+                      <span *ngIf="addr.addressType" class="badge bg-primary-subtle text-primary rounded-pill x-small me-2">{{ addr.addressType }}</span>
                       <span *ngIf="addr.isDefault" class="badge bg-success-subtle text-success rounded-pill x-small">Default</span>
                       <div class="d-flex gap-2 ms-auto">
                         <button class="btn btn-link text-primary p-0" (click)="editAddress(addr)" title="Edit">
@@ -272,6 +274,22 @@ import { ToastService } from '../../services/toast';
             <button type="button" class="btn-close" (click)="closeAddressModal()"></button>
           </div>
           <div class="modal-body p-4">
+            <div class="d-grid mb-4">
+              <button type="button" class="btn btn-outline-primary rounded-pill" (click)="detectLocation()" [disabled]="isDetectingLocation()">
+                <i class="fa-solid fa-location-arrow me-2" [class.fa-spin]="isDetectingLocation()"></i>
+                {{ isDetectingLocation() ? 'Detecting Location...' : 'Detect My Location' }}
+              </button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted">ADDRESS TYPE / LABEL</label>
+              <select class="form-select rounded-pill" [(ngModel)]="addressForm().addressType">
+                <option value="">Select Label</option>
+                <option value="Home">Home</option>
+                <option value="Work">Work</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
             <div class="mb-3">
               <label class="form-label small fw-bold text-muted">ADDRESS LINE</label>
               <input type="text" class="form-control rounded-pill" [(ngModel)]="addressForm().addressLine" placeholder="e.g. 123 Main St">
@@ -350,8 +368,9 @@ export class ProfileComponent implements OnInit {
   addressSubmitting = signal<boolean>(false);
   editingAddressId = signal<number | null>(null);
   addressForm = signal<AddressDTO>({
-    addressLine: '', city: '', state: '', zipCode: '', country: '', isDefault: false
+    addressLine: '', city: '', state: '', zipCode: '', country: '', isDefault: false, addressType: ''
   });
+  isDetectingLocation = signal<boolean>(false);
 
   constructor(
     private userService: UserService,
@@ -359,7 +378,8 @@ export class ProfileComponent implements OnInit {
     private toastService: ToastService,
     public themeService: ThemeService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private locationService: LocationService
   ) { }
 
   ngOnInit(): void {
@@ -471,7 +491,7 @@ export class ProfileComponent implements OnInit {
   openAddressModal(): void {
     this.editingAddressId.set(null);
     this.addressForm.set({
-      addressLine: '', city: '', state: '', zipCode: '', country: '', isDefault: false
+      addressLine: '', city: '', state: '', zipCode: '', country: '', isDefault: false, addressType: ''
     });
     this.showAddressModal.set(true);
   }
@@ -485,6 +505,29 @@ export class ProfileComponent implements OnInit {
   closeAddressModal(): void {
     this.showAddressModal.set(false);
     this.editingAddressId.set(null);
+  }
+
+  detectLocation(): void {
+    this.isDetectingLocation.set(true);
+    this.locationService.detectGPS().subscribe({
+            next: (data: LocationData) => {
+                this.addressForm.set({
+                    ...this.addressForm(),
+                    addressLine: data.addressLine || data.area || this.addressForm().addressLine,
+                    street: data.street || this.addressForm().street,
+                    city: data.city,
+                    state: data.state || this.addressForm().state,
+                    zipCode: data.zipCode || this.addressForm().zipCode,
+                    country: data.country || 'India'
+                });
+        this.isDetectingLocation.set(false);
+        this.toastService.success('Location detected!');
+      },
+      error: (err: any) => {
+        this.toastService.error(err.message || 'Failed to detect location');
+        this.isDetectingLocation.set(false);
+      }
+    });
   }
 
   saveAddress(): void {

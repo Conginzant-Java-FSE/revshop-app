@@ -30,7 +30,7 @@ describe('Navbar', () => {
         mockNotificationService.getNotifications.and.returnValue(of({ message: 'OK', data: [] }));
         mockNotificationService.markAsRead.and.returnValue(of({ message: 'OK', data: undefined }));
 
-        mockLocationService = jasmine.createSpyObj('LocationService', ['selectedLocation', 'clearLocation']);
+        mockLocationService = jasmine.createSpyObj('LocationService', ['selectedLocation', 'clearLocation', 'showPopup']);
         mockLocationService.selectedLocation.and.returnValue(null);
 
         spyOn(localStorage, 'getItem').and.returnValue(null);
@@ -103,8 +103,9 @@ describe('Navbar', () => {
         expect(component.isAnyUserLoggedIn).toBeFalse();
     });
 
-    it('should clear location when openLocationPopup is called', () => {
+    it('should show popup and clear location when openLocationPopup is called', () => {
         component.openLocationPopup();
+        expect(mockLocationService.showPopup).toHaveBeenCalled();
         expect(mockLocationService.clearLocation).toHaveBeenCalled();
     });
 

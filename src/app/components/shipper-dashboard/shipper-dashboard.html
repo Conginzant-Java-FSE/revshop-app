@@ -3,7 +3,7 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <span class="logo-icon">🚚</span>
+                <i class="fa-solid fa-truck-fast text-warning me-2 fs-4"></i>
                 <span>RevShop</span>
             </div>
         </div>
@@ -47,21 +47,21 @@
 
         <nav class="sidebar-nav">
             <button class="nav-item" [class.active]="activeTab() === 'all'" (click)="setTab('all')">
-                <span>📋</span> All Orders
+                <i class="fa-solid fa-list-check me-2"></i> All Orders
                 <span class="nav-badge">{{ allOrders().length }}</span>
             </button>
             <button class="nav-item" [class.active]="activeTab() === 'pending'" (click)="setTab('pending')">
-                <span>📦</span> In Transit
+                <i class="fa-solid fa-truck-moving me-2"></i> In Transit
                 <span class="nav-badge orange">{{ pendingOrders().length }}</span>
             </button>
             <button class="nav-item" [class.active]="activeTab() === 'delivered'" (click)="setTab('delivered')">
-                <span>✅</span> Delivered
+                <i class="fa-solid fa-circle-check me-2"></i> Delivered
                 <span class="nav-badge green">{{ deliveredOrders().length }}</span>
             </button>
         </nav>
 
         <button class="logout-btn" (click)="logout()">
-            <span>🚪</span> Logout
+            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
         </button>
     </aside>
 
@@ -71,11 +71,11 @@
         <header class="dashboard-header">
             <div class="header-left">
                 <h1>Delivery Dashboard</h1>
-                <p>Welcome back, {{ shipperName() }} 👋</p>
+                <p>Welcome back, {{ shipperName() }}</p>
             </div>
             <div class="header-right">
                 <button class="refresh-btn" (click)="loadOrders()">
-                    🔄 Refresh
+                    <i class="fa-solid fa-rotate me-1"></i> Refresh
                 </button>
             </div>
         </header>
@@ -83,21 +83,21 @@
         <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-card blue">
-                <div class="stat-icon">📋</div>
+                <div class="stat-icon"><i class="fa-solid fa-clipboard-list"></i></div>
                 <div class="stat-info">
                     <h2>{{ allOrders().length }}</h2>
                     <p>Total Assigned</p>
                 </div>
             </div>
             <div class="stat-card orange">
-                <div class="stat-icon">🚚</div>
+                <div class="stat-icon"><i class="fa-solid fa-truck"></i></div>
                 <div class="stat-info">
                     <h2>{{ pendingOrders().length }}</h2>
                     <p>In Transit</p>
                 </div>
             </div>
             <div class="stat-card green">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon"><i class="fa-solid fa-check-double"></i></div>
                 <div class="stat-info">
                     <h2>{{ deliveredOrders().length }}</h2>
                     <p>Delivered</p>
@@ -124,7 +124,7 @@
             </div>
             } @else if (filteredOrders().length === 0) {
             <div class="empty-state">
-                <div class="empty-icon">📭</div>
+                <div class="empty-icon"><i class="fa-solid fa-inbox mb-3 d-block" style="font-size: 3rem; opacity: 0.5;"></i></div>
                 <h3>No Orders Found</h3>
                 <p>You don't have any orders in this category yet.</p>
             </div>
@@ -135,7 +135,7 @@
                     <!-- Card Header -->
                     <div class="card-header">
                         <div class="order-id">
-                            <span class="order-icon">{{ getStatusIcon(order.status) }}</span>
+                            <span class="order-icon"><i [class]="getStatusIcon(order.status)"></i></span>
                             <div>
                                 <h3>#{{ order.orderNumber || order.orderId }}</h3>
                                 <p class="order-date">{{ formatDate(order.orderDate) }}</p>
@@ -186,8 +186,9 @@
                         <div class="customer-details">
                             <h4>{{ order.customerName }}</h4>
                             @if (order.customerPhone) {
-                            <a [href]="'tel:' + order.customerPhone" class="customer-phone">📞 {{ order.customerPhone
-                                }}</a>
+                            <a [href]="'tel:' + order.customerPhone" class="customer-phone">
+                                <i class="fa-solid fa-phone small me-1"></i> {{ order.customerPhone }}
+                            </a>
                             }
                         </div>
                         <div class="order-amount">{{ formatCurrency(order.totalAmount) }}</div>
@@ -195,7 +196,7 @@
 
                     <!-- Delivery Address -->
                     <div class="delivery-address">
-                        <div class="address-icon">📍</div>
+                        <div class="address-icon"><i class="fa-solid fa-location-dot me-2 text-primary"></i></div>
                         <div class="address-text">
                             <strong>Deliver to:</strong>
                             <p>

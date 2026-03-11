@@ -44,6 +44,7 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   openLocationPopup(): void {
+    this.locationService.showPopup();
     this.locationService.clearLocation();
   }
 

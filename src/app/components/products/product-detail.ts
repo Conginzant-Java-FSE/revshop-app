@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ProductService, ProductDTO, ProductVideo } from '../../services/product';
 import { CartService } from '../../services/cart';
+import { AuthService } from '../../services/auth';
 import { ReviewService } from '../../services/review';
 import { FavoriteService } from '../../services/favorite';
 import { Review } from '../../models/review.model';
@@ -50,6 +51,7 @@ export class ProductDetailComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private productService: ProductService,
+        public authService: AuthService,
         private cartService: CartService,
         private reviewService: ReviewService,
         private favoriteService: FavoriteService,

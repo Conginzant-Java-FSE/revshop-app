@@ -1,0 +1,105 @@
+.about-page {
+    background: var(--bg-color, #0f172a);
+    color: var(--text-primary, #f8fafc);
+    overflow-x: hidden;
+}
+
+.hero-section {
+    min-height: 60vh;
+    background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=2000');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.stat-card {
+    background: var(--surface, #1e293b);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--warning);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.image-wrapper {
+    position: relative;
+    transition: all 0.5s ease;
+}
+
+.image-wrapper:hover {
+    transform: scale(1.02);
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.bg-gradient-warning-red {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.feature-icon-sm {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 1.2s ease-out;
+}
+
+.animate-slide-left {
+    animation: slideLeft 1s ease-out;
+}
+
+.animate-slide-right {
+    animation: slideRight 1s ease-out;
+}
+
+.animate-pulse-slow {
+    animation: pulse 4s infinite ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.01); }
+}
+
+/* Glassmorphism for CTA container if desired */
+.cta-section .container {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 991px) {
+    .image-wrapper img {
+        height: 300px;
+    }
+    
+    .display-3 {
+        font-size: 2.5rem;
+    }
+}

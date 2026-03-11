@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../services/auth';
 import { AddressService, AddressDTO } from '../../services/address';
 import { CartService, CartDTO } from '../../services/cart';
 import { OrderService } from '../../services/order';
@@ -11,7 +12,7 @@ import { PaymentService } from '../../services/payment.service';
 import { NotificationService } from '../../services/notification.service';
 import { WalletService } from '../../services/wallet.service';
 import { ApiResponse } from '../../models/api-response.model';
-import { LocationService } from '../../services/location.service';
+import { LocationService, LocationData } from '../../services/location.service';
 
 
 @Component({
@@ -55,12 +56,14 @@ export class CheckoutComponent implements OnInit {
         state: '',
         zipCode: '',
         country: 'India',
-        isDefault: false
+        isDefault: false,
+        addressType: ''
     };
 
     isBuyNow: boolean = false;
     buyNowCartItemId: number | null = null;
     buyNowProductId: number | null = null;
+    isDetectingLocation = signal<boolean>(false);
 
     constructor(
         private addressService: AddressService,
@@ -72,6 +75,7 @@ export class CheckoutComponent implements OnInit {
         private notificationService: NotificationService,
         private walletService: WalletService,
         private locationService: LocationService,
+        private authService: AuthService,
         private router: Router,
         private route: ActivatedRoute
     ) { }
@@ -80,6 +84,12 @@ export class CheckoutComponent implements OnInit {
         const userId = Number(localStorage.getItem('userId'));
         if (!userId) {
             this.router.navigate(['/login']);
+            return;
+        }
+
+        if (this.authService.userRole() === 'SELLER') {
+            this.toastService.error('Sellers are not allowed to access checkout.');
+            this.router.navigate(['/']);
             return;
         }
 
@@ -442,6 +452,29 @@ export class CheckoutComponent implements OnInit {
                 }
             });
         }
+    }
+
+    detectLocation(): void {
+        this.isDetectingLocation.set(true);
+        this.locationService.detectGPS().subscribe({
+            next: (data: LocationData) => {
+                this.addressForm = {
+                    ...this.addressForm,
+                    addressLine: data.addressLine || data.area || this.addressForm.addressLine,
+                    street: data.street || this.addressForm.street,
+                    city: data.city,
+                    state: data.state || this.addressForm.state,
+                    zipCode: data.zipCode || this.addressForm.zipCode,
+                    country: data.country || 'India'
+                };
+                this.isDetectingLocation.set(false);
+                this.toastService.success('Location detected!');
+            },
+            error: (err: any) => {
+                this.toastService.error(err.message || 'Failed to detect location');
+                this.isDetectingLocation.set(false);
+            }
+        });
     }
 
     onSavedAddressSelect(event: Event): void {

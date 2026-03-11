@@ -8,6 +8,8 @@ import { CartService } from '../../services/cart';
 import { CategoryService, CategoryDTO } from '../../services/category';
 import { ToastService } from '../../services/toast';
 
+import { CATEGORY_FILTERS } from '../../constants/category-filters';
+
 @Component({
     selector: 'app-product-list',
     standalone: true,
@@ -25,6 +27,9 @@ export class ProductListComponent implements OnInit {
     minDiscount = signal<number | undefined>(undefined);
     categories = signal<CategoryDTO[]>([]);
     loading = signal<boolean>(false);
+
+    currentCategoryFilters = signal<{ name: string, options: string[] }[]>([]);
+    dynamicFilters = signal<Record<string, string>>({});
 
     // Pagination
     currentPage = signal<number>(0);
@@ -89,7 +94,8 @@ export class ProductListComponent implements OnInit {
             this.minPrice() !== undefined ||
             this.maxPrice() !== undefined ||
             this.minRating() !== undefined ||
-            this.minDiscount() !== undefined;
+            this.minDiscount() !== undefined ||
+            Object.keys(this.dynamicFilters()).length > 0;
 
         if (hasFilters) {
             // Use filterProducts — supports category, price, rating, discount, keyword (via backend search+filter)
@@ -100,6 +106,7 @@ export class ProductListComponent implements OnInit {
                     categoryId: this.categoryId(),
                     minRating: this.minRating(),
                     minDiscount: this.minDiscount(),
+                    dynamicFilters: this.dynamicFilters(),
                     // pass keyword too if present
                     ...(kw ? { keyword: kw } : {})
                 },
@@ -150,6 +157,35 @@ export class ProductListComponent implements OnInit {
         this.fetchProducts();
     }
 
+    onCategoryChange(): void {
+        const catId = this.categoryId();
+        this.dynamicFilters.set({}); // reset dynamic filters
+        if (catId) {
+            const cat = this.categories().find(c => c.categoryId === Number(catId));
+            if (cat && CATEGORY_FILTERS[cat.name]) {
+                this.currentCategoryFilters.set(CATEGORY_FILTERS[cat.name]);
+            } else {
+                this.currentCategoryFilters.set([]);
+            }
+        } else {
+            this.currentCategoryFilters.set([]);
+        }
+        this.onFilter();
+    }
+
+    onDynamicFilterChange(filterName: string, event: Event): void {
+        const select = event.target as HTMLSelectElement;
+        const value = select.value;
+        const current = { ...this.dynamicFilters() };
+        if (value) {
+            current[filterName] = value;
+        } else {
+            delete current[filterName];
+        }
+        this.dynamicFilters.set(current);
+        this.onFilter();
+    }
+
     /** Called when sort dropdown changes — keeps all active filters */
     onSortChange(): void {
         this.currentPage.set(0);
@@ -190,6 +226,8 @@ export class ProductListComponent implements OnInit {
         this.categoryId.set(undefined);
         this.minRating.set(undefined);
         this.minDiscount.set(undefined);
+        this.dynamicFilters.set({});
+        this.currentCategoryFilters.set([]);
         this.currentPage.set(0);
         this.fetchProducts();
     }

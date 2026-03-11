@@ -19,12 +19,23 @@
 
                     <div class="mb-4">
                         <label class="form-label small text-muted text-uppercase fw-bold">Category</label>
-                        <select class="form-select" [(ngModel)]="categoryId" (change)="onFilter()">
-                            <option [ngValue]="null">All Categories</option>
-                            <option *ngFor="let cat of categories()" [value]="cat.categoryId">{{ cat.name }}
+                        <select class="form-select" [(ngModel)]="categoryId" (change)="onCategoryChange()">
+                            <option [ngValue]="undefined">All Categories</option>
+                            <option *ngFor="let cat of categories()" [ngValue]="cat.categoryId">{{ cat.name }}
                             </option>
                         </select>
                     </div>
+
+                    <ng-container *ngIf="currentCategoryFilters().length > 0">
+                        <div class="mb-4" *ngFor="let filter of currentCategoryFilters()">
+                            <label class="form-label small text-muted text-uppercase fw-bold">{{ filter.name }}</label>
+                            <select class="form-select" (change)="onDynamicFilterChange(filter.name, $event)"
+                                [value]="dynamicFilters()[filter.name] || ''">
+                                <option value="">All {{ filter.name }}</option>
+                                <option *ngFor="let opt of filter.options" [value]="opt">{{ opt }}</option>
+                            </select>
+                        </div>
+                    </ng-container>
 
                     <div class="mb-4">
                         <label class="form-label small text-muted text-uppercase fw-bold">Price Range</label>

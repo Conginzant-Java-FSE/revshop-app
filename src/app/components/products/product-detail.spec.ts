@@ -55,12 +55,12 @@ describe('ProductDetailComponent', () => {
         reviewService = jasmine.createSpyObj('ReviewService', [
             'getReviewsByProduct',
             'getAverageRating',
-            'hasUserReviewed',
+            'checkReviewEligibility',
             'addReview'
         ]);
         reviewService.getReviewsByProduct.and.returnValue(of({ message: 'ok', data: MOCK_REVIEWS }));
         reviewService.getAverageRating.and.returnValue(of({ message: 'ok', data: { averageRating: 4.5, reviewCount: 1 } }));
-        reviewService.hasUserReviewed.and.returnValue(of({ message: 'ok', data: false }));
+        reviewService.checkReviewEligibility.and.returnValue(of({ message: 'ok', data: { hasPurchased: true, hasReviewed: false, canReview: true } }));
         reviewService.addReview.and.returnValue(of({ message: 'ok', data: MOCK_REVIEWS[0] }));
 
         favoriteService = jasmine.createSpyObj('FavoriteService', ['getFavorites', 'addToFavorite', 'removeFromFavorite']);

@@ -163,7 +163,7 @@ describe('ProductListComponent', () => {
         component.categoryId.set(1);
         component.onFilter();
         expect(productService.filterProducts).toHaveBeenCalledWith(
-            { minPrice: 10, maxPrice: 500, categoryId: 1 },
+            { minPrice: 10, maxPrice: 500, categoryId: 1, minRating: undefined, minDiscount: undefined, dynamicFilters: {} },
             0,
             12,
             'productId',

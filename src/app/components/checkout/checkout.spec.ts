@@ -20,7 +20,8 @@ describe('CheckoutComponent', () => {
     beforeEach(async () => {
         const addrSpy = jasmine.createSpyObj('AddressService', ['getAddressesByUser', 'addAddress']);
         const cartSpy = jasmine.createSpyObj('CartService', ['getCartByUserId']);
-        const couponSpy = jasmine.createSpyObj('CouponService', ['validateCoupon']);
+        const couponSpy = jasmine.createSpyObj('CouponService', ['validateCoupon', 'getActiveCoupons']);
+        couponSpy.getActiveCoupons.and.returnValue(of({ message: 'Success', data: [] }));
         const paySpy = jasmine.createSpyObj('PaymentService', ['createRazorpayOrder', 'verifyPayment']);
         const orderSpy = jasmine.createSpyObj('OrderService', ['placeOrder', 'cancelOrder']);
         const toastSpy = jasmine.createSpyObj('ToastService', ['success', 'error']);

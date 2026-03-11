@@ -1,16 +1,35 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { ToastComponent } from './components/shared/toast/toast';
 import { Navbar } from './components/shared/navbar/navbar';
+import { LocationService } from './services/location.service';
+import { AuthService } from './services/auth';
+
+import { LocationPopupComponent } from './components/shared/location-popup/location-popup';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HttpClientModule, ReactiveFormsModule, ToastComponent, Navbar],
+  imports: [RouterOutlet, HttpClientModule, ReactiveFormsModule, CommonModule, ToastComponent, Navbar, LocationPopupComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
   protected readonly title = signal('revshop-app');
+
+  showLocationPopup = computed(() => {
+    // Check if buyer/seller is logged in via signal, OR if shipper is in localStorage
+    const isLoggedIn = !!this.authService.authState().token || !!localStorage.getItem('shipperId');
+    // Only show popup IF logged in AND no location is currently selected
+    return isLoggedIn && !this.locationService.selectedLocation();
+  });
+
+  constructor(
+    public locationService: LocationService,
+    public authService: AuthService,
+    private themeService: ThemeService
+  ) { }
 }

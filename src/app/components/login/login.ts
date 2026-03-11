@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, RouterLink } from '@angular/router';
-import { Location } from '@angular/common';
-import { CommonModule } from '@angular/common';
+import { Location, CommonModule } from '@angular/common';
+import { LocationService } from '../../services/location.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +22,8 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private locationService: LocationService
   ) { }
 
   goBack(): void {
@@ -53,23 +54,42 @@ export class LoginComponent implements OnInit {
         next: (res) => {
           const data = res.data || res;
           this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
+          this.locationService.clearLocation();
           this.router.navigate(['/']);
         },
-        error: (err) => {
-          this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';
-        }
+        error: (err) => this.handleLoginError(err, credentials, role)
       });
     } else {
       this.authService.loginBuyer(credentials).subscribe({
         next: (res) => {
           const data = res.data || res;
           this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
+          this.locationService.clearLocation();
           this.router.navigate(['/dashboard']);
         },
-        error: (err) => {
-          this.errorMessage = err.error?.message || err.error || 'Login failed Check your credentials.';
-        }
+        error: (err) => this.handleLoginError(err, credentials, role)
       });
+    }
+  }
+
+  handleLoginError(err: any, credentials: any, role: string) {
+    const msg = err.error?.message || err.error || '';
+    if (typeof msg === 'string' && msg.toLowerCase().includes('inactive')) {
+      if (confirm("Your account is deactivated. Would you like to reactivate and log in?")) {
+        this.authService.reactivate(credentials).subscribe({
+          next: (res) => {
+            const data = res.data || res;
+            this.authService.saveAuthData(data.token, data.role, data.userId, data.name);
+            this.locationService.clearLocation();
+            this.router.navigate(role === 'SELLER' ? ['/'] : ['/dashboard']);
+          },
+          error: (rErr) => {
+            this.errorMessage = rErr.error?.message || rErr.error || 'Reactivation failed.';
+          }
+        });
+      }
+    } else {
+      this.errorMessage = msg || 'Login failed Check your credentials.';
     }
   }
 }

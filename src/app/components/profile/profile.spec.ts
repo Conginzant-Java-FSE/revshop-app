@@ -3,8 +3,10 @@ import { ProfileComponent } from './profile';
 import { UserService } from '../../services/user';
 import { AddressService } from '../../services/address';
 import { ToastService } from '../../services/toast';
+import { ThemeService } from '../../services/theme.service';
 import { FormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
+import { signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, provideRouter } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -15,6 +17,7 @@ describe('ProfileComponent', () => {
     let userServiceSpy: any;
     let addressServiceSpy: any;
     let toastServiceSpy: any;
+    let themeServiceSpy: any;
     let router: Router;
 
     beforeEach(async () => {
@@ -33,6 +36,10 @@ describe('ProfileComponent', () => {
             success: jasmine.createSpy('success'),
             error: jasmine.createSpy('error')
         };
+        themeServiceSpy = {
+            currentTheme: signal('system'),
+            setTheme: jasmine.createSpy('setTheme')
+        };
 
         userServiceSpy.getUserById.and.returnValue(of({ data: {} as any }));
         userServiceSpy.updateProfile.and.returnValue(of({ data: {} as any }));
@@ -48,7 +55,8 @@ describe('ProfileComponent', () => {
                 provideRouter([]),
                 { provide: UserService, useValue: userServiceSpy },
                 { provide: AddressService, useValue: addressServiceSpy },
-                { provide: ToastService, useValue: toastServiceSpy }
+                { provide: ToastService, useValue: toastServiceSpy },
+                { provide: ThemeService, useValue: themeServiceSpy }
             ],
             schemas: [NO_ERRORS_SCHEMA]
         }).compileComponents();

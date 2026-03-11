@@ -36,4 +36,12 @@ export class UserService {
     updatePassword(id: number, request: PasswordUpdateRequest): Observable<ApiResponse<void>> {
         return this.http.put<ApiResponse<void>>(`${this.apiUrl}/${id}/password`, request);
     }
+
+    deactivateAccount(id: number): Observable<ApiResponse<void>> {
+        return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/${id}/deactivate`, {});
+    }
+
+    deleteAccount(id: number): Observable<ApiResponse<void>> {
+        return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}/delete`);
+    }
 }

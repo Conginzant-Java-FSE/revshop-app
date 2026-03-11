@@ -24,6 +24,27 @@
             </button>
         </div>
 
+        <div class="theme-switcher px-3 py-3 border-top border-bottom my-3">
+            <span class="d-block text-body-secondary small fw-bold mb-2 text-uppercase">Theme Options</span>
+            <div class="d-flex flex-column gap-2">
+                <label class="d-flex align-items-center gap-2 cursor-pointer small">
+                    <input type="radio" name="shipperTheme" class="form-check-input mt-0"
+                        [checked]="themeService.currentTheme() === 'system'" (change)="themeService.setTheme('system')">
+                    <span><i class="fa-solid fa-display me-1 text-body-secondary"></i> System</span>
+                </label>
+                <label class="d-flex align-items-center gap-2 cursor-pointer small">
+                    <input type="radio" name="shipperTheme" class="form-check-input mt-0"
+                        [checked]="themeService.currentTheme() === 'light'" (change)="themeService.setTheme('light')">
+                    <span><i class="fa-solid fa-sun me-1 text-warning"></i> Light</span>
+                </label>
+                <label class="d-flex align-items-center gap-2 cursor-pointer small">
+                    <input type="radio" name="shipperTheme" class="form-check-input mt-0"
+                        [checked]="themeService.currentTheme() === 'dark'" (change)="themeService.setTheme('dark')">
+                    <span><i class="fa-solid fa-moon me-1 text-light"></i> Dark</span>
+                </label>
+            </div>
+        </div>
+
         <nav class="sidebar-nav">
             <button class="nav-item" [class.active]="activeTab() === 'all'" (click)="setTab('all')">
                 <span>📋</span> All Orders

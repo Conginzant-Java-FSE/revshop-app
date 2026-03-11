@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { UserService, UserDTO, PasswordUpdateRequest } from '../../services/user';
 import { AddressService, AddressDTO } from '../../services/address';
 import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
+import { ThemeService, Theme } from '../../services/theme.service';
 import { Header } from '../shared/header/header';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast';
@@ -22,7 +24,7 @@ import { ToastService } from '../../services/toast';
             <div class="card-header bg-primary text-white py-4">
               <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-4">
-                  <div class="profile-avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                  <div class="profile-avatar bg-body text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
                     <i class="fa-solid fa-user fs-2"></i>
                   </div>
                   <div>
@@ -76,10 +78,31 @@ import { ToastService } from '../../services/toast';
                 <div class="mt-5 pt-4 border-top">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
-                      <h5 class="fw-bold mb-1 text-dark">Account Security</h5>
+                      <h5 class="fw-bold mb-1 text-body">Account Security</h5>
                       <p class="text-muted small mb-0">Update your password to keep your account safe</p>
                     </div>
                     <button class="btn btn-outline-primary rounded-pill px-4" (click)="openPasswordModal()">Change Password</button>
+                  </div>
+                  
+                  <!-- Account Deactivation/Deletion -->
+                  <div class="mt-4 border-top pt-4">
+                    <h5 class="fw-bold mb-3 text-danger">Danger Zone</h5>
+                    <div class="d-flex flex-column gap-3">
+                      <div class="d-flex justify-content-between align-items-center border p-3 rounded-3 bg-danger-subtle bg-opacity-10 border-danger border-opacity-25">
+                        <div>
+                          <h6 class="fw-bold mb-1 text-danger">Deactivate Account</h6>
+                          <p class="text-muted small mb-0">Temporarily disable your account</p>
+                        </div>
+                        <button class="btn btn-outline-warning rounded-pill px-4" (click)="deactivateAccount()">Deactivate</button>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center border p-3 rounded-3 bg-danger-subtle bg-opacity-25 border-danger border-opacity-50">
+                        <div>
+                          <h6 class="fw-bold mb-1 text-danger">Delete Account</h6>
+                          <p class="text-muted small mb-0">Permanently delete your account and data</p>
+                        </div>
+                        <button class="btn btn-danger rounded-pill px-4" (click)="deleteAccount()">Delete Account</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -90,7 +113,7 @@ import { ToastService } from '../../services/toast';
           <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0 text-dark">My Addresses</h5>
+                <h5 class="fw-bold mb-0 text-body">My Addresses</h5>
                 <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="openAddressModal()">
                   <i class="fa-solid fa-plus me-2"></i>Add Address
                 </button>
@@ -100,7 +123,7 @@ import { ToastService } from '../../services/toast';
                 <div class="spinner-border spinner-border-sm text-primary"></div>
               </div>
 
-              <div *ngIf="!loadingAddresses() && addresses().length === 0" class="text-center py-4 bg-light rounded-3">
+              <div *ngIf="!loadingAddresses() && addresses().length === 0" class="text-center py-4 bg-body-tertiary rounded-3">
                 <i class="fa-solid fa-map-location-dot fs-2 text-muted mb-2"></i>
                 <p class="text-muted mb-0">No addresses saved yet.</p>
               </div>
@@ -119,7 +142,7 @@ import { ToastService } from '../../services/toast';
                         </button>
                       </div>
                     </div>
-                    <p class="mb-1 fw-medium text-dark">{{ addr.addressLine }}</p>
+                    <p class="mb-1 fw-medium text-body">{{ addr.addressLine }}</p>
                     <p class="mb-0 text-muted small">{{ addr.city }}, {{ addr.state }} {{ addr.zipCode }}</p>
                     <p class="mb-0 text-muted small">{{ addr.country }}</p>
                   </div>
@@ -131,15 +154,79 @@ import { ToastService } from '../../services/toast';
 
         <!-- Role Info/Side Card -->
         <div class="col-lg-4">
-          <div class="card border-0 shadow-sm rounded-4 bg-light">
+          <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary mb-4">
             <div class="card-body p-4 text-center">
               <div class="mb-3">
-                <div class="bg-white p-3 rounded-circle d-inline-block shadow-sm">
+                <div class="bg-body p-3 rounded-circle d-inline-block shadow-sm">
                   <i class="fa-solid fa-shield-halved text-primary fs-3"></i>
                 </div>
               </div>
               <h6 class="fw-bold mb-2">Account Type: {{ user()?.role }}</h6>
               <p class="text-muted small mb-0">Your account is active and verified. You can manage your orders and profile details from here.</p>
+            </div>
+          </div>
+
+          <!-- Theme Settings Card -->
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-3">Appearance</h5>
+              <div class="d-flex flex-column gap-3">
+                
+                <!-- System Theme Option -->
+                <label class="theme-option p-3 border rounded-3 d-flex align-items-center gap-3 cursor-pointer transition-all" 
+                       [class.border-primary]="themeService.currentTheme() === 'system'"
+                       [class.bg-primary-subtle]="themeService.currentTheme() === 'system'">
+                  <div class="theme-icon rounded-circle d-flex align-items-center justify-content-center bg-body-tertiary text-secondary" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-display"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0 fw-bold">System Default</h6>
+                    <small class="text-muted">Matches device theme</small>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input fs-5" type="radio" name="themeSelector" 
+                           [checked]="themeService.currentTheme() === 'system'"
+                           (change)="themeService.setTheme('system')">
+                  </div>
+                </label>
+
+                <!-- Light Theme Option -->
+                <label class="theme-option p-3 border rounded-3 d-flex align-items-center gap-3 cursor-pointer transition-all"
+                       [class.border-primary]="themeService.currentTheme() === 'light'"
+                       [class.bg-primary-subtle]="themeService.currentTheme() === 'light'">
+                  <div class="theme-icon rounded-circle d-flex align-items-center justify-content-center bg-body-tertiary text-warning" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-sun"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0 fw-bold">Light Mode</h6>
+                    <small class="text-muted">Bright & clear</small>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input fs-5" type="radio" name="themeSelector" 
+                           [checked]="themeService.currentTheme() === 'light'"
+                           (change)="themeService.setTheme('light')">
+                  </div>
+                </label>
+
+                <!-- Dark Theme Option -->
+                <label class="theme-option p-3 border rounded-3 d-flex align-items-center gap-3 cursor-pointer transition-all"
+                       [class.border-primary]="themeService.currentTheme() === 'dark'"
+                       [class.bg-primary-subtle]="themeService.currentTheme() === 'dark'">
+                  <div class="theme-icon rounded-circle d-flex align-items-center justify-content-center bg-body-tertiary text-body" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-moon"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0 fw-bold">Dark Mode</h6>
+                    <small class="text-muted">Easy on the eyes</small>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input fs-5" type="radio" name="themeSelector" 
+                           [checked]="themeService.currentTheme() === 'dark'"
+                           (change)="themeService.setTheme('dark')">
+                  </div>
+                </label>
+
+              </div>
             </div>
           </div>
         </div>
@@ -233,11 +320,13 @@ import { ToastService } from '../../services/toast';
   styles: [`
     .container { max-width: 1000px; }
     .profile-avatar { border: 4px solid rgba(255,255,255,0.2); }
-    .address-card:hover { border-color: var(--bs-primary) !important; background: var(--bs-light); }
+    .address-card:hover { border-color: var(--bs-primary) !important; background: var(--surface); }
     .x-small { font-size: 0.65rem; }
     .transition-all { transition: all 0.2s ease; }
     .modal { background: rgba(0,0,0,0.5); }
     input.form-control:focus { box-shadow: none; border-color: var(--bs-primary); }
+    .cursor-pointer { cursor: pointer; }
+    .theme-option:hover { border-color: var(--bs-primary) !important; }
   `]
 })
 export class ProfileComponent implements OnInit {
@@ -267,7 +356,10 @@ export class ProfileComponent implements OnInit {
   constructor(
     private userService: UserService,
     private addressService: AddressService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    public themeService: ThemeService,
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -451,4 +543,41 @@ export class ProfileComponent implements OnInit {
       error: (err: any) => this.toastService.error(err?.error?.message ?? 'Failed to delete address')
     });
   }
+
+  deactivateAccount(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    if (confirm('Are you sure you want to deactivate your account? You will be logged out.')) {
+      this.userService.deactivateAccount(Number(userId)).subscribe({
+        next: () => {
+          this.toastService.success('Account deactivated successfully');
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        },
+        error: (err: any) => {
+          this.toastService.error(err.error?.message || 'Failed to deactivate account');
+        }
+      });
+    }
+  }
+
+  deleteAccount(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    if (confirm('WARNING: Are you sure you want to PERMANENTLY delete your account? This action cannot be undone.')) {
+      this.userService.deleteAccount(Number(userId)).subscribe({
+        next: () => {
+          this.toastService.success('Account deleted successfully');
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        },
+        error: (err: any) => {
+          this.toastService.error(err.error?.message || 'Failed to delete account');
+        }
+      });
+    }
+  }
 }
+

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { AuthService } from '../../services/auth';
 import { Router, RouterLink } from '@angular/router';
 import { Location, CommonModule } from '@angular/common';
+import { ToastService } from '../../services/toast';
+
 
 @Component({
   selector: 'app-register',
@@ -17,12 +19,16 @@ export class RegisterComponent implements OnInit {
   submitted: boolean = false;
   errorMessage: string = '';
   showPassword: boolean = false;
+  otpSent: boolean = false;
+  otpVerified: boolean = false;
+  loading: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private toastService: ToastService
   ) { }
 
   goBack(): void {
@@ -45,7 +51,8 @@ export class RegisterComponent implements OnInit {
       securityAnswer: ['', Validators.required],
       businessName: [''],
       taxId: [''],
-      businessDescription: ['']
+      businessDescription: [''],
+      otp: ['']
     });
 
     this.registerForm.get('role')?.valueChanges.subscribe(role => {
@@ -82,7 +89,47 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    const { businessName, taxId, businessDescription, ...commonData } = this.registerForm.value;
+    if (!this.otpSent) {
+      this.loading = true;
+      this.authService.sendOtp(this.registerForm.get('email')?.value).subscribe({
+        next: () => {
+          this.otpSent = true;
+          this.loading = false;
+          this.toastService.success('OTP sent successfully! Please check your email.');
+          this.registerForm.get('otp')?.setValidators([Validators.required, Validators.pattern('^[0-9]{6}$')]);
+          this.registerForm.get('otp')?.updateValueAndValidity();
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = err.error?.message || 'Failed to send OTP';
+          this.toastService.error(this.errorMessage);
+        }
+      });
+      return;
+    }
+
+    if (!this.otpVerified) {
+      this.loading = true;
+      this.authService.verifyOtp(this.registerForm.get('email')?.value, this.registerForm.get('otp')?.value).subscribe({
+        next: () => {
+          this.otpVerified = true;
+          this.toastService.success('OTP verified successfully!');
+          this.proceedWithRegistration();
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = err.error?.message || 'Invalid or expired OTP';
+          this.toastService.error(this.errorMessage);
+        }
+      });
+      return;
+    }
+
+    this.proceedWithRegistration();
+  }
+
+  proceedWithRegistration() {
+    const { businessName, taxId, businessDescription, otp, ...commonData } = this.registerForm.value;
 
     if (this.isSeller) {
       const payload = {
@@ -94,11 +141,14 @@ export class RegisterComponent implements OnInit {
       };
       this.authService.registerSeller(payload).subscribe({
         next: (res) => {
-          console.log('Seller registration successful', res);
+          this.toastService.success('Seller registration successful! Please login.');
           this.router.navigate(['/login']);
+          this.loading = false;
         },
         error: (err) => {
           this.errorMessage = err.error?.message || err.error || 'Registration failed';
+          this.toastService.error(this.errorMessage);
+          this.loading = false;
         }
       });
     } else {
@@ -108,14 +158,21 @@ export class RegisterComponent implements OnInit {
       };
       this.authService.registerBuyer(payload).subscribe({
         next: (res) => {
-          console.log('Buyer registration successful', res);
+          this.toastService.success('Buyer registration successful! Please login.');
           this.router.navigate(['/login']);
+          this.loading = false;
         },
         error: (err) => {
           this.errorMessage = err.error?.message || err.error || 'Registration failed';
+          this.toastService.error(this.errorMessage);
+          this.loading = false;
         }
       });
     }
+  }
+
+  resendOtp() {
+    this.authService.sendOtp(this.registerForm.get('email')?.value).subscribe();
   }
 
 }

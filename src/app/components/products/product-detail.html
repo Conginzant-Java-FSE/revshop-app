@@ -13,7 +13,7 @@
             <div class="col-lg-6">
                 <!-- Main Image -->
                 <div
-                    class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white position-relative overflow-hidden">
+                    class="card border-0 shadow-sm rounded-4 p-5 text-center bg-body position-relative overflow-hidden">
                     <img [src]="allImages().length > 0 ? allImages()[currentImageIndex()] : 'https://placehold.co/600x400?text=No+Image'"
                         class="img-fluid" [alt]="product()?.name"
                         style="max-height: 500px; object-fit: contain; width: 100%; transition: opacity 0.3s ease;">
@@ -34,7 +34,7 @@
                 <!-- Thumbnails Gallery -->
                 <div class="d-flex gap-3 mt-4 overflow-auto px-1 py-1 custom-scrollbar" *ngIf="allImages().length > 1">
                     <div *ngFor="let img of allImages(); let i = index"
-                        class="cursor-pointer border rounded-3 bg-white shadow-sm overflow-hidden flex-shrink-0 transition-all opacity-75 hover-opacity-100"
+                        class="cursor-pointer border rounded-3 bg-body shadow-sm overflow-hidden flex-shrink-0 transition-all opacity-75 hover-opacity-100"
                         [class.border-primary]="i === currentImageIndex()" [class.border-2]="i === currentImageIndex()"
                         [class.opacity-100]="i === currentImageIndex()" style="width: 80px; height: 80px;"
                         (click)="setCurrentImage(i)">
@@ -55,7 +55,7 @@
                                 [class.text-muted]="s > averageRating()"></i>
                         </span>
                         <span class="fw-bold">{{ averageRating() | number:'1.1-1' }}</span>
-                        <span class="text-light small">({{ reviewCount() }} reviews)</span>
+                        <span class="text-body-secondary small">({{ reviewCount() }} reviews)</span>
                     </div>
                     <div class="d-flex align-items-center gap-3 mb-4">
                         <h2 class="text-primary fw-bold mb-0">₹{{ product()?.sellingPrice }}</h2>
@@ -68,7 +68,7 @@
 
                     <div class="mb-4">
                         <h5 class="fw-bold mb-2">Description</h5>
-                        <p class="text-light lh-lg">{{ product()?.description }}</p>
+                        <p class="text-body-secondary lh-lg">{{ product()?.description }}</p>
                     </div>
 
                     <div class="mb-4 d-flex align-items-center gap-4">
@@ -88,7 +88,7 @@
                                 [disabled]="quantity() <= 1">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
-                            <input type="text" class="form-control text-center bg-white border-secondary-subtle"
+                            <input type="text" class="form-control text-center bg-body border-secondary-subtle"
                                 [value]="quantity()" readonly>
                             <button class="btn btn-outline-secondary rounded-end-pill px-3" (click)="incrementQty()"
                                 [disabled]="quantity() >= product()!.stockQuantity">
@@ -142,7 +142,7 @@
                 <div class="col-lg-8">
                     <h3 class="fw-bold mb-4">Customer Reviews</h3>
 
-                    <div *ngIf="reviews().length === 0" class="text-light-50 py-4 opacity-75">
+                    <div *ngIf="reviews().length === 0" class="text-body-secondary py-4 opacity-75">
                         No reviews yet. Be the first to review this product!
                     </div>
 
@@ -159,7 +159,7 @@
                                     </div>
                                     <span class="text-muted small">{{ review.createdAt | date:'mediumDate' }}</span>
                                 </div>
-                                <p class="text-dark mb-0">{{ review.reviewText }}</p>
+                                <p class="text-body mb-0">{{ review.reviewText }}</p>
                             </div>
                         </div>
                     </div>
@@ -169,18 +169,18 @@
                     <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
                         <!-- Verified Purchase Check -->
                         <div *ngIf="!hasPurchased()"
-                            class="text-center py-4 bg-light rounded-4 border border-info-subtle">
+                            class="text-center py-4 bg-body-tertiary rounded-4 border border-info-subtle">
                             <i class="fa-solid fa-cart-shopping text-info fs-2 mb-2"></i>
-                            <p class="text-dark fw-medium mb-1">Want to review this product?</p>
+                            <p class="text-body fw-medium mb-1">Want to review this product?</p>
                             <p class="text-muted small px-3 mb-0">Only customers who have purchased and received this
                                 product can leave a review.</p>
                         </div>
 
                         <!-- Already reviewed -->
                         <div *ngIf="hasPurchased() && hasUserReviewed()"
-                            class="text-center py-4 bg-light rounded-4 border border-success-subtle">
+                            class="text-center py-4 bg-body-tertiary rounded-4 border border-success-subtle">
                             <i class="fa-solid fa-circle-check text-success fs-2 mb-2"></i>
-                            <p class="text-dark fw-medium mb-1">Thank you for your feedback!</p>
+                            <p class="text-body fw-medium mb-1">Thank you for your feedback!</p>
                             <p class="text-muted small mb-0">You have already reviewed this product.</p>
                         </div>
 

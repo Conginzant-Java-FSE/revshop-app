@@ -4,21 +4,25 @@ import { ShipperService } from '../../services/shipper.service';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LocationService } from '../../services/location.service';
 import { of, throwError } from 'rxjs';
 
 describe('ShipperLoginComponent', () => {
     let component: ShipperLoginComponent;
     let fixture: ComponentFixture<ShipperLoginComponent>;
     let mockShipperService: jasmine.SpyObj<ShipperService>;
+    let mockLocationService: jasmine.SpyObj<LocationService>;
     let mockRouter: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
         mockShipperService = jasmine.createSpyObj('ShipperService', ['loginShipper']);
+        mockLocationService = jasmine.createSpyObj('LocationService', ['clearLocation']);
 
         await TestBed.configureTestingModule({
             imports: [ShipperLoginComponent, ReactiveFormsModule, RouterTestingModule],
             providers: [
-                { provide: ShipperService, useValue: mockShipperService }
+                { provide: ShipperService, useValue: mockShipperService },
+                { provide: LocationService, useValue: mockLocationService }
             ]
         })
             .overrideComponent(ShipperLoginComponent, {
@@ -96,6 +100,7 @@ describe('ShipperLoginComponent', () => {
         expect(setItemSpy).toHaveBeenCalledWith('shipperId', '1');
         expect(setItemSpy).toHaveBeenCalledWith('shipperName', 'Shipper');
         expect(setItemSpy).toHaveBeenCalledWith('role', 'SHIPPER');
+        expect(mockLocationService.clearLocation).toHaveBeenCalled();
         expect(component['router'].navigate).toHaveBeenCalledWith(['/shipper-dashboard']);
         expect(component.loading).toBeFalse();
     });

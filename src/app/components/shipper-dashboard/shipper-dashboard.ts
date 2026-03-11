@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ShipperService, ShipperOrder } from '../../services/shipper.service';
 import { ToastService } from '../../services/toast';
+import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
 import { ApiResponse } from '../../models/api-response.model';
 
@@ -42,6 +43,7 @@ export class ShipperDashboardComponent implements OnInit {
         private shipperService: ShipperService,
         private router: Router,
         private toastService: ToastService,
+        public themeService: ThemeService,
         private notificationService: NotificationService
     ) { }
 

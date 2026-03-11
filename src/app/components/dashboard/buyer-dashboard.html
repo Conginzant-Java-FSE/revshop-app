@@ -4,10 +4,10 @@
     <div class="row mb-5">
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white overflow-hidden position-relative">
-                <div class="position-absolute end-0 bottom-0 p-4 opacity-10">
+                <div class="position-absolute end-0 bottom-0 p-4 opacity-10" style="pointer-events: none; z-index: 0;">
                     <i class="fa-solid fa-cart-shopping" style="font-size: 15rem; transform: rotate(-15deg);"></i>
                 </div>
-                <div class="row align-items-center">
+                <div class="row align-items-center position-relative" style="z-index: 1;">
                     <div class="col-auto">
                         <div class="rounded-circle bg-white bg-opacity-25 p-3">
                             <i class="fa-solid fa-user-check fs-1"></i>
@@ -18,7 +18,11 @@
                         <h4 class="mb-1">Welcome, {{ authService.authState().name }}!</h4>
                         <p class="mb-0 opacity-75">Track your orders and manage your profile</p>
                     </div>
-
+                    <div class="col-auto text-end">
+                        <button class="btn btn-light rounded-pill px-4 shadow-sm" (click)="onLogout()">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Log Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -28,7 +32,7 @@
     <div class="row g-4">
         <!-- Left Stats -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-body">
                 <h5 class="fw-bold mb-4">Quick Links</h5>
                 <div class="list-group list-group-flush">
                     <a routerLink="/products"
@@ -57,7 +61,7 @@
 
         <!-- Right Content: Recent Orders -->
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="fw-bold mb-0">Recent Orders</h5>
                     <a routerLink="/orders" class="small text-decoration-none">View All</a>

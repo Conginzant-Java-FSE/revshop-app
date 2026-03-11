@@ -46,6 +46,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login/seller`, credentials);
   }
 
+  reactivate(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reactivate`, credentials);
+  }
+
   // ==== Authentication Helper Methods ====
 
   /**
@@ -72,16 +76,32 @@ export class AuthService {
   /**
  * Fetches the security question for a given email
  */
-getSecurityQuestion(email: string): Observable<any> {
-  return this.http.get(`${this.apiUrl}/security-question`, { params: { email } });
-}
+  getSecurityQuestion(email: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/security-question`, { params: { email } });
+  }
 
-/**
- * Resets the password using security answer
- */
-resetPassword(data: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/reset-password`, data);
-}
+  /**
+   * Resets the password using security answer
+   */
+  resetPassword(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, data);
+  }
+
+  sendPasswordResetLink(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password/send-link`, { email });
+  }
+
+  resetPasswordViaLink(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password/reset-via-link`, data);
+  }
+
+  sendOtp(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/otp/send`, null, { params: { email } });
+  }
+
+  verifyOtp(email: string, otp: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/otp/verify`, { email, otp });
+  }
 
 
 }

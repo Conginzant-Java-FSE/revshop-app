@@ -18,7 +18,7 @@
 
 .login-container {
     display: flex;
-    background: #fff;
+    background: var(--surface);
     border-radius: 24px;
     overflow: hidden;
     width: 100%;
@@ -132,7 +132,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
+    background: var(--surface);
 }
 
 .form-container {
@@ -165,12 +165,12 @@
 .form-header h2 {
     font-size: 1.6rem;
     font-weight: 800;
-    color: #1a1a2e;
+    color: var(--text-primary);
     margin-bottom: 0.4rem;
 }
 
 .form-header p {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 0.9rem;
 }
 
@@ -203,7 +203,7 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -225,19 +225,19 @@
 .input-wrapper input {
     width: 100%;
     padding: 0.8rem 1rem 0.8rem 2.8rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: 0.95rem;
     transition: all 0.2s;
-    background: #f9fafb;
-    color: #111;
+    background: var(--bg-color);
+    color: var(--text-primary);
     box-sizing: border-box;
 }
 
 .input-wrapper input:focus {
     outline: none;
     border-color: #f59e0b;
-    background: #fff;
+    background: var(--bg-color);
     box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
 }
 
@@ -325,7 +325,7 @@
     margin-top: 1.5rem;
     text-align: center;
     font-size: 0.875rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .form-footer a {

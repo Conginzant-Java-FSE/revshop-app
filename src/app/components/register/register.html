@@ -184,17 +184,48 @@
                                     </div>
                                 </ng-container>
 
+                                <!-- OTP Verification Section -->
+                                <ng-container *ngIf="otpSent && !otpVerified">
+                                    <div class="col-12 mt-4">
+                                        <div class="alert alert-info rounded-3 mb-4">
+                                            <i class="fa-solid fa-envelope me-2"></i>
+                                            We've sent a 6-digit verification code to <strong>{{
+                                                registerForm.get('email')?.value }}</strong>.
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="otp" formControlName="otp"
+                                                placeholder="123456" maxlength="6"
+                                                [ngClass]="{'is-invalid': submitted && registerForm.get('otp')?.errors}">
+                                            <label for="otp">Enter 6-digit OTP</label>
+                                            <div class="invalid-feedback">A valid 6-digit OTP is required</div>
+                                        </div>
+                                        <div class="text-end mt-2">
+                                            <button type="button" class="btn btn-link text-decoration-none p-0"
+                                                (click)="resendOtp()">
+                                                <small>Resend Code</small>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
                                 <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
-                                        Register as {{ isSeller ? 'Seller' : 'Buyer' }}
+                                    <button type="submit" class="btn w-100 py-3 fw-bold rounded-3"
+                                        [ngClass]="otpSent ? 'btn-success' : 'btn-primary'" [disabled]="loading">
+                                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                                        <ng-container *ngIf="!otpSent">Send Verification Code</ng-container>
+                                        <ng-container *ngIf="otpSent && !otpVerified">Verify & Create
+                                            Account</ng-container>
                                     </button>
                                 </div>
                             </div>
                         </form>
 
                     </div>
-                    <div class="card-footer bg-light p-4 text-center border-0">
-                        <p class="mb-0 text-muted">Already have an account? <a routerLink="/login"
+                    <div class="card-footer bg-body-tertiary p-4 text-center border-0">
+                        <p class="mb-0 text-body-secondary">Already have an account? <a routerLink="/login"
                                 class="text-primary fw-bold text-decoration-none">Login here</a></p>
                     </div>
                 </div>

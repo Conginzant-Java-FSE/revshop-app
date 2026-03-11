@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top py-3 custom-navbar">
+<nav class="navbar navbar-expand-lg sticky-top py-3 custom-navbar shadow-sm border-bottom">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" routerLink="/">
             <i class="fa-solid fa-store fs-3 text-warning me-2"></i>
@@ -16,13 +16,20 @@
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
             </ul>
+            <!-- Deliver-to chip -->
+            <div *ngIf="isAnyUserLoggedIn" class="deliver-to-chip" (click)="openLocationPopup()"
+                title="Change delivery location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>{{ deliveryCity ? 'Deliver to: ' + deliveryCity : 'Set location' }}</span>
+            </div>
             <app-search-bar class="mx-auto"></app-search-bar>
             <ul
-                class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-center d-flex flex-row justify-content-center gap-3 gap-lg-0">
+                class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-start align-items-lg-center d-flex flex-column flex-lg-row gap-3 gap-lg-0">
                 <li class="nav-item me-lg-3" *ngIf="!authService.authState().token && !isShipper">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative" routerLink="/login">
-                        <i class="fa-solid fa-user fs-5 mb-1"></i>
-                        <span class="small d-none d-lg-block">Login</span>
+                    <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative"
+                        routerLink="/login">
+                        <i class="fa-solid fa-user fs-5 mb-0 mb-lg-1"></i>
+                        <span class="small ms-2 ms-lg-0">Login</span>
                     </a>
                 </li>
 
@@ -58,22 +65,23 @@
 
 
                 <!-- Notification Bell -->
-                <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative" style="cursor:pointer;"
-                        (click)="toggleNotifications($event)">
-                        <i class="fa-solid fa-bell fs-5 mb-1"></i>
+                <li class="nav-item me-lg-3 position-relative" *ngIf="authService.authState().token"
+                    #notificationContainer>
+                    <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative"
+                        style="cursor:pointer;" (click)="toggleNotifications($event)">
+                        <i class="fa-solid fa-bell fs-5 mb-0 mb-lg-1"></i>
                         <span *ngIf="unreadCount() > 0"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
                             {{ unreadCount() > 9 ? '9+' : unreadCount() }}
                         </span>
-                        <span class="small d-none d-lg-block">Alerts</span>
+                        <span class="small ms-2 ms-lg-0">Alerts</span>
                     </a>
 
                     <!-- Notification Dropdown -->
                     <div class="notification-dropdown position-absolute end-0 mt-2 p-0 z-3" *ngIf="showNotifications()"
                         style="top: 100%;">
                         <div class="d-flex justify-content-between align-items-center p-3 border-bottom"
-                            style="border-color: rgba(255,255,255,0.1) !important;">
+                            style="border-color: var(--border-color) !important;">
                             <span class="dropdown-header fw-bold p-0">Notifications</span>
                             <span class="mark-all-btn small text-warning" *ngIf="unreadCount() > 0"
                                 (click)="markAllRead()">
@@ -94,9 +102,9 @@
                                 <i class="fa-solid fa-circle notification-icon mt-1" [style.font-size]="'0.5rem'"
                                     [style.color]="notif.isRead ? 'transparent' : '#ffc107'"></i>
                                 <div class="flex-grow-1">
-                                    <div class="fw-bold small" style="color: #F8FAFC;">{{ notif.title }}</div>
-                                    <div class="small" style="color: #94A3B8;">{{ notif.message }}</div>
-                                    <div class="small mt-1" style="color: #64748B;">
+                                    <div class="fw-bold small" style="color: var(--text-primary);">{{ notif.title }}</div>
+                                    <div class="small" style="color: var(--text-secondary);">{{ notif.message }}</div>
+                                    <div class="small mt-1" style="color: var(--text-secondary); opacity: 0.8;">
                                         {{ notif.createdAt | date:'short' }}
                                     </div>
                                 </div>
@@ -137,10 +145,10 @@
                     </ul>
                 </li>
                 <li class="nav-item" *ngIf="!isShipper">
-                    <a class="nav-link d-flex flex-column align-items-center position-relative text-warning"
+                    <a class="nav-link d-flex flex-row flex-lg-column align-items-center position-relative text-warning"
                         routerLink="/cart">
-                        <i class="fa-solid fa-cart-shopping fs-5 mb-1"></i>
-                        <span class="small d-none d-lg-block text-white">Cart</span>
+                        <i class="fa-solid fa-cart-shopping fs-5 mb-0 mb-lg-1"></i>
+                        <span class="small ms-2 ms-lg-0 text-body">Cart</span>
                     </a>
                 </li>
 

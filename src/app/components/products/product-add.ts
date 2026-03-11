@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Header } from '../shared/header/header';
 import { ToastService } from '../../services/toast';
+import { CATEGORY_FILTERS } from '../../constants/category-filters';
 
 @Component({
     selector: 'app-product-add',
@@ -18,6 +19,9 @@ export class ProductAddComponent implements OnInit {
     productForm!: FormGroup;
     categories = signal<CategoryDTO[]>([]);
     loading = signal<boolean>(false);
+    dynamicAttributes = signal<{ name: string, options: string[] }[]>([]);
+    primaryImageMode = signal<'file' | 'url'>('file');
+    additionalImageModes = signal<Record<number, 'file' | 'url'>>({});
     submitted = false;
 
     constructor(
@@ -31,6 +35,11 @@ export class ProductAddComponent implements OnInit {
     ngOnInit(): void {
         this.initForm();
         this.loadCategories();
+
+        // Listen for category changes
+        this.productForm.get('categoryId')?.valueChanges.subscribe(categoryId => {
+            this.onCategoryChange(categoryId);
+        });
     }
 
     private initForm(): void {
@@ -46,8 +55,30 @@ export class ProductAddComponent implements OnInit {
             sellerId: [Number(sellerId), [Validators.required]],
             isActive: [true],
             imageUrl: [''],
-            additionalImages: this.fb.array([])
+            additionalImages: this.fb.array([]),
+            attributes: this.fb.group({})
         });
+    }
+
+    onCategoryChange(categoryId: any): void {
+        const cat = this.categories().find(c => c.categoryId === Number(categoryId));
+        if (cat && CATEGORY_FILTERS[cat.name]) {
+            const filters = CATEGORY_FILTERS[cat.name];
+            this.dynamicAttributes.set(filters);
+
+            const attributesGroup = this.productForm.get('attributes') as FormGroup;
+            // Clear existing controls
+            Object.keys(attributesGroup.controls).forEach(key => attributesGroup.removeControl(key));
+
+            // Add new controls
+            filters.forEach(filter => {
+                attributesGroup.addControl(filter.name, this.fb.control(''));
+            });
+        } else {
+            this.dynamicAttributes.set([]);
+            const attributesGroup = this.productForm.get('attributes') as FormGroup;
+            Object.keys(attributesGroup.controls).forEach(key => attributesGroup.removeControl(key));
+        }
     }
 
     get additionalImages(): FormArray {
@@ -56,10 +87,26 @@ export class ProductAddComponent implements OnInit {
 
     addAdditionalImage(): void {
         this.additionalImages.push(this.fb.control(''));
+        const modes = { ...this.additionalImageModes() };
+        modes[this.additionalImages.length - 1] = 'file';
+        this.additionalImageModes.set(modes);
     }
 
     removeAdditionalImage(index: number): void {
         this.additionalImages.removeAt(index);
+        const modes = { ...this.additionalImageModes() };
+        delete modes[index];
+        this.additionalImageModes.set(modes);
+    }
+
+    setImageMode(isMain: boolean, mode: 'file' | 'url', index?: number): void {
+        if (isMain) {
+            this.primaryImageMode.set(mode);
+        } else if (index !== undefined) {
+            const modes = { ...this.additionalImageModes() };
+            modes[index] = mode;
+            this.additionalImageModes.set(modes);
+        }
     }
 
     onFileSelected(event: Event, isMain: boolean, index?: number): void {

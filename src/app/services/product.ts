@@ -18,6 +18,7 @@ export interface ProductDTO {
     sellerId: number;
     categoryName?: string;
     sellerName?: string;
+    attributes?: Record<string, string>;
 }
 
 import { ApiResponse } from '../models/api-response.model';
@@ -63,7 +64,7 @@ export class ProductService {
         return this.http.get<ApiResponse<Page<ProductDTO>>>(`${this.apiUrl}/search`, { params });
     }
 
-    filterProducts(filters: { minPrice?: number, maxPrice?: number, categoryId?: number, minRating?: number, minDiscount?: number, keyword?: string }, page: number = 0, size: number = 10, sortBy: string = 'productId', direction: string = 'asc'): Observable<ApiResponse<Page<ProductDTO>>> {
+    filterProducts(filters: { minPrice?: number, maxPrice?: number, categoryId?: number, minRating?: number, minDiscount?: number, keyword?: string, dynamicFilters?: Record<string, string> }, page: number = 0, size: number = 10, sortBy: string = 'productId', direction: string = 'asc'): Observable<ApiResponse<Page<ProductDTO>>> {
         let params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString())
@@ -76,6 +77,14 @@ export class ProductService {
         if (filters.categoryId !== undefined) params = params.set('categoryId', filters.categoryId.toString());
         if (filters.minRating !== undefined) params = params.set('minRating', filters.minRating.toString());
         if (filters.minDiscount !== undefined) params = params.set('minDiscount', filters.minDiscount.toString());
+
+        if (filters.dynamicFilters) {
+            Object.keys(filters.dynamicFilters).forEach(key => {
+                if (filters.dynamicFilters![key]) {
+                    params = params.set(key, filters.dynamicFilters![key]);
+                }
+            });
+        }
 
         return this.http.get<ApiResponse<Page<ProductDTO>>>(`${this.apiUrl}/filter`, { params });
     }

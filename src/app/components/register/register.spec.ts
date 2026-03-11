@@ -21,7 +21,8 @@ describe('RegisterComponent', () => {
   beforeEach(async () => {
     authServiceSpy = {
       registerBuyer: jasmine.createSpy('registerBuyer'),
-      registerSeller: jasmine.createSpy('registerSeller')
+      registerSeller: jasmine.createSpy('registerSeller'),
+      sendOtp: jasmine.createSpy('sendOtp').and.returnValue(of({}))
     };
     routerSpy = {
       navigate: jasmine.createSpy('navigate'),
@@ -82,6 +83,9 @@ describe('RegisterComponent', () => {
   it('should call registerBuyer and navigate on successful submission', async () => {
     fixture.detectChanges();
     authServiceSpy.registerBuyer.and.returnValue(of({}));
+    
+    component.otpSent = true;
+    component.otpVerified = true;
 
     component.registerForm.patchValue({
       role: 'BUYER',
@@ -91,7 +95,8 @@ describe('RegisterComponent', () => {
       phone: '1234567890',
       age: 25,
       securityQuestion: 'Pet name?',
-      securityAnswer: 'Fluffy'
+      securityAnswer: 'Fluffy',
+      otp: '123456'
     });
 
     component.onSubmit();
@@ -104,6 +109,9 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
     const errorResponse = { error: { message: 'Email already exists' } };
     authServiceSpy.registerBuyer.and.returnValue(throwError(() => errorResponse));
+    
+    component.otpSent = true;
+    component.otpVerified = true;
 
     component.registerForm.patchValue({
       role: 'BUYER',
@@ -113,7 +121,8 @@ describe('RegisterComponent', () => {
       phone: '1234567890',
       age: 25,
       securityQuestion: 'Pet name?',
-      securityAnswer: 'Fluffy'
+      securityAnswer: 'Fluffy',
+      otp: '123456'
     });
 
     component.onSubmit();
@@ -124,6 +133,9 @@ describe('RegisterComponent', () => {
   it('should call registerSeller and navigate on successful submission', async () => {
     fixture.detectChanges();
     authServiceSpy.registerSeller.and.returnValue(of({}));
+    
+    component.otpSent = true;
+    component.otpVerified = true;
 
     component.registerForm.patchValue({
       role: 'SELLER',
@@ -136,7 +148,8 @@ describe('RegisterComponent', () => {
       securityAnswer: 'Toyota',
       businessName: 'Jane Store',
       taxId: 'TAX123',
-      businessDescription: 'Selling items'
+      businessDescription: 'Selling items',
+      otp: '123456'
     });
 
     component.onSubmit();

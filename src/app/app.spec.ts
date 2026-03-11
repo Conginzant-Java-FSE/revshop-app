@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { App } from './app';
 import { AuthService } from './services/auth';
 import { NotificationService } from './services/notification.service';
+import { LocationService } from './services/location.service';
 import { of } from 'rxjs';
 
 import { signal } from '@angular/core';
@@ -24,8 +25,10 @@ describe('App', () => {
       refresh$: of()
     });
 
-    mockLocationService = jasmine.createSpyObj('LocationService', ['selectedLocation']);
-    mockLocationService.selectedLocation.and.returnValue(null);
+    mockLocationService = {
+      selectedLocation: signal(null),
+      isPopupDismissed: signal(false)
+    };
 
     spyOn(localStorage, 'getItem').and.callFake((key: string) => null);
 
@@ -36,7 +39,7 @@ describe('App', () => {
         provideHttpClient(),
         { provide: AuthService, useValue: mockAuthService },
         { provide: NotificationService, useValue: mockNotificationService },
-        { provide: import('./services/location.service').then(m => m.LocationService), useValue: mockLocationService }
+        { provide: LocationService, useValue: mockLocationService }
       ]
     }).compileComponents();
   });
@@ -75,7 +78,7 @@ describe('App', () => {
 
   it('should hide location popup when location is already set, even if logged in', () => {
     mockAuthService.authState.set({ token: 'abc', role: 'BUYER', userId: 1, name: 'Test' });
-    mockLocationService.selectedLocation.and.returnValue({ city: 'Test City', source: 'gps', lat: 0, lng: 0 });
+    mockLocationService.selectedLocation.set({ city: 'Test City', source: 'gps', lat: 0, lng: 0 });
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     expect(app.showLocationPopup()).toBeFalse();

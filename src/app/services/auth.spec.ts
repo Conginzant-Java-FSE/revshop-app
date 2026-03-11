@@ -14,8 +14,9 @@ describe('AuthService', () => {
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // Clear localStorage before each test
+    // Clear localStorage and spy on it to ensure predictable state
     localStorage.clear();
+    spyOn(localStorage, 'getItem').and.returnValue(null);
   });
 
   afterEach(() => {
@@ -73,10 +74,14 @@ describe('AuthService', () => {
   });
 
   it('should save auth data and update state', () => {
+    const store: any = {};
+    spyOn(localStorage, 'setItem').and.callFake((key, value) => { store[key] = value; });
+    (localStorage.getItem as jasmine.Spy).and.callFake((key) => store[key] || null);
+
     service.saveAuthData('token123', 'BUYER', '1', 'John');
 
-    expect(localStorage.getItem('token')).toBe('token123');
-    expect(localStorage.getItem('role')).toBe('BUYER');
+    expect(localStorage.setItem).toHaveBeenCalledWith('token', 'token123');
+    expect(localStorage.setItem).toHaveBeenCalledWith('role', 'BUYER');
     expect(service.isLoggedIn()).toBe(true);
     expect(service.userRole()).toBe('BUYER');
     expect(service.authState().name).toBe('John');

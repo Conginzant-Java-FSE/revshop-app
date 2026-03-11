@@ -36,7 +36,18 @@ const MOCK_REVIEWS: Review[] = [
 const MOCK_FAVORITES: Favorite[] = [{ productId: 10, productName: 'Wireless Headphones' }];
 
 const MOCK_SIMILAR_PRODUCTS: ProductDTO[] = [
-    { productId: 11, name: 'Wired Headphones', sellingPrice: 1500, categoryId: 2 }
+    { 
+        productId: 11, 
+        name: 'Wired Headphones', 
+        description: 'Wired audio device',
+        mrp: 2000,
+        sellingPrice: 1500, 
+        stockQuantity: 10,
+        thresholdQuantity: 2,
+        categoryId: 2,
+        sellerId: 3,
+        isActive: true
+    }
 ];
 
 const MOCK_VIDEOS: ProductVideo[] = [
@@ -88,7 +99,10 @@ describe('ProductDetailComponent', () => {
                 provideRouter([]),
                 {
                     provide: ActivatedRoute,
-                    useValue: { snapshot: { paramMap: { get: () => '10' } } }
+                    useValue: { 
+                        paramMap: of({ get: () => '10' }),
+                        snapshot: { paramMap: { get: () => '10' } } 
+                    }
                 },
                 { provide: ProductService, useValue: productService },
                 { provide: CartService, useValue: cartService },

@@ -6,7 +6,6 @@ pipeline {
     }
 
     environment {
-        // Adjust these variables based on your environment
         FRONTEND_DIR = "revshop-app"
         SSH_CONFIG_NAME = "frontend-server" // Jenkins SSH Publisher config name for the EC2 server
         REMOTE_DOCROOT = "/usr/share/nginx/html"    // Nginx document root on Amazon Linux

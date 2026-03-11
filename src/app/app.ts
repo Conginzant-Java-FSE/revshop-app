@@ -23,8 +23,8 @@ export class App {
   showLocationPopup = computed(() => {
     // Check if buyer/seller is logged in via signal, OR if shipper is in localStorage
     const isLoggedIn = !!this.authService.authState().token || !!localStorage.getItem('shipperId');
-    // Only show popup IF logged in AND no location is currently selected
-    return isLoggedIn && !this.locationService.selectedLocation();
+    // Only show popup IF logged in AND no location is currently selected AND not dismissed
+    return isLoggedIn && !this.locationService.selectedLocation() && !this.locationService.isPopupDismissed();
   });
 
   constructor(

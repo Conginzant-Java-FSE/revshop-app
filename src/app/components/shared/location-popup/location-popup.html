@@ -1,6 +1,6 @@
 <!-- ── OVERLAY ──────────────────────────────────────────────────────────────── -->
-<div class="lp-overlay">
-    <div class="lp-card" role="dialog" aria-modal="true" aria-labelledby="lp-title">
+<div class="lp-overlay" (click)="locationService.dismissPopup()">
+    <div class="lp-card" role="dialog" aria-modal="true" aria-labelledby="lp-title" (click)="$event.stopPropagation()">
 
         <!-- ── CHOOSE VIEW ─────────────────────────────────────────────────────── -->
         <ng-container *ngIf="currentView() === 'choose'">

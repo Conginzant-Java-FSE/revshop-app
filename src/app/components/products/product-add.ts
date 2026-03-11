@@ -56,7 +56,10 @@ export class ProductAddComponent implements OnInit {
             isActive: [true],
             imageUrl: [''],
             additionalImages: this.fb.array([]),
-            attributes: this.fb.group({})
+            attributes: this.fb.group({}),
+            videoType: ['YOUTUBE'],
+            videoUrl: [''],
+            videoFile: [null]
         });
     }
 
@@ -71,7 +74,7 @@ export class ProductAddComponent implements OnInit {
             Object.keys(attributesGroup.controls).forEach(key => attributesGroup.removeControl(key));
 
             // Add new controls
-            filters.forEach(filter => {
+            filters.forEach((filter: { name: string, options: string[] }) => {
                 attributesGroup.addControl(filter.name, this.fb.control(''));
             });
         } else {
@@ -112,24 +115,47 @@ export class ProductAddComponent implements OnInit {
     onFileSelected(event: Event, isMain: boolean, index?: number): void {
         const file = (event.target as HTMLInputElement).files?.[0];
         if (file) {
+            this.uploadFile(file, isMain, index);
+        }
+    }
+
+    onVideoFileSelected(event: Event): void {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (file) {
             this.loading.set(true);
             this.productService.uploadImage(file).subscribe({
                 next: (res: any) => {
                     const url = res.url || res.data?.url;
-                    if (isMain) {
-                        this.productForm.get('imageUrl')?.setValue(url);
-                    } else if (index !== undefined) {
-                        this.additionalImages.at(index).setValue(url);
-                    }
-                    this.toastService.success('Image uploaded successfully');
+                    this.productForm.get('videoUrl')?.setValue(url);
+                    this.toastService.success('Video uploaded successfully');
                     this.loading.set(false);
                 },
                 error: (err) => {
-                    this.toastService.error('Failed to upload image');
+                    this.toastService.error('Failed to upload video');
                     this.loading.set(false);
                 }
             });
         }
+    }
+
+    private uploadFile(file: File, isMain: boolean, index?: number): void {
+        this.loading.set(true);
+        this.productService.uploadImage(file).subscribe({
+            next: (res: any) => {
+                const url = res.url || res.data?.url;
+                if (isMain) {
+                    this.productForm.get('imageUrl')?.setValue(url);
+                } else if (index !== undefined) {
+                    this.additionalImages.at(index).setValue(url);
+                }
+                this.toastService.success('Image uploaded successfully');
+                this.loading.set(false);
+            },
+            error: (err) => {
+                this.toastService.error('Failed to upload image');
+                this.loading.set(false);
+            }
+        });
     }
 
     loadCategories(): void {
@@ -147,10 +173,33 @@ export class ProductAddComponent implements OnInit {
         }
 
         this.loading.set(true);
-        this.productService.createProduct(this.productForm.value).subscribe({
-            next: () => {
-                this.toastService.success('Product added successfully!');
-                this.router.navigate(['/seller-dashboard']);
+        const formValue = { ...this.productForm.value };
+        const videoUrl = formValue.videoUrl;
+        const videoType = formValue.videoType;
+        
+        // Remove video fields from main product payload
+        delete formValue.videoUrl;
+        delete formValue.videoType;
+        delete formValue.videoFile;
+
+        this.productService.createProduct(formValue).subscribe({
+            next: (res) => {
+                const productId = res.data.productId;
+                if (productId && videoUrl) {
+                    this.productService.addProductVideo(productId, videoUrl, videoType).subscribe({
+                        next: () => {
+                            this.toastService.success('Product and video added successfully!');
+                            this.router.navigate(['/seller-dashboard']);
+                        },
+                        error: () => {
+                            this.toastService.warning('Product added, but video failed to save');
+                            this.router.navigate(['/seller-dashboard']);
+                        }
+                    });
+                } else {
+                    this.toastService.success('Product added successfully!');
+                    this.router.navigate(['/seller-dashboard']);
+                }
             },
             error: (err) => {
                 this.loading.set(false);

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ProductDetailComponent } from './product-detail';
 import { provideRouter, ActivatedRoute } from '@angular/router';
-import { ProductService, ProductDTO } from '../../services/product';
+import { ProductService, ProductDTO, ProductVideo } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { ReviewService } from '../../services/review';
 import { FavoriteService } from '../../services/favorite';
@@ -25,7 +25,8 @@ const MOCK_PRODUCT: ProductDTO = {
     categoryId: 2,
     sellerId: 3,
     categoryName: 'Audio',
-    sellerName: 'TechSeller'
+    sellerName: 'TechSeller',
+    additionalImages: ['img1.jpg', 'img2.jpg']
 };
 
 const MOCK_REVIEWS: Review[] = [
@@ -33,6 +34,14 @@ const MOCK_REVIEWS: Review[] = [
 ];
 
 const MOCK_FAVORITES: Favorite[] = [{ productId: 10, productName: 'Wireless Headphones' }];
+
+const MOCK_SIMILAR_PRODUCTS: ProductDTO[] = [
+    { productId: 11, name: 'Wired Headphones', sellingPrice: 1500, categoryId: 2 }
+];
+
+const MOCK_VIDEOS: ProductVideo[] = [
+    { productId: 10, videoUrl: 'https://youtube.com/watch?v=123', videoType: 'YOUTUBE' }
+];
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
@@ -46,8 +55,11 @@ describe('ProductDetailComponent', () => {
     let toastService: jasmine.SpyObj<ToastService>;
 
     beforeEach(async () => {
-        productService = jasmine.createSpyObj('ProductService', ['getProductById']);
+        productService = jasmine.createSpyObj('ProductService', ['getProductById', 'getSimilarProducts', 'compareProducts', 'getProductVideos']);
         productService.getProductById.and.returnValue(of({ message: 'ok', data: MOCK_PRODUCT }));
+        productService.getSimilarProducts.and.returnValue(of({ message: 'ok', data: MOCK_SIMILAR_PRODUCTS }));
+        productService.compareProducts.and.returnValue(of({ message: 'ok', data: [MOCK_PRODUCT, MOCK_SIMILAR_PRODUCTS[0]] }));
+        productService.getProductVideos.and.returnValue(of({ message: 'ok', data: MOCK_VIDEOS }));
 
         cartService = jasmine.createSpyObj('CartService', ['addItemToCart']);
         cartService.addItemToCart.and.returnValue(of({ message: 'ok', data: {} }));
@@ -261,5 +273,79 @@ describe('ProductDetailComponent', () => {
         component.newReview.reviewText = 'Good';
         component.submitReview();
         expect(toastService.error).toHaveBeenCalledWith('Please login to submit a review');
+    });
+
+    // ── New Features ─────────────────────────────────────────────────────────
+
+    it('should load similar products on init', () => {
+        expect(productService.getSimilarProducts).toHaveBeenCalledWith(10);
+        expect(component.similarProducts()).toEqual(MOCK_SIMILAR_PRODUCTS);
+    });
+
+    it('should load comparison data for similar products', () => {
+        expect(productService.compareProducts).toHaveBeenCalledWith([10, 11]);
+        expect(component.comparisonProducts().length).toBe(2);
+    });
+
+    it('should load product videos on init', () => {
+        expect(productService.getProductVideos).toHaveBeenCalledWith(10);
+        expect(component.productVideos()).toEqual(MOCK_VIDEOS);
+    });
+
+    it('should change active tab when setActiveTab is called', () => {
+        component.setActiveTab('specifications');
+        expect(component.activeTab()).toBe('specifications');
+    });
+
+    it('should toggle zoom state', () => {
+        component.toggleZoom(true);
+        expect(component.isZoomed()).toBeTrue();
+        component.toggleZoom(false);
+        expect(component.isZoomed()).toBeFalse();
+    });
+
+    it('should update zoom position on mouse move', () => {
+        const mockEvent = {
+            target: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) },
+            clientX: 50,
+            clientY: 50
+        } as unknown as MouseEvent;
+
+        component.onMouseMove(mockEvent);
+        expect(component.zoomPosition()).toEqual({ x: 50, y: 50 });
+    });
+
+    it('should return safe YouTube URL', () => {
+        const url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        const safeUrl = component.getSafeUrl(url);
+        expect(safeUrl).toBeTruthy();
+    });
+
+    // ── Image Gallery ─────────────────────────────────────────────────────────
+
+    it('should populate allImages with main image and additional images', () => {
+        expect(component.allImages()).toEqual(['headphones.jpg', 'img1.jpg', 'img2.jpg']);
+    });
+
+    it('should increment currentImageIndex when nextImage is called', () => {
+        component.nextImage();
+        expect(component.currentImageIndex()).toBe(1);
+        component.nextImage();
+        expect(component.currentImageIndex()).toBe(2);
+        component.nextImage(); // should wrap around
+        expect(component.currentImageIndex()).toBe(0);
+    });
+
+    it('should decrement currentImageIndex when prevImage is called', () => {
+        component.currentImageIndex.set(0);
+        component.prevImage(); // should wrap to the end
+        expect(component.currentImageIndex()).toBe(2);
+        component.prevImage();
+        expect(component.currentImageIndex()).toBe(1);
+    });
+
+    it('should set currentImageIndex when setCurrentImage is called', () => {
+        component.setCurrentImage(1);
+        expect(component.currentImageIndex()).toBe(1);
     });
 });
